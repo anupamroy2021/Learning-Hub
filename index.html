@@ -698,55 +698,92 @@ justify-content:center;
 <body class="dark">
 
 <header>
-    <div style="display:flex; align-items:center; gap:8px;">
-	<button class="menu-toggle"
-id="hamburger"
-onclick="toggleSidebar()"
-style="position:relative; z-index:10000;">
-☰
-</button>
 
-        <div class="logo" onclick="showDashboard()">⚡ <span>LEARNING HUB</span></div>
+<!-- LEFT SIDE -->
+<div style="display:flex; align-items:center; gap:8px;">
+
+    <!-- Ebook PDF Back -->
+    <button id="ebookBackBtn"
+    class="btn btn-outline"
+    onclick="handleEbookBack()"
+    style="display:none;">
+    ←
+    </button>
+
+    <!-- Sidebar Toggle -->
+    <button class="menu-toggle"
+    id="hamburger"
+    onclick="toggleSidebar()"
+    style="position:relative; z-index:10000;">
+    ☰
+    </button>
+
+    <!-- Logo -->
+    <div class="logo" onclick="showDashboard()">
+        ⚡ <span>LEARNING HUB</span>
     </div>
-    <div class="header-actions">
-        <button class="btn btn-outline edit-action" id="lockBtn" onclick="toggleDraggable()" style="display: none;" title="Toggle Drag Lock">
-            <span id="lockIcon">🔒</span> <b id="lockText">Locked</b>
+
+</div>
+
+<!-- RIGHT SIDE -->
+<div class="header-actions">
+
+    <button class="btn btn-outline edit-action"
+    id="lockBtn"
+    onclick="toggleDraggable()"
+    style="display: none;"
+    title="Toggle Drag Lock">
+    <span id="lockIcon">🔒</span>
+    <b id="lockText">Locked</b>
+    </button>
+
+    <button class="btn edit-action"
+    id="headerNewBtn"
+    onclick="openEditor()"
+    style="display: none;"
+    title="Shortcut: Ctrl+N">
+    <b>+</b> <span>New Entry</span>
+    </button>
+
+    <div id="dashboardControls">
+
+        <button class="btn btn-outline"
+        onclick="toggleTheme()"
+        title="Toggle Theme">
+        🌓
         </button>
 
-        <button class="btn edit-action" id="headerNewBtn" onclick="openEditor()" style="display: none;" title="Shortcut: Ctrl+N">
-            <b>+</b> <span>New Entry</span>
+        <input type="file" id="importFile" hidden accept=".json">
+
+        <button class="btn btn-outline"
+        onclick="document.getElementById('importFile').click()"
+        title="Import JSON">
+        📥 <span>Import</span>
         </button>
-		
-		<div id="dashboardControls">
-			<button class="btn btn-outline" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
 
-			<input type="file" id="importFile" hidden accept=".json">
+        <button class="btn"
+        onclick="exportData()"
+        title="Export JSON">
+        📤 <span>Export</span>
+        </button>
 
-			<button class="btn btn-outline"
-				onclick="document.getElementById('importFile').click()"
-				title="Import JSON">
-				📥 <span>Import</span>
-			</button>
+        <button class="btn btn-outline"
+        id="readModeBtn"
+        onclick="toggleReadMode()"
+        title="Toggle Reading Mode">
+        📖 <span>Reading Mode</span>
+        </button>
 
-			<button class="btn"
-				onclick="exportData()"
-				title="Export JSON">
-				📤 <span>Export</span>
-			</button>
-			<button class="btn btn-outline"
-				id="readModeBtn"
-				onclick="toggleReadMode()"
-				title="Toggle Reading Mode">
-				📖 <span>Reading Mode</span>
-			</button>
-			<button class="btn"
-onclick="openEbookPage()"
-title="Ebook Library">
-📚 <span>E-Books</span>
-</button>
-		</div>
-		
+        <button class="btn"
+        onclick="openEbookPage()"
+        title="Ebook Library">
+        📚 <span>E-Books</span>
+        </button>
+
     </div>
+
+</div>
+
 </header>
 	<div id="pdfProgressBox"
 		style="
@@ -908,24 +945,22 @@ style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
     background:rgba(0,0,0,0.85);
     z-index:9999;
     ">
-
-        <button onclick="closePdfViewer()"
-        style="
-        position:absolute;
-        top:20px;
-        right:20px;
-        z-index:10000;
-        background:var(--danger);
-        color:white;
-        border:none;
-        padding:8px 16px;
-        border-radius:6px;
-        cursor:pointer;
-        font-size:14px;
-        ">
-        ✖ Close
-        </button>
-
+<button onclick="goBackToEbooks()"
+style="
+position:absolute;
+top:20px;
+left:20px;
+z-index:10000;
+background:var(--primary);
+color:white;
+border:none;
+padding:8px 16px;
+border-radius:6px;
+cursor:pointer;
+font-size:14px;
+">
+← Back to E-Books
+</button>
         <iframe id="pdfViewer"
         style="
         width:100%;
@@ -1417,16 +1452,6 @@ ${pasted}
     }
 
 });
-function closePdfViewer(){
-
-    const viewerBox = document.getElementById("pdfViewerBox");
-    const viewer = document.getElementById("pdfViewer");
-
-    viewer.src = "";
-    viewerBox.style.display = "none";
-
-    document.body.style.overflow = "auto";   // enable scroll back
-}
 function toggleDeleteMode(){
 
     isDeleteMode = !isDeleteMode;
@@ -1475,6 +1500,25 @@ function addBookPrompt(){
     localStorage.setItem("ebooks_db",JSON.stringify(ebooks));
 
     renderEbooks();
+}
+function handleEbookBack(){
+
+    const viewerBox = document.getElementById("pdfViewerBox");
+
+    // ⭐ IF PDF IS OPEN → GO BACK TO EBOOK PAGE
+    if(viewerBox.style.display === "block"){
+
+        const viewer = document.getElementById("pdfViewer");
+
+        viewer.src = "";
+        viewerBox.style.display = "none";
+        document.body.style.overflow = "auto";
+
+        // ⭐ HIDE BACK BUTTON AFTER RETURNING
+        document.getElementById('ebookBackBtn').style.display='none';
+
+        return;
+    }
 }
 function convertDriveLink(link){
 
@@ -1645,7 +1689,10 @@ function openBook(link){
     viewerBox.style.display = "block";
     viewer.src = link;
 
-    document.body.style.overflow = "hidden";   // disable background scroll
+    document.body.style.overflow = "hidden";
+
+    // ⭐ SHOW BACK BUTTON ONLY WHEN PDF OPENS
+    document.getElementById('ebookBackBtn').style.display='block';
 }
 let isFullScreenEditor = false;
 
@@ -1925,23 +1972,27 @@ function looksLikeDiagram(code){
     }
 
 	function showDashboard() {
-		currentModule = null;
-		currentSubmodule = null;
 
-		document.getElementById('dashboardView').style.display = 'block';
-		document.getElementById('submoduleView').style.display = 'none';
-		document.getElementById('moduleWorkspace').style.display = 'none';
-		document.getElementById('ebookView').style.display='none';
+    currentModule = null;
+    currentSubmodule = null;
 
-		document.getElementById('hamburger').style.display = 'none';
-		document.getElementById('headerNewBtn').style.display = 'none';
-		document.getElementById('lockBtn').style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+    document.getElementById('submoduleView').style.display = 'none';
+    document.getElementById('moduleWorkspace').style.display = 'none';
+    document.getElementById('ebookView').style.display='none';
 
-		document.getElementById('dashboardControls').style.display = 'flex';  // ⭐ ADD THIS
-		
-		renderDashboard();
-		document.getElementById('scrollToggleBtn').style.display = 'none';
-	}
+    document.getElementById('hamburger').style.display = 'none';
+    document.getElementById('headerNewBtn').style.display = 'none';
+    document.getElementById('lockBtn').style.display = 'none';
+
+    document.getElementById('dashboardControls').style.display = 'flex';
+
+    // ⭐ HIDE EBOOK BACK BUTTON
+    document.getElementById('ebookBackBtn').style.display = 'none';
+
+    renderDashboard();
+    document.getElementById('scrollToggleBtn').style.display = 'none';
+}
 	
 	function goBackToDashboard(){
 
@@ -3412,4 +3463,3 @@ Add Book
 </div>
 </body>
 </html>
-
