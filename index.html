@@ -622,6 +622,77 @@ display:table-cell !important;
     filter: grayscale(80%);
     border:1px dashed var(--border);
 }
+.ebook-grid{
+
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+gap:20px;
+
+}
+@media(max-width:900px){
+
+.ebook-grid{
+
+grid-template-columns:repeat(3,1fr);
+
+}
+
+}
+@media(max-width:600px){
+
+.ebook-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+@media(max-width:400px){
+
+.ebook-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+.ebook-card{
+
+background:var(--card);
+padding:15px;
+border-radius:16px;
+border:1px solid var(--border);
+cursor:pointer;
+transition:0.2s;
+text-align:center;
+
+}
+.ebook-card:hover{
+
+transform:translateY(-4px);
+border-color:var(--primary);
+
+}
+@media(max-width:600px){
+
+#ebookView .btn span{
+
+display:none;
+
+}
+
+#ebookView .btn{
+
+min-width:40px;
+height:40px;
+padding:8px;
+display:flex;
+align-items:center;
+justify-content:center;
+
+}
+
+}
     </style>
 </head>
 <body class="dark">
@@ -662,6 +733,11 @@ display:table-cell !important;
 				title="Toggle Reading Mode">
 				📖 <span>Reading Mode</span>
 			</button>
+			<button class="btn"
+onclick="openEbookPage()"
+title="Ebook Library">
+📚 <span>E-Books</span>
+</button>
 		</div>
 		
     </div>
@@ -777,6 +853,85 @@ Cancel Export
 
 <div id="moduleGrid" class="grid"></div>
 </div>
+<!-- ================= EBOOK PAGE ================= -->
+<!-- ================= EBOOK PAGE ================= -->
+
+<div id="ebookView"
+style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
+
+    <!-- HEADER -->
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+
+        <button class="btn btn-outline"
+        onclick="showDashboard()">
+        ←
+        </button>
+
+        <h1 style="margin:0; color:var(--primary);">
+        📚 E-Books
+        </h1>
+
+        <div style="margin-left:auto; display:flex; gap:8px;">
+
+            <button class="btn"
+			onclick="openAddBookModal()">
+			➕ <span>Add Book</span>
+			</button>
+
+            <button class="btn btn-outline"
+			id="deleteBooksBtn"
+			onclick="toggleDeleteMode()">
+			🗑 <span>Delete Books</span>
+			</button>
+
+        </div>
+
+    </div>
+
+    <!-- ⭐ MOVE THIS INSIDE -->
+	<div id="ebookGrid" class="ebook-grid"></div>
+    <!-- ⭐ MOVE THIS INSIDE -->
+    <div id="pdfViewerBox"
+    style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:rgba(0,0,0,0.85);
+    z-index:9999;
+    ">
+
+        <button onclick="closePdfViewer()"
+        style="
+        position:absolute;
+        top:20px;
+        right:20px;
+        z-index:10000;
+        background:var(--danger);
+        color:white;
+        border:none;
+        padding:8px 16px;
+        border-radius:6px;
+        cursor:pointer;
+        font-size:14px;
+        ">
+        ✖ Close
+        </button>
+
+        <iframe id="pdfViewer"
+        style="
+        width:100%;
+        height:100%;
+        border:none;
+        background:white;
+        ">
+        </iframe>
+
+    </div>
+
+</div>
 
 <div id="submoduleView">
 
@@ -853,7 +1008,7 @@ Cancel Export
 
 
 <div id="moduleWorkspace" style="display:none;">
-<aside class="sidebar collapsed" id="sidebar">
+    <aside class="sidebar collapsed" id="sidebar">
     <div style="margin-bottom:10px;">
         
         <button class="btn btn-outline"
@@ -998,6 +1153,7 @@ Cancel Export
 <script>
     // Updated data structure: { moduleName: { subModuleName: [ {id, q, subtopic, a}, ... ], ... }, ... }
     let data = JSON.parse(localStorage.getItem("devmaster_db_v7")) || { "Getting Started": {} };
+	let ebooks = JSON.parse(localStorage.getItem("ebooks_db")) || [];
     let currentModule = null;
     let currentSubmodule = null;
     let editId = null;
@@ -1012,6 +1168,8 @@ Cancel Export
     let moduleCurrentMatchIndex = -1;
 	let globalSearchMatches = [];
     let globalCurrentMatchIndex = -1;
+	let isDeleteMode = false;
+   let selectedBooks = new Set();
     const save = () => { localStorage.setItem("devmaster_db_v7", JSON.stringify(data)); };
 	
 	function wrapSelection(textarea, before, after = before) {
@@ -1253,7 +1411,236 @@ ${pasted}
     }
 
 });
+function closePdfViewer(){
 
+    const viewerBox = document.getElementById("pdfViewerBox");
+    const viewer = document.getElementById("pdfViewer");
+
+    viewer.src = "";
+    viewerBox.style.display = "none";
+
+    document.body.style.overflow = "auto";   // enable scroll back
+}
+function toggleDeleteMode(){
+
+    isDeleteMode = !isDeleteMode;
+selectedBooks = new Set();
+    const btn = document.getElementById("deleteBooksBtn");
+
+    if(isDeleteMode){
+        btn.innerHTML = "❌ <span>Cancel Delete</span>";
+        btn.classList.remove("btn-outline");
+    }
+    else{
+        btn.innerHTML = "🗑 <span>Delete Books</span>";
+        btn.classList.add("btn-outline");
+    }
+
+    renderEbooks();
+}
+function openEbookPage(){
+
+    document.getElementById('dashboardView').style.display='none';
+    document.getElementById('submoduleView').style.display='none';
+    document.getElementById('moduleWorkspace').style.display='none';
+    document.getElementById('ebookView').style.display='block';
+
+    document.getElementById('dashboardControls').style.display='none';
+
+    renderEbooks();
+}
+function addBookPrompt(){
+
+    let title = prompt("Enter Book Title:");
+    if(!title) return;
+
+    let link = prompt("Paste Google Drive PDF Link:");
+    if(!link) return;
+
+    // Convert drive link to embed
+    let embedLink = convertDriveLink(link);
+
+    ebooks.push({
+        id: Date.now(),
+        title: title,
+        link: embedLink
+    });
+
+    localStorage.setItem("ebooks_db",JSON.stringify(ebooks));
+
+    renderEbooks();
+}
+function convertDriveLink(link){
+
+    // Example:
+    // https://drive.google.com/file/d/FILEID/view?usp=sharing
+
+    let fileIdMatch = link.match(/\/d\/(.*?)\//);
+
+    if(fileIdMatch){
+        return "https://drive.google.com/file/d/" +
+        fileIdMatch[1] +
+        "/preview";
+    }
+
+    return link;
+}
+function renderEbooks(){
+
+    const grid = document.getElementById("ebookGrid");
+    grid.innerHTML = "";
+
+    ebooks.forEach(book=>{
+
+        const card = document.createElement("div");
+		card.className="ebook-card";
+        card.style.position="relative";
+
+        let checkboxHTML = "";
+
+        if(isDeleteMode){
+
+            checkboxHTML = `
+            <input type="checkbox"
+${selectedBooks.has(book.id) ? "checked" : ""}
+onchange="selectBook(${book.id}, this)"
+            style="
+            position:absolute;
+            top:10px;
+            right:10px;
+            width:18px;
+            height:18px;
+            ">
+            `;
+        }
+
+        card.innerHTML = `
+${checkboxHTML}
+
+<div style="
+width:100%;
+aspect-ratio:3/4;
+border-radius:10px;
+overflow:hidden;
+margin-bottom:10px;
+background:#111;
+">
+
+<img
+src="${getDriveThumbnail(book.link)}"
+style="
+width:100%;
+height:100%;
+object-fit:cover;
+">
+</div>
+
+<h3 style="font-size:14px; margin:0;">
+📘 ${book.title}
+</h3>
+
+<small style="opacity:0.6;">
+${book.author || ""}
+</small>
+`;
+
+        if(!isDeleteMode){
+            card.onclick = ()=>{
+                openBook(book.link);
+            }
+        }
+
+        grid.appendChild(card);
+    });
+
+    // ⭐ Add Delete Selected Button
+    if(isDeleteMode && selectedBooks.size > 0){
+
+        const delBtn = document.createElement("button");
+
+        delBtn.className="btn";
+        delBtn.style.marginTop="15px";
+
+        delBtn.innerText =
+        "Delete Selected ("+selectedBooks.size+")";
+
+        delBtn.onclick = deleteSelectedBooks;
+
+        grid.appendChild(delBtn);
+    }
+}
+function getDriveThumbnail(link){
+
+    let match = link.match(/\/d\/(.*?)\//);
+
+    if(match){
+        return "https://drive.google.com/thumbnail?id=" +
+        match[1] +
+        "&sz=w400";
+    }
+
+    return "";
+}
+function selectBook(id, checkbox){
+
+    if(checkbox.checked){
+        selectedBooks.add(id);      // ⭐ SET ADD
+    }
+    else{
+        selectedBooks.delete(id);   // ⭐ SET REMOVE
+    }
+
+    renderEbooks();
+}
+function deleteSelectedBooks(){
+
+    if(!confirm("Delete selected books?")) return;
+
+    ebooks =
+    ebooks.filter(book =>
+		!selectedBooks.has(book.id)
+    );
+
+    localStorage.setItem(
+        "ebooks_db",
+        JSON.stringify(ebooks)
+    );
+
+selectedBooks = new Set();
+    isDeleteMode = false;
+
+    document.getElementById("deleteBooksBtn")
+    .innerHTML = "🗑 Delete Books";
+
+    renderEbooks();
+}
+function deleteBook(id, e){
+
+    e.stopPropagation();   // VERY IMPORTANT
+    // prevents opening pdf when clicking delete
+
+    if(confirm("Delete this book?")){
+
+        ebooks = ebooks.filter(book => book.id !== id);
+
+        localStorage.setItem(
+            "ebooks_db",
+            JSON.stringify(ebooks)
+        );
+
+        renderEbooks();
+    }
+}
+function openBook(link){
+
+    const viewerBox = document.getElementById("pdfViewerBox");
+    const viewer = document.getElementById("pdfViewer");
+
+    viewerBox.style.display = "block";
+    viewer.src = link;
+
+    document.body.style.overflow = "hidden";   // disable background scroll
+}
 let isFullScreenEditor = false;
 
 function toggleFullEditor(){
@@ -1525,6 +1912,7 @@ function looksLikeDiagram(code){
 		document.getElementById('dashboardView').style.display = 'block';
 		document.getElementById('submoduleView').style.display = 'none';
 		document.getElementById('moduleWorkspace').style.display = 'none';
+		document.getElementById('ebookView').style.display='none';
 
 		document.getElementById('hamburger').style.display = 'none';
 		document.getElementById('headerNewBtn').style.display = 'none';
@@ -1602,6 +1990,7 @@ function openSubmodule(name) {
     document.getElementById('hamburger').style.display = 'block';
     document.getElementById('headerNewBtn').style.display = 'block';
     document.getElementById('lockBtn').style.display = 'block';
+
     showListView(); 
     renderSidebarIndex(); 
     renderQuestions();
@@ -2058,17 +2447,55 @@ if(sub){
             "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
     }
 
-    function exportData() {
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob); a.download = "backup.json"; a.click();
-    }
+   function exportData() {
+
+    const backup = {
+
+        learning_data : data,
+        ebook_data : ebooks
+
+    };
+
+    const blob = new Blob(
+        [JSON.stringify(backup, null, 2)],
+        { type: "application/json" }
+    );
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "learninghub_backup.json";
+    a.click();
+}
 
     document.getElementById('importFile').onchange = (e) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => { data = JSON.parse(ev.target.result); save(); renderDashboard(); };
-        reader.readAsText(e.target.files[0]);
+
+    const reader = new FileReader();
+
+    reader.onload = (ev) => {
+
+        const imported = JSON.parse(ev.target.result);
+
+        // 📘 Learning Data
+        if(imported.learning_data){
+            data = imported.learning_data;
+        }
+
+        // 📚 Ebook Data
+        if(imported.ebook_data){
+            ebooks = imported.ebook_data;
+        }
+
+        localStorage.setItem("devmaster_db_v7",JSON.stringify(data));
+        localStorage.setItem("ebooks_db",JSON.stringify(ebooks));
+
+        renderDashboard();
+        renderEbooks();
+
+        alert("Backup Restored Successfully!");
     };
+
+    reader.readAsText(e.target.files[0]);
+};
 	// Helper to highlight text
 	function highlightText(text, query) {
 		if (!query) return text;
@@ -2631,6 +3058,53 @@ function updatePDFProgress(percent){
     document.getElementById("pdfProgressBar").style.width = percent + "%";
     document.getElementById("pdfProgressText").innerText = percent + "%";
 }
+function openAddBookModal(){
+
+    document.getElementById("addBookModal")
+    .style.display = "flex";
+
+    document.getElementById("bookTitleInput").value = "";
+	document.getElementById("bookAuthorInput").value = "";
+	document.getElementById("bookLinkInput").value = "";
+}
+function closeAddBookModal(){
+
+    document.getElementById("addBookModal")
+    .style.display = "none";
+}
+function saveBookFromModal(){
+
+    let title =
+    document.getElementById("bookTitleInput").value.trim();
+
+    let author =
+    document.getElementById("bookAuthorInput").value.trim();
+
+    let link =
+    document.getElementById("bookLinkInput").value.trim();
+
+    if(!title || !link){
+        alert("Title & Link required!");
+        return;
+    }
+
+    let embedLink = convertDriveLink(link);
+
+    ebooks.push({
+        id: Date.now(),
+        title: title,
+        author: author,
+        link: embedLink
+    });
+
+    localStorage.setItem(
+        "ebooks_db",
+        JSON.stringify(ebooks)
+    );
+
+    closeAddBookModal();
+    renderEbooks();
+}
 	
 	
 let cancelPDFExport = false;
@@ -2860,7 +3334,63 @@ let cancelPDFExport = false;
     document.body.style.cursor = "default";
 }
 </script>
+<!-- ================= ADD BOOK MODAL ================= -->
+
+<div id="addBookModal"
+style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:rgba(0,0,0,0.5);
+z-index:9999;
+justify-content:center;
+align-items:center;
+">
+
+<div style="
+background:var(--card);
+padding:25px;
+border-radius:12px;
+width:350px;
+border:1px solid var(--border);
+display:flex;
+flex-direction:column;
+gap:12px;
+">
+
+<h3 style="margin-bottom:5px;">📚 Add New Ebook</h3>
+
+<input id="bookTitleInput"
+placeholder="Book Title">
+
+<input id="bookAuthorInput"
+placeholder="Author Name">
+
+<input id="bookLinkInput"
+placeholder="Google Drive PDF Link">
+
+<div style="display:flex; gap:10px; margin-top:10px;">
+
+<button class="btn btn-outline"
+style="flex:1"
+onclick="closeAddBookModal()">
+Cancel
+</button>
+
+<button class="btn"
+style="flex:2"
+onclick="saveBookFromModal()">
+Add Book
+</button>
+
+</div>
+
+</div>
+
+</div>
+</body>
 </html>
 
-
-</body>
