@@ -853,8 +853,7 @@ Cancel Export
 
 
 <div id="moduleWorkspace" style="display:none;">
-    <aside class="sidebar" id="sidebar">
-
+<aside class="sidebar collapsed" id="sidebar">
     <div style="margin-bottom:10px;">
         
         <button class="btn btn-outline"
@@ -1603,8 +1602,6 @@ function openSubmodule(name) {
     document.getElementById('hamburger').style.display = 'block';
     document.getElementById('headerNewBtn').style.display = 'block';
     document.getElementById('lockBtn').style.display = 'block';
-    document.getElementById('sidebar').classList.remove('collapsed', 'active');
-
     showListView(); 
     renderSidebarIndex(); 
     renderQuestions();
@@ -2864,5 +2861,6 @@ let cancelPDFExport = false;
 }
 </script>
 </html>
+
 
 </body>
