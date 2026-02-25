@@ -326,7 +326,7 @@ display:table-cell !important;
 
         header { 
             display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; 
-            background: var(--card); border-bottom: 1px solid var(--border); z-index: 1000;
+            background: var(--card); border-bottom: 1px solid var(--border); z-index: 10001;
             height: 60px; gap: 8px;
         }
         .logo { font-weight: 800; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; flex-shrink: 0; }
@@ -489,7 +489,7 @@ display:table-cell !important;
         .overlay.active { display: block; }
 
         @media (max-width: 850px) {
-            .sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); width: 280px; opacity: 1; pointer-events: all; }
+            .sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); width: 280px; opacity: 1; pointer-events: all;z-index:10000; }
             .sidebar.active { transform: translateX(0); }
             .editor-container { grid-template-columns: 1fr; }
             .preview-box { display: none; }
@@ -699,7 +699,13 @@ justify-content:center;
 
 <header>
     <div style="display:flex; align-items:center; gap:8px;">
-        <button class="menu-toggle" id="hamburger" onclick="toggleSidebar()" style="display:none;">☰</button>
+	<button class="menu-toggle"
+id="hamburger"
+onclick="toggleSidebar()"
+style="position:relative; z-index:10000;">
+☰
+</button>
+
         <div class="logo" onclick="showDashboard()">⚡ <span>LEARNING HUB</span></div>
     </div>
     <div class="header-actions">
@@ -1877,11 +1883,24 @@ function looksLikeDiagram(code){
 }
 
     function toggleSidebar() {
-        const sb = document.getElementById('sidebar');
-        const ov = document.getElementById('overlay');
-        if (window.innerWidth > 850) { sb.classList.toggle('collapsed'); } 
-        else { sb.classList.toggle('active'); ov.classList.toggle('active'); }
+
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+
+    if (window.innerWidth > 850) {
+
+        sb.classList.toggle('collapsed');
+
+    } 
+    else {
+
+        // ⭐ REMOVE DESKTOP COLLAPSE FIRST
+        sb.classList.remove('collapsed');
+
+        sb.classList.toggle('active');
+        ov.classList.toggle('active');
     }
+}
 
     function toggleDraggable() {
 	if(isReadOnlyMode){
