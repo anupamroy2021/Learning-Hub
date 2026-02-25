@@ -1,0 +1,2868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Hub</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="https://unpkg.com/lucide@latest"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.plugin.html.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <link id="prism-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #f8fafc; --text: #1e293b; --card: #ffffff; --sidebar: #f1f5f9;
+            --primary: #2563eb; --border: #cbd5e1; --accent: #6366f1; --danger: #ef4444;
+            --md-bg: #ffffff;
+			--highlight: #facc15;
+        }
+        .dark {
+            --bg: #0d1117; 
+            --text: #e6edf3; --card: #161b22; --sidebar: #010409;
+            --primary: #2f81f7; --border: #30363d;
+            --md-bg: #0d1117;
+			--highlight: #f59e0b;
+        }
+		.highlighted {
+            background-color: var(--highlight);
+            color: #000 !important;
+            padding: 0 2px;
+            border-radius: 2px;
+            font-weight: 600;
+            display: inline-block;
+        }
+		h2{
+    color:#2563eb;
+    margin-top:20px;
+}
+pre code{
+    font-family:'Fira Code';
+    font-size:12px;
+}
+blockquote{
+    border-left:4px solid #6366f1;
+    padding-left:10px;
+    color:#555;
+}
+/* ================= PDF EXPORT STYLING ================= */
+
+.pdf-wrapper{
+    padding:40px;
+    font-family: Inter;
+    background:white;
+    color:#111;
+}
+
+.pdf-wrapper h1{
+    font-size:24px;
+    margin-bottom:10px;
+}
+
+.pdf-wrapper h2{
+    color:#2563eb;
+    margin-top:25px;
+}
+
+.pdf-wrapper table{
+    width:100%;
+    border-collapse:collapse;
+    margin:20px 0;
+}
+
+.pdf-wrapper table th{
+    background:#2563eb;
+    color:white;
+    padding:8px;
+}
+
+.pdf-wrapper table td{
+    border:1px solid #ccc;
+    padding:8px;
+}
+
+.pdf-wrapper pre{
+    background:#0d1117;
+    color:#e6edf3;
+    padding:12px;
+    border-radius:8px;
+    overflow-x:auto;
+}
+
+.pdf-wrapper blockquote{
+    border-left:4px solid #6366f1;
+    padding-left:10px;
+    color:#555;
+    margin:10px 0;
+}
+/* ================= PDF FIX ================= */
+
+.pdf-export{
+    background:white !important;
+    color:#111 !important;
+}
+
+.pdf-export *{
+    color:#111 !important;
+}
+
+.pdf-export pre{
+    background:#f6f8fa !important;
+    color:#24292f !important;
+}
+
+.pdf-export code{
+    background:#f6f8fa !important;
+    color:#d63384 !important;
+}
+
+.pdf-export table th{
+    background:#2563eb !important;
+    color:white !important;
+}
+
+.pdf-export blockquote{
+    color:#555 !important;
+}
+
+.pdf-export .token.comment{color:#6a737d !important;}
+.pdf-export .token.keyword{color:#d73a49 !important;}
+.pdf-export .token.string{color:#032f62 !important;}
+.pdf-export .token.function{color:#6f42c1 !important;}
+.pdf-export .token.number{color:#005cc5 !important;}
+.pdf-text{
+    font-family:Helvetica;
+    font-size:10px;
+    line-height:1.5;
+    color:#000;
+}
+
+.pdf-text h1{font-size:20px;}
+.pdf-text h2{font-size:16px;color:#2563eb;}
+.pdf-text h3{font-size:14px;}
+
+.pdf-text table{
+    width:100%;
+    border-collapse:collapse;
+    margin:10px 0;
+}
+
+.pdf-text table th{
+    background:#2563eb;
+    color:white;
+    padding:5px;
+}
+
+.pdf-text table td{
+    border:1px solid #ccc;
+    padding:5px;
+}
+
+.pdf-text pre{
+    background:#f6f8fa;
+    padding:8px;
+    border-radius:4px;
+    white-space:pre-wrap;
+    font-family:Courier;
+}
+.pdf-print{
+    display:block;
+    width:520px;
+    font-family:Helvetica;
+    font-size:10px;
+    line-height:1.5;
+    color:#000;
+}
+
+.pdf-print div,
+.pdf-print p,
+.pdf-print span,
+.pdf-print h1,
+.pdf-print h2,
+.pdf-print h3{
+    position:static !important;
+    float:none !important;
+}
+
+.pdf-print table{
+    display:table !important;
+    width:100%;
+    border-collapse:collapse;
+    margin:10px 0;
+}
+
+.pdf-print table tr{
+    display:table-row !important;
+}
+
+.pdf-print table th,
+.pdf-print table td{
+    display:table-cell !important;
+    border:1px solid #ccc;
+    padding:6px;
+text-align:left;
+font-weight:bold;
+background:#2563eb !important;
+color:white !important;
+display:table-cell !important;
+}
+
+.pdf-print pre{
+    white-space:pre-wrap;
+    word-break:break-word;
+    background:#f6f8fa;
+    padding:8px;
+}
+
+.pdf-print h1{
+    font-size:20px;
+    margin-bottom:10px;
+}
+
+.pdf-print h2{
+    font-size:14px;
+    color:#2563eb;
+    margin-top:20px;
+}
+
+.pdf-print p{
+    margin:5px 0;
+}
+
+.pdf-print table{
+    width:100%;
+    border-collapse:collapse;
+    margin:10px 0;
+}
+
+.pdf-print table th{
+    background:#2563eb;
+    color:#fff;
+    padding:5px;
+}
+
+.pdf-print table td{
+    border:1px solid #ccc;
+    padding:5px;
+}
+
+.pdf-print pre{
+    background:#f6f8fa;
+    padding:8px;
+    white-space:pre-wrap;
+    overflow-wrap:break-word;
+}
+
+.pdf-print blockquote{
+    border-left:4px solid #6366f1;
+    padding-left:8px;
+    color:#555;
+}
+.pdf-entry{
+    page-break-inside:avoid !important;
+    break-inside:avoid !important;
+    margin-bottom:20px;
+}
+
+.pdf-entry h2{
+    margin-top:10px;
+}
+.pdf-hidden-render{
+    position:absolute;
+    top:0;
+    left:-9999px;   /* move left only */
+}
+		.icon-btn {
+			background: none;
+			border: 1px solid var(--border);
+			color: var(--text);
+			padding: 4px 6px;
+			border-radius: 6px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.icon-btn svg {
+			width: 14px;
+			height: 14px;
+		}
+
+		.icon-btn:hover {
+			background: var(--primary);
+			color: white;
+			border-color: var(--primary);
+		}
+
+		.delete-btn:hover {
+			background: var(--danger);
+			border-color: var(--danger);
+		}
+		.collapse-icon {
+			cursor: pointer;
+			margin-right: 5px;
+			font-size: 12px;
+			user-select: none;
+		}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.3s; }
+
+        header { 
+            display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; 
+            background: var(--card); border-bottom: 1px solid var(--border); z-index: 1000;
+            height: 60px; gap: 8px;
+        }
+        .logo { font-weight: 800; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; flex-shrink: 0; }
+        .header-actions { display: flex; gap: 6px; align-items: center; }
+        
+        .menu-toggle { 
+            display: none; background: #2563eb1a; border: 1px solid var(--primary); 
+            font-size: 1.2rem; color: var(--primary); cursor: pointer; 
+            padding: 5px 10px; border-radius: 6px; 
+        }
+
+        /* Responsive UI Fixes */
+        @media (max-width: 650px) {
+            .btn span { display: none; }
+            .btn { padding: 10px; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
+            #lockBtn b { display: none; } /* Hide "Locked/Unlocked" text on mobile */
+            .logo span { display: none; }
+            .menu-toggle { display: block; }
+            .header-actions-mobile {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-end;
+            }
+            .header-actions-mobile button {
+                margin-left: 0;
+            }
+        }
+		@media (max-width: 600px) {
+            #submoduleView h1 { font-size: 1.2rem; }
+}
+
+        #dashboardView { flex: 1; overflow-y: auto; padding: 1.5rem; max-width: 1200px; width: 100%; }
+        #submoduleView { flex: 1; overflow-y: auto; padding: 1.5rem; max-width: 1200px; width: 100%; display: none; }
+		#dashboardView,
+#submoduleView {
+    width: 100%;
+    max-width: none;
+    padding: 1.5rem 2rem;
+    overflow-y: auto;
+}
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+
+        #moduleWorkspace { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+        .sidebar { 
+            width: 300px; background: var(--sidebar); border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; padding: 1rem; overflow-y: auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200;
+        }
+        .sidebar.collapsed { width: 0; padding: 0; border: none; overflow: hidden; opacity: 0; pointer-events: none; }
+
+        /* Draggable Styles */
+        .index-group { 
+            margin-bottom: 15px; min-width: 240px; background: var(--bg); 
+            border: 1px solid transparent; border-radius: 8px; padding-bottom: 5px;
+        }
+        .index-group:hover { border-color: var(--border); }
+        .index-group-header { 
+            cursor: grab; display: flex; align-items: center; padding: 5px;
+        }
+        .subtopic-label { 
+            font-size: 0.75rem; font-weight: 800; color: var(--accent); 
+            text-transform: uppercase; letter-spacing: 1px; flex: 1; pointer-events: none;
+        }
+        .drag-handle { cursor: grab; opacity: 0.3; margin-right: 8px; font-size: 12px; }
+        .drag-handle:hover { opacity: 1; }
+        .sortable-ghost { opacity: 0.4; background: var(--primary); }
+        .sortable-drag { cursor: grabbing; }
+
+        /* Lock Visual Feedback */
+        .drag-locked .drag-handle { cursor: default; opacity: 0.05; }
+        .drag-locked .index-group-header { cursor: default; }
+
+        .group-list-container { min-height: 10px; }
+
+        .nav-btn {
+            width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; 
+            cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.9rem; margin-bottom: 2px;
+            display: flex; gap: 8px; align-items: center;
+        }
+        .nav-btn:hover { background: var(--card); color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        .search-container { width: 100%; margin-bottom: 30px; }
+        #search { 
+            width: 100%; padding: 12px 18px; font-size: 1rem; border-radius: 12px; 
+            border: 2px solid var(--border); background: var(--card); color: var(--text); outline: none;
+        }
+
+        .content-area { flex: 1; overflow-y: auto; padding: 1rem; position: relative; scroll-behavior: smooth; }
+        .section-separator {
+            margin: 30px 0 15px 0; padding-bottom: 8px; border-bottom: 2px solid var(--border);
+            color: var(--primary); font-size: 1.2rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1px; display: flex; align-items: center; gap: 10px;
+        }
+		/* Container to hold input and clear button */
+		.search-wrapper {
+			position: relative;
+			width: 100%;
+		}
+
+		/* Position the clear button */
+		.clear-search {
+			position: absolute;
+			right: 15px;
+			top: 50%;
+			transform: translateY(-50%);
+			background: none;
+			border: none;
+			color: var(--text);
+			cursor: pointer;
+			font-size: 1.2rem;
+			opacity: 0.5;
+			display: none; /* Hidden by default */
+			z-index: 10;
+		}
+
+		.clear-search:hover {
+			opacity: 1;
+			color: var(--danger);
+		}
+		#dashboardControls{
+			display:flex;
+			gap:6px;
+			align-items:center;
+		}
+		.module-search-box {
+			margin-top: 20px;
+		}
+
+		/* Adjust search padding so text doesn't hide behind the X */
+		#globalSearch {
+			padding-right: 45px; 
+		}
+
+        .markdown-body { background-color: transparent !important; color: var(--text) !important; font-size: 14px; }
+        .markdown-body table { background-color: var(--card) !important; color: var(--text) !important; margin-bottom: 16px; border-collapse: collapse; }
+        .markdown-body table tr { background-color: var(--card) !important; border-top: 1px solid var(--border); }
+        .markdown-body table tr:nth-child(2n) { background-color: var(--bg) !important; }
+        .markdown-body table th, .markdown-body table td { border: 1px solid var(--border); padding: 6px 13px; }
+        code[class*="language-"], pre[class*="language-"] { font-family: 'Fira Code', monospace !important; font-size: 13px !important; }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); z-index: 150; }
+        .overlay.active { display: block; }
+
+        @media (max-width: 850px) {
+            .sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); width: 280px; opacity: 1; pointer-events: all; }
+            .sidebar.active { transform: translateX(0); }
+            .editor-container { grid-template-columns: 1fr; }
+            .preview-box { display: none; }
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+        .module-card { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); cursor: pointer; text-align: center; transition: transform 0.2s; }
+        .module-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+        .card { background: var(--card); padding: 1.2rem; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); }
+        .editor-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; height: 100%; }
+        .form-box, .preview-box { background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+        textarea, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn:active { transform: scale(0.95); }
+		.nav-btn.active-index {
+			background: var(--primary);
+			color: white;
+		}
+		.scroll-toggle-btn {
+
+			position: fixed;
+			right: 25px;
+			bottom: 25px;
+
+			width: 45px;
+			height: 45px;
+
+			border-radius: 50%;
+			border: none;
+
+			background: var(--primary);
+			color: white;
+
+			font-size: 20px;
+			font-weight: bold;
+
+			cursor: pointer;
+
+			display: none;
+
+			z-index: 999;
+
+			box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+		}
+		/* ================= PRISM SYMBOL GREY BG FIX ================= */
+
+/* Remove GitHub markdown inline code bg INSIDE code blocks */
+.markdown-body pre code{
+    background: transparent !important;
+}
+
+/* Remove token background */
+.markdown-body pre code span{
+    background: transparent !important;
+}
+
+/* Especially operators & punctuation */
+.token.operator,
+.token.punctuation,
+.token.symbol{
+    background: transparent !important;
+}
+
+/* Keep inline markdown code bg intact */
+.markdown-body :not(pre) > code{
+    background: #f6f8fa;
+    padding:2px 4px;
+    border-radius:4px;
+}
+
+/* DARK MODE INLINE */
+.dark .markdown-body :not(pre) > code{
+    background:#161b22;
+}
+/* ================= FULL SCREEN EDITOR ================= */
+
+.fullscreen-editor{
+
+    position:fixed !important;
+    top:0;
+    left:0;
+    width:100vw !important;
+    height:100vh !important;
+    z-index:9999;
+
+    background:var(--bg);
+
+    padding:40px;
+}
+
+.fullscreen-editor textarea{
+
+    height:80vh !important;
+    font-size:16px;
+}
+
+.fullscreen-preview{
+
+    position:fixed;
+    right:0;
+    top:0;
+    width:50%;
+    height:100vh;
+    overflow-y:auto;
+
+    background:var(--card);
+    padding:40px;
+    border-left:1px solid var(--border);
+}
+
+.fullscreen-preview .markdown-body{
+
+    max-width:800px;
+    margin:auto;
+}
+.search-wrapper input{
+    padding-right:95px !important;
+}
+/* ================= READ MODE DISABLED UI ================= */
+
+
+/* READ MODE DISABLE ONLY EDIT ACTIONS */
+
+.read-mode .edit-action {
+
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: not-allowed !important;
+    filter: grayscale(80%);
+    border:1px dashed var(--border);
+}
+    </style>
+</head>
+<body class="dark">
+
+<header>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <button class="menu-toggle" id="hamburger" onclick="toggleSidebar()" style="display:none;">☰</button>
+        <div class="logo" onclick="showDashboard()">⚡ <span>LEARNING HUB</span></div>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-outline edit-action" id="lockBtn" onclick="toggleDraggable()" style="display: none;" title="Toggle Drag Lock">
+            <span id="lockIcon">🔒</span> <b id="lockText">Locked</b>
+        </button>
+
+        <button class="btn edit-action" id="headerNewBtn" onclick="openEditor()" style="display: none;" title="Shortcut: Ctrl+N">
+            <b>+</b> <span>New Entry</span>
+        </button>
+		
+		<div id="dashboardControls">
+			<button class="btn btn-outline" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
+
+			<input type="file" id="importFile" hidden accept=".json">
+
+			<button class="btn btn-outline"
+				onclick="document.getElementById('importFile').click()"
+				title="Import JSON">
+				📥 <span>Import</span>
+			</button>
+
+			<button class="btn"
+				onclick="exportData()"
+				title="Export JSON">
+				📤 <span>Export</span>
+			</button>
+			<button class="btn btn-outline"
+				id="readModeBtn"
+				onclick="toggleReadMode()"
+				title="Toggle Reading Mode">
+				📖 <span>Reading Mode</span>
+			</button>
+		</div>
+		
+    </div>
+</header>
+	<div id="pdfProgressBox"
+		style="
+		position:fixed;
+		top:50%;
+		left:50%;
+		transform:translate(-50%,-50%);
+		background:var(--card);
+		color:var(--text);
+		padding:20px;
+		border-radius:10px;
+		border:1px solid var(--border);
+		box-shadow:0 0 10px rgba(0,0,0,0.2);
+		z-index:9999;
+		display:none;
+		width:300px;
+		text-align:center;
+	">
+
+    <div style="margin-bottom:10px;font-weight:bold;">
+        Generating PDF...
+    </div>
+
+    <div style="
+        width:100%;
+        height:12px;
+		background:var(--border);
+        border-radius:6px;
+        overflow:hidden;
+    ">
+        <div id="pdfProgressBar"
+        style="
+        height:100%;
+        width:0%;
+		background:var(--primary);
+        transition:width 0.3s;
+        ">
+        </div>
+    </div>
+
+    <div id="pdfProgressText"
+    style="
+    margin-top:8px;
+    font-size:12px;
+    color:var(--text);
+    ">
+    0%
+	
+</div>
+<button id="cancelPDFBtn"
+style="
+margin-top:12px;
+padding:6px 12px;
+background:var(--danger);
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-size:12px;
+">
+Cancel Export
+</button>
+</div>
+
+<div id="dashboardView">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+    <h1>Dashboard</h1>
+    <button class="btn edit-action" onclick="addModule()">+ Create Module</button>
+	</div>
+
+	<div class="search-container">
+    <div class="search-wrapper">
+
+		<input id="globalSearch"
+		placeholder="🔍 Search across all modules..."
+		oninput="renderGlobalSearch()"
+		style="padding-right:120px;">
+
+		<span id="globalMatchCounter"
+		style="
+		position:absolute;
+		right:60px;
+		top:50%;
+		transform:translateY(-50%);
+		font-size:11px;
+		background:var(--card);
+		padding:2px 6px;
+		border-radius:4px;
+		border:1px solid var(--border);
+		display:none;
+		z-index:5;
+		">
+		0 / 0
+		</span>
+
+		<button id="clearBtn"
+		class="clear-search"
+		onclick="clearGlobalSearch()">
+		✖
+		</button>
+
+		</div>
+    </div>
+
+	<div id="globalResults" style="display:none; margin-bottom: 30px;">
+		<h3 style="color:var(--accent); margin-bottom:10px;">Search Results</h3>
+		<div id="resultsList"></div>
+		<hr style="border:0; border-top:1px solid var(--border); margin: 20px 0;">
+	</div>
+
+<div id="moduleGrid" class="grid"></div>
+</div>
+
+<div id="submoduleView">
+
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:15px;">
+           <button id="moduleBackBtn"
+				class="btn btn-outline"
+				onclick="goBackToDashboard()">
+				←
+			</button>
+            <h1 id="currentModuleTitle">Module</h1>
+        </div>
+
+        <div class="header-actions-mobile">
+            <button class="btn edit-action"
+                onclick="addSubmodule()">+ Create Submodule</button>
+
+            <button class="edit-action" onclick="deleteCurrentModule()"
+                style="background:none;
+                border:1px solid var(--danger);
+                color:var(--danger);
+                padding:4px 8px;
+                border-radius:4px;
+                font-size:11px;
+                cursor:pointer;">
+                Delete Module
+            </button>
+        </div>
+    </div>
+
+    <!-- ⭐ MODULE SEARCH -->
+    <div class="search-container module-search-box">
+        <div class="search-wrapper">
+
+			<input id="moduleSearch"
+				placeholder="🔍 Search across all submodules..."
+				oninput="renderModuleSearch()"
+				style="padding-right:120px;">
+
+			<span id="moduleMatchCounter"
+			style="
+			position:absolute;
+			right:60px;
+			top:50%;
+			transform:translateY(-50%);
+			font-size:11px;
+			background:var(--card);
+			padding:2px 6px;
+			border-radius:4px;
+			border:1px solid var(--border);
+			display:none;
+			z-index:5;
+			">
+			0 / 0
+			</span>
+
+			<button id="moduleClearBtn"
+			class="clear-search"
+			onclick="clearModuleSearch()">
+			✖
+			</button>
+
+			</div>
+    </div>
+
+    <div id="moduleSearchResults"
+        style="display:none; margin-bottom:20px;">
+    </div>
+
+    <!-- ⭐ GRID LAST -->
+    <div id="submoduleGrid" class="grid"></div>
+
+</div>
+
+
+<div id="moduleWorkspace" style="display:none;">
+    <aside class="sidebar" id="sidebar">
+
+    <div style="margin-bottom:10px;">
+        
+        <button class="btn btn-outline"
+            id="toggleAllBtn"
+            style="width:100%; font-size:12px; padding:5px;"
+            onclick="toggleAllGroups()">
+            ⏬ Collapse All
+        </button>
+
+    </div>
+
+    <div id="indexList"></div>
+
+</aside>
+
+</aside>
+    
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <main class="content-area">
+        <div id="listView">
+            <!-- Updated Header with Back Button -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+
+    <!-- LEFT SIDE -->
+    <div style="display:flex; align-items:center; gap:10px;">
+        <button id="backBtn" class="btn btn-outline"
+			onclick="showSubmoduleView()"
+			title="Back to Submodules"
+			style="padding:6px 10px;">
+			←
+		</button>
+        <h2 id="currentSubmoduleTitle"
+			style="
+			color:var(--primary);
+			margin:0;
+			line-height:1;
+			">
+            Submodule
+        </h2>
+    </div>
+
+    <!-- RIGHT SIDE (FIXED ORDER) -->
+    <div style="display:flex; align-items:center; gap:8px;">
+
+        <button class="edit-action" onclick="deleteCurrentSubmodule()"
+            style="background:none;
+            border:1px solid var(--danger);
+            color:var(--danger);
+            padding:4px 8px;
+            border-radius:4px;
+            font-size:11px;
+            cursor:pointer;">
+            Delete Submodule
+        </button>
+
+        <button class="btn btn-outline edit-action"
+            onclick="exportSubmodulePDF()"
+            style="font-size:11px;">
+            📄 Export PDF
+        </button>
+
+    </div>
+</div>
+            
+            <div class="search-container">
+                <div class="search-wrapper" style="position:relative;">
+
+					<input id="search"
+					placeholder="🔍 Search entries..."
+					oninput="renderQuestions()"
+					style="padding-right:95px;">
+
+					<span id="matchCounter"
+					style="
+					position:absolute;
+					right:60px;
+					top:50%;
+					transform:translateY(-50%);
+					font-size:11px;
+					background:var(--card);
+					padding:2px 6px;
+					border-radius:4px;
+					border:1px solid var(--border);
+					display:none;
+					z-index:5;
+					">
+					0 / 0
+					</span>
+
+					<button id="subClearBtn"
+					class="clear-search"
+					onclick="clearSubmoduleSearch()"
+					style="right:15px; z-index:10;">
+					✖
+					</button>
+
+					</div>
+            <div id="questionsBox"></div>
+        </div>
+</div>
+        <div id="formView" style="display:none; height: 100%;">
+            <div class="editor-container">
+                <div class="form-box">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+						<h3>
+						Editor 
+						<small style="font-weight: normal; opacity: 0.6; font-size: 10px;">
+						(Ctrl+S to save)
+						</small>
+						</h3>
+
+						<button class="btn btn-outline"
+							id="fullscreenBtn"
+							onclick="toggleFullEditor()"
+							title="Fullscreen Editor (Ctrl+Shift+F)">
+							⛶ <span id="fullscreenText">Fullscreen</span>
+						</button>
+					</div>
+                    <input id="qInput" placeholder="Title">
+                    <input id="tInput" list="subtopicList" placeholder="Sub-topic (Search or Type New)">
+                    <datalist id="subtopicList"></datalist>
+                    <textarea id="aInput" placeholder="Markdown..." oninput="autoResize(this); updatePreview()" style="min-height:150px; resize:none;"></textarea>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-outline" style="flex:1" onclick="showListView()">Cancel</button>
+                        <button class="btn" style="flex:2" onclick="saveEntry()">Save</button>
+                    </div>
+                </div>
+                <div class="preview-box">
+                    <small>PREVIEW</small>
+                    <div id="livePreview" class="markdown-body"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+	<button id="scrollToggleBtn" class="scroll-toggle-btn"
+        onclick="toggleScroll()">
+    ↓
+    </button>
+</div>
+
+<script>
+    // Updated data structure: { moduleName: { subModuleName: [ {id, q, subtopic, a}, ... ], ... }, ... }
+    let data = JSON.parse(localStorage.getItem("devmaster_db_v7")) || { "Getting Started": {} };
+    let currentModule = null;
+    let currentSubmodule = null;
+    let editId = null;
+    let isLocked = true;
+	let scrollAnim = null;
+	let isAllCollapsed = false;
+	let lastUsedSubtopic = "";
+	let isReadOnlyMode = false;
+	let searchMatches = [];
+    let currentMatchIndex = -1;
+	let moduleSearchMatches = [];
+    let moduleCurrentMatchIndex = -1;
+	let globalSearchMatches = [];
+    let globalCurrentMatchIndex = -1;
+    const save = () => { localStorage.setItem("devmaster_db_v7", JSON.stringify(data)); };
+	
+	function wrapSelection(textarea, before, after = before) {
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.substring(start, end);
+
+    if (selected.length > 0) {
+
+        textarea.value =
+            textarea.value.substring(0, start) +
+            before + selected + after +
+            textarea.value.substring(end);
+
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = end + before.length;
+
+    } else {
+
+        textarea.value =
+            textarea.value.substring(0, start) +
+            before + after +
+            textarea.value.substring(end);
+
+        textarea.selectionStart = start + before.length;
+        textarea.selectionEnd = start + before.length;
+    }
+
+    updatePreview();
+}
+    window.addEventListener('keydown', (e) => {
+
+// ⭐ ENTER → NEXT MATCH
+// ⭐ SHIFT + ENTER → PREVIOUS MATCH
+if(e.key === "Enter"){
+
+    const active = document.activeElement;
+
+    // 🔹 ENTRY SEARCH (Inside Submodule Entries Page)
+    if(active.id === "search"){
+
+        e.preventDefault();
+
+        if(e.shiftKey){
+            goToPreviousSearchMatch();
+        }else{
+            goToNextSearchMatch();
+        }
+    }
+
+    // 🔹 SUBMODULE SEARCH (Inside Submodule Grid Page)
+    else if(active.id === "moduleSearch"){
+
+        e.preventDefault();
+
+        if(e.shiftKey){
+            goToPreviousModuleSearchMatch();
+        }else{
+            goToNextModuleSearchMatch();
+        }
+    }
+
+    // 🔹 GLOBAL SEARCH (Dashboard)
+    else if(active.id === "globalSearch"){
+
+        e.preventDefault();
+
+        if(e.shiftKey){
+            goToPreviousGlobalSearchMatch();
+        }else{
+            goToNextGlobalSearchMatch();
+        }
+    }
+}
+    // Ctrl + N → New Entry
+    if (e.ctrlKey && e.key === 'a') {
+        e.preventDefault();
+        if (currentSubmodule) openEditor();
+    }
+
+    // Ctrl + S → Save
+    if (e.ctrlKey && e.key === 's') {
+        if (document.getElementById('formView').style.display === 'block') {
+            e.preventDefault();
+            saveEntry();
+        }
+    }
+
+  if (e.key === 'Escape') {
+
+    if(isFullScreenEditor){
+        toggleFullEditor();   // ⭐ THIS NOW ALSO CHANGES BUTTON UI
+        return;
+    }
+
+    if (document.getElementById('formView').style.display === 'block') {
+        showListView();
+    }
+}
+
+    // ⭐⭐⭐ CTRL + B → BOLD MARKDOWN ⭐⭐⭐
+    if (e.ctrlKey && e.key.toLowerCase() === 'b') {
+
+        const textarea = document.getElementById("aInput");
+
+        // Only work inside editor
+        if (document.activeElement === textarea) {
+
+            e.preventDefault();
+
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+
+            if (selectedText.length > 0) {
+
+                // Wrap selected text with **
+                const replaced = `**${selectedText}**`;
+
+                textarea.value =
+                    textarea.value.substring(0, start) +
+                    replaced +
+                    textarea.value.substring(end);
+
+                textarea.selectionStart = start + 2;
+                textarea.selectionEnd = end + 2;
+
+            } else {
+
+                // Insert **** and move cursor in middle
+                textarea.value =
+                    textarea.value.substring(0, start) +
+                    "****" +
+                    textarea.value.substring(end);
+
+                textarea.selectionStart = start + 2;
+                textarea.selectionEnd = start + 2;
+            }
+
+            updatePreview();
+        }
+    }
+	// ⭐⭐⭐ CTRL + I → ITALIC MARKDOWN ⭐⭐⭐
+if (e.ctrlKey && e.key.toLowerCase() === 'i') {
+
+    const textarea = document.getElementById("aInput");
+
+    if (document.activeElement === textarea) {
+
+        e.preventDefault();
+        wrapSelection(textarea, "*");
+    }
+}
+// ⭐⭐⭐ CTRL + Q → INLINE CODE ⭐⭐⭐
+if (e.ctrlKey && e.key.toLowerCase() === 'q') {
+
+    const textarea = document.getElementById("aInput");
+
+    if (document.activeElement === textarea) {
+
+        e.preventDefault();
+        wrapSelection(textarea, "`");
+    }
+}
+// ⭐⭐⭐ CTRL + K → JAVA CODE BLOCK ⭐⭐⭐
+if (e.ctrlKey && e.key.toLowerCase() === 'k') {
+
+    const textarea = document.getElementById("aInput");
+
+    if (document.activeElement === textarea) {
+
+        e.preventDefault();
+        wrapSelection(textarea, "\n```java\n", "\n```\n");
+    }
+}
+// ⭐ CTRL + SHIFT + F → FULLSCREEN EDITOR
+if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'f') {
+
+    if(document.getElementById('formView').style.display === 'block'){
+
+        e.preventDefault();
+        toggleFullEditor();
+    }
+}
+
+});
+document.getElementById("aInput").addEventListener("paste", function(e){
+
+    const textarea = this;
+    let pasted = (e.clipboardData || window.clipboardData).getData('text');
+
+    if(!pasted.includes("\n")) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+
+    // ⭐ TREE / ASCII DIAGRAM
+    if(looksLikeDiagram(pasted)){
+
+        e.preventDefault();
+
+        const block =
+`\n\`\`\`text
+${pasted}
+\`\`\`\n`;
+
+        textarea.value =
+            textarea.value.substring(0,start) +
+            block +
+            textarea.value.substring(end);
+
+        textarea.selectionStart = start + block.length;
+        textarea.selectionEnd = start + block.length;
+
+        updatePreview();
+        return;
+    }
+
+    // ⭐ JAVA CODE
+    if(looksLikeJava(pasted)){
+
+        e.preventDefault();
+
+        const block =
+`\n\`\`\`java
+${pasted}
+\`\`\`\n`;
+
+        textarea.value =
+            textarea.value.substring(0,start) +
+            block +
+            textarea.value.substring(end);
+
+        textarea.selectionStart = start + block.length;
+        textarea.selectionEnd = start + block.length;
+
+        updatePreview();
+    }
+
+});
+
+let isFullScreenEditor = false;
+
+function toggleFullEditor(){
+
+    const form = document.querySelector('.form-box');
+    const preview = document.querySelector('.preview-box');
+
+    const btn = document.getElementById("fullscreenBtn");
+    const text = document.getElementById("fullscreenText");
+
+    isFullScreenEditor = !isFullScreenEditor;
+
+    if(isFullScreenEditor){
+
+        form.classList.add("fullscreen-editor");
+        preview.classList.add("fullscreen-preview");
+
+        // ⭐ CHANGE BUTTON UI
+        btn.classList.remove("btn-outline");
+        btn.style.background = "var(--danger)";
+        btn.innerHTML = "✖ <span id='fullscreenText'>Exit</span>";
+
+    }else{
+
+        form.classList.remove("fullscreen-editor");
+        preview.classList.remove("fullscreen-preview");
+
+        // ⭐ RESTORE BUTTON UI
+        btn.classList.add("btn-outline");
+        btn.style.background = "";
+        btn.innerHTML = "⛶ <span id='fullscreenText'>Fullscreen</span>";
+    }
+}
+
+function updateMatchCounter(){
+
+    const counter = document.getElementById("matchCounter");
+
+    if(!counter) return;
+
+    if(searchMatches.length === 0){
+
+        counter.style.display = "none";
+        return;
+    }
+
+    counter.style.display = "block";
+
+    counter.innerText =
+        (currentMatchIndex + 1) +
+        " / " +
+        searchMatches.length;
+}
+function updateModuleMatchCounter(){
+
+    const counter = document.getElementById("moduleMatchCounter");
+
+    if(!counter) return;
+
+    if(moduleSearchMatches.length === 0){
+
+        counter.style.display = "none";
+        return;
+    }
+
+    counter.style.display = "block";
+
+    counter.innerText =
+        (moduleCurrentMatchIndex + 1) +
+        " / " +
+        moduleSearchMatches.length;
+}
+function goToNextModuleSearchMatch(){
+
+    if(moduleSearchMatches.length === 0) return;
+
+    moduleCurrentMatchIndex++;
+
+    if(moduleCurrentMatchIndex >= moduleSearchMatches.length){
+        moduleCurrentMatchIndex = 0;
+    }
+
+    const id = moduleSearchMatches[moduleCurrentMatchIndex];
+    const el = document.getElementById(id);
+
+    if(el){
+
+        el.scrollIntoView({
+            behavior:'smooth',
+            block:'center'
+        });
+
+        el.style.borderColor = "#f59e0b";
+
+        setTimeout(()=>{
+            el.style.borderColor = "var(--border)";
+        },800);
+    }
+
+    updateModuleMatchCounter();
+}
+function goToPreviousModuleSearchMatch(){
+
+    if(moduleSearchMatches.length === 0) return;
+
+    moduleCurrentMatchIndex--;
+
+    if(moduleCurrentMatchIndex < 0){
+        moduleCurrentMatchIndex = moduleSearchMatches.length - 1;
+    }
+
+    const id = moduleSearchMatches[moduleCurrentMatchIndex];
+    const el = document.getElementById(id);
+
+    if(el){
+
+        el.scrollIntoView({
+            behavior:'smooth',
+            block:'center'
+        });
+
+        el.style.borderColor = "#f59e0b";
+
+        setTimeout(()=>{
+            el.style.borderColor = "var(--border)";
+        },800);
+    }
+
+    updateModuleMatchCounter();
+}
+function toggleReadMode(){
+
+    isReadOnlyMode = !isReadOnlyMode;
+
+    const btn = document.getElementById("readModeBtn");
+
+    if(isReadOnlyMode){
+
+        btn.innerHTML = "🔒 <span>Read Only</span>";
+
+        document.body.classList.add("read-mode");
+
+        // Disable header buttons manually
+        document.getElementById('headerNewBtn').disabled = true;
+        document.getElementById('lockBtn').disabled = true;
+
+    }
+    else{
+
+        btn.innerHTML = "📖 <span>Reading Mode</span>";
+
+        document.body.classList.remove("read-mode");
+
+        document.getElementById('headerNewBtn').disabled = false;
+        document.getElementById('lockBtn').disabled = false;
+    }
+}
+
+function looksLikeJava(code){
+
+    const javaPatterns = [
+
+        // OOP
+        /\bclass\s+\w+/,
+        /\binterface\s+\w+/,
+
+        // Method signature
+        /\bvoid\s+\w+\s*\(/,
+        /\bint\s+\w+\s*\(/,
+        /\bboolean\s+\w+\s*\(/,
+        /\bString\s+\w+\s*\(/,
+
+        // Common Java syntax
+        /System\.out\.(print|println)/,
+        /new\s+\w+\s*\(/,
+        /\bnull\b/,
+        /\bthis\./,
+        /\breturn\b/,
+
+        // Tree / DSA style
+        /\bnode\.\w+/,
+        /\broot\.\w+/,
+
+        // Generics
+        /\bList<.*?>/,
+        /\bMap<.*?>/,
+
+        // Spring Boot
+        /@\w+/,
+
+        // Imports
+        /import\s+java\./,
+
+        // Control flow
+        /\bif\s*\(/,
+        /\bfor\s*\(/,
+        /\bwhile\s*\(/,
+        /\btry\s*\{/,
+        /\bcatch\s*\(/
+    ];
+
+    let matchCount = 0;
+
+    javaPatterns.forEach(pattern=>{
+        if(pattern.test(code)){
+            matchCount++;
+        }
+    });
+
+    return matchCount >= 2;  // now DSA methods will pass
+}
+function looksLikeDiagram(code){
+
+    const diagramPatterns = [
+
+        /^[\s\d]+$/m,       // only numbers + spaces
+        /\/\s*\\/,          // / \
+        /\|\s*/,            // |
+        /-\s*-\s*/,         // --
+        /\(\)/,             // ()
+        /\b\d+\b\s*\n\s*\/\s*\\/,  // 1 \n / \
+        /\s{2,}\d+\s{2,}/   // spaced children
+    ];
+
+    let matchCount = 0;
+
+    diagramPatterns.forEach(pattern=>{
+        if(pattern.test(code)){
+            matchCount++;
+        }
+    });
+
+    return matchCount >= 2;
+}
+
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('overlay');
+        if (window.innerWidth > 850) { sb.classList.toggle('collapsed'); } 
+        else { sb.classList.toggle('active'); ov.classList.toggle('active'); }
+    }
+
+    function toggleDraggable() {
+	if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+        isLocked = !isLocked;
+        const icon = document.getElementById('lockIcon');
+        const text = document.getElementById('lockText');
+        const btn = document.getElementById('lockBtn');
+        
+        if (isLocked) {
+            icon.innerText = "🔒";
+            text.innerText = "Locked";
+            btn.classList.add('btn-outline');
+        } else {
+            icon.innerText = "🔓";
+            text.innerText = "Unlocked";
+            btn.classList.remove('btn-outline');
+        }
+        renderSidebarIndex();
+    }
+
+	function showDashboard() {
+		currentModule = null;
+		currentSubmodule = null;
+
+		document.getElementById('dashboardView').style.display = 'block';
+		document.getElementById('submoduleView').style.display = 'none';
+		document.getElementById('moduleWorkspace').style.display = 'none';
+
+		document.getElementById('hamburger').style.display = 'none';
+		document.getElementById('headerNewBtn').style.display = 'none';
+		document.getElementById('lockBtn').style.display = 'none';
+
+		document.getElementById('dashboardControls').style.display = 'flex';  // ⭐ ADD THIS
+		
+		renderDashboard();
+		document.getElementById('scrollToggleBtn').style.display = 'none';
+	}
+	
+	function goBackToDashboard(){
+
+    currentModule = null;
+    currentSubmodule = null;
+
+    document.getElementById('dashboardView').style.display = 'block';
+    document.getElementById('submoduleView').style.display = 'none';
+    document.getElementById('moduleWorkspace').style.display = 'none';
+
+    document.getElementById('hamburger').style.display = 'none';
+    document.getElementById('headerNewBtn').style.display = 'none';
+    document.getElementById('lockBtn').style.display = 'none';
+
+    document.getElementById('dashboardControls').style.display = 'flex';
+
+    renderDashboard();
+}
+
+    function openModule(name) {
+		currentModule = name;
+
+		document.getElementById('dashboardControls').style.display = 'none'; // ⭐ ADD THIS
+
+		document.getElementById('currentModuleTitle').textContent = name;
+		document.getElementById('dashboardView').style.display = 'none';
+		document.getElementById('submoduleView').style.display = 'block';
+		document.getElementById('moduleWorkspace').style.display = 'none';
+
+		renderSubmodules();
+	}
+
+   function showSubmoduleView() {
+
+		document.getElementById('dashboardControls').style.display = 'none'; // ⭐ ADD THIS
+
+		currentSubmodule = null;
+
+		document.getElementById('dashboardView').style.display = 'none';
+		document.getElementById('submoduleView').style.display = 'block';
+		document.getElementById('moduleWorkspace').style.display = 'none';
+
+		document.getElementById('hamburger').style.display = 'none';
+		document.getElementById('headerNewBtn').style.display = 'none';
+		document.getElementById('lockBtn').style.display = 'none';
+
+		renderSubmodules();
+		document.getElementById('scrollToggleBtn').style.display = 'none';
+	}
+
+function openSubmodule(name) {
+
+    document.getElementById('dashboardControls').style.display = 'none';
+    currentSubmodule = name;
+
+    const submoduleSearch = document.getElementById('search');
+    if (submoduleSearch) {
+        submoduleSearch.value = "";
+    }
+
+    document.getElementById('currentSubmoduleTitle').textContent = name;
+    document.getElementById('dashboardView').style.display = 'none';
+    document.getElementById('submoduleView').style.display = 'none';
+    document.getElementById('moduleWorkspace').style.display = 'flex';
+    document.getElementById('hamburger').style.display = 'block';
+    document.getElementById('headerNewBtn').style.display = 'block';
+    document.getElementById('lockBtn').style.display = 'block';
+    document.getElementById('sidebar').classList.remove('collapsed', 'active');
+
+    showListView(); 
+    renderSidebarIndex(); 
+    renderQuestions();
+
+    setTimeout(() => {
+
+		const area = document.querySelector('.content-area');
+		const btn = document.getElementById('scrollToggleBtn');
+
+		if (area) {
+
+			btn.style.display = 'block'; // ⭐ SHOW BUTTON
+
+			area.addEventListener('scroll', function () {
+
+				// ⭐ STOP AUTO SCROLL IF USER SCROLLS
+				if (scrollAnim) {
+					cancelAnimationFrame(scrollAnim);
+					scrollAnim = null;
+				}
+
+				// ⭐ INDEX MAPPING
+				mapIndexWithScroll();
+
+				// ⭐ ARROW SWITCH
+				if (area.scrollTop > area.scrollHeight / 2) {
+					btn.innerText = "↑";
+				} else {
+					btn.innerText = "↓";
+				}
+
+			});
+			area.addEventListener('wheel', () => {
+
+				if (scrollAnim) {
+					cancelAnimationFrame(scrollAnim);
+					scrollAnim = null;
+				}
+
+			});
+			area.addEventListener('touchmove', () => {
+
+				if (scrollAnim) {
+					cancelAnimationFrame(scrollAnim);
+					scrollAnim = null;
+				}
+
+			});
+
+		}
+
+	}, 300);
+}
+
+    function showListView() {
+        document.getElementById('listView').style.display = 'block';
+        document.getElementById('formView').style.display = 'none';
+    }
+
+    function renderSidebarIndex() {
+        const list = document.getElementById('indexList');
+        list.innerHTML = "";
+        
+        if (isLocked) list.classList.add('drag-locked');
+        else list.classList.remove('drag-locked');
+        
+        if (!currentModule || !currentSubmodule || !data[currentModule][currentSubmodule]) return;
+        
+        const groups = {};
+        const groupOrder = []; 
+
+        data[currentModule][currentSubmodule].forEach(item => {
+            const topic = item.subtopic || "General";
+            if (!groups[topic]) {
+                groups[topic] = [];
+                groupOrder.push(topic);
+            }
+            groups[topic].push(item);
+        });
+
+        groupOrder.forEach(topic => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = "index-group";
+            groupDiv.dataset.topic = topic;
+
+            const header = document.createElement('div');
+            header.className = "index-group-header";
+			header.innerHTML = `
+			<span class="drag-handle">⠿</span>
+			<span class="collapse-icon" onclick="toggleGroup('${topic}', this)">▼</span>
+			<div class="subtopic-label">${topic}</div>
+			`;            
+			groupDiv.appendChild(header);
+            const btnContainer = document.createElement('div');
+            btnContainer.className = "group-list-container";
+            btnContainer.dataset.topicGroup = topic;
+
+            groups[topic].forEach(item => {
+                const b = document.createElement('div');
+                b.className = "nav-btn";
+                b.dataset.id = item.id;
+                
+                // ADD THIS LINE: Shows full text on hover
+                b.title = item.q; 
+                
+                b.innerHTML = `<span style="opacity:0.5; font-size:10px;">::</span> <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.q}</span>`;
+                b.onclick = (e) => { 
+                    if(e.target.classList.contains('nav-btn') || e.target.parentElement.classList.contains('nav-btn')) {
+                        scrollToQuestion(item.id); 
+                    }
+                };
+                btnContainer.appendChild(b);
+            });
+
+            groupDiv.appendChild(btnContainer);
+            list.appendChild(groupDiv);
+
+            new Sortable(btnContainer, {
+                group: 'nested-questions',
+                animation: 150,
+                disabled: isLocked,
+                ghostClass: 'sortable-ghost',
+                onEnd: () => saveSidebarOrder()
+            });
+        });
+
+        new Sortable(list, {
+            animation: 150,
+            handle: '.index-group-header',
+            disabled: isLocked,
+            ghostClass: 'sortable-ghost',
+            onEnd: () => saveSidebarOrder()
+        });
+    }
+    function saveSidebarOrder() {
+        const newModuleData = [];
+        const indexList = document.getElementById('indexList');
+        const groupDivs = indexList.getElementsByClassName('index-group');
+        for (let g of groupDivs) {
+            const topicName = g.dataset.topic;
+            const itemDivs = g.querySelectorAll('.nav-btn');
+            for (let itemDiv of itemDivs) {
+                const id = itemDiv.dataset.id;
+                const originalItem = data[currentModule][currentSubmodule].find(x => x.id == id);
+                if (originalItem) {
+                    originalItem.subtopic = topicName;
+                    newModuleData.push(originalItem);
+                }
+            }
+        }
+        data[currentModule][currentSubmodule] = newModuleData;
+        save();
+        renderQuestions();
+    }
+
+    function scrollToQuestion(id) {
+        showListView();
+        setTimeout(() => {
+            const el = document.getElementById("q-" + id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.style.borderColor = "var(--primary)";
+                setTimeout(() => el.style.borderColor = "var(--border)", 1000);
+            }
+        }, 50);
+        if (window.innerWidth <= 850) toggleSidebar(); 
+    }
+
+    function renderQuestions() {
+		searchMatches = [];
+		currentMatchIndex = -1;
+        const box = document.getElementById('questionsBox');
+        const searchInput = document.getElementById('search');
+        const term = searchInput.value.toLowerCase();
+        
+        // Toggle the X button for the submodule search
+        const clearBtn = document.getElementById('subClearBtn');
+        if (clearBtn) clearBtn.style.display = term ? 'block' : 'none';
+    
+        box.innerHTML = "";
+        if (!currentModule || !currentSubmodule || !data[currentModule][currentSubmodule]) return;
+        
+        const filteredItems = data[currentModule][currentSubmodule].filter(item => {
+            const searchStr = (item.q + (item.subtopic || "") + item.a).toLowerCase();
+            return searchStr.includes(term);
+        });
+        
+        const grouped = {};
+        const topicOrder = [];
+        
+        filteredItems.forEach(item => {
+            const topic = item.subtopic || "General";
+            if (!grouped[topic]) {
+                grouped[topic] = [];
+                topicOrder.push(topic);
+            }
+            grouped[topic].push(item);
+        });
+        
+        topicOrder.forEach(topic => {
+            const sectionHeader = document.createElement('div');
+            sectionHeader.className = "section-separator";
+            sectionHeader.innerHTML = `<span>#</span> ${highlightText(topic, term)}`;
+            box.appendChild(sectionHeader);
+            
+            grouped[topic].forEach(item => {
+                const card = document.createElement('div');
+                card.className = "card"; 
+				card.id = "q-" + item.id;
+
+				if(term){
+					searchMatches.push(card.id);
+				}                
+				card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span style="color:var(--accent); font-size:12px; font-weight:700;">${highlightText(item.subtopic || 'General', term)}</span>
+                        <div style="display:flex; gap:6px;">
+							<button class="icon-btn edit-action"
+								title="Edit Entry"
+								onclick="openEditor('${item.id}')">
+								<i data-lucide="pencil"></i>
+							</button>
+
+							<button class="icon-btn delete-btn edit-action"
+								title="Delete Entry"
+								onclick="deleteEntry('${item.id}')">
+								<i data-lucide="trash-2"></i>
+							</button>
+						</div>
+                    </div>
+                    <h2 style="margin-bottom:10px;">${highlightText(item.q, term)}</h2>
+                    <div class="markdown-body answer-body">
+					${marked.parse(item.a)}
+					</div>
+                `;
+                box.appendChild(card);
+            });
+        });
+        Prism.highlightAll();
+
+		document.querySelectorAll('.answer-body').forEach(el => {
+			el.innerHTML = highlightHTML(el.innerHTML, term);
+		});
+
+		lucide.createIcons();
+		setTimeout(mapIndexWithScroll, 100);
+		updateMatchCounter();
+    }
+	function clearSubmoduleSearch(){
+
+    document.getElementById('search').value = "";
+    document.getElementById('matchCounter').style.display = "none";
+
+    currentMatchIndex = -1;
+    searchMatches = [];
+
+    renderQuestions();
+}
+function goToNextSearchMatch(){
+
+    if(searchMatches.length === 0) return;
+
+    currentMatchIndex++;
+
+    if(currentMatchIndex >= searchMatches.length){
+        currentMatchIndex = 0;
+    }
+
+    const id = searchMatches[currentMatchIndex];
+    const el = document.getElementById(id);
+
+    if(el){
+
+        el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+
+        el.style.borderColor = "#f59e0b";
+
+        setTimeout(()=>{
+            el.style.borderColor = "var(--border)";
+        },800);
+    }
+	updateMatchCounter();
+}
+function goToPreviousSearchMatch(){
+
+    if(searchMatches.length === 0) return;
+
+    currentMatchIndex--;
+
+    if(currentMatchIndex < 0){
+        currentMatchIndex = searchMatches.length - 1;
+    }
+
+    const id = searchMatches[currentMatchIndex];
+    const el = document.getElementById(id);
+
+    if(el){
+
+        el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+
+        el.style.borderColor = "#f59e0b";
+
+        setTimeout(()=>{
+            el.style.borderColor = "var(--border)";
+        },800);
+    }
+	updateMatchCounter();
+}
+
+    function openEditor(id = null) {
+	if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+        editId = id;
+        document.getElementById('listView').style.display = 'none';
+        document.getElementById('formView').style.display = 'block';
+
+        // Populate Sub-topic Suggestions
+        const datalist = document.getElementById('subtopicList');
+        datalist.innerHTML = ""; // Clear old suggestions
+        
+        // Get unique sub-topics from current submodule
+        const uniqueSubtopics = [...new Set(data[currentModule][currentSubmodule]
+            .map(item => item.subtopic)
+            .filter(s => s && s.trim() !== "")
+        )];
+        
+        uniqueSubtopics.forEach(topic => {
+            const option = document.createElement('option');
+            option.value = topic;
+            datalist.appendChild(option);
+        });
+
+        if (id) {
+            const item = data[currentModule][currentSubmodule].find(i => i.id == id);
+            document.getElementById('qInput').value = item.q;
+            document.getElementById('tInput').value = item.subtopic || "";
+            document.getElementById('aInput').value = item.a;
+        } else {
+
+    document.getElementById('qInput').value = "";
+
+    // ⭐ AUTO PREFILL LAST SUBTOPIC
+    document.getElementById('tInput').value = lastUsedSubtopic || "";
+
+    document.getElementById('aInput').value = "";
+}
+        updatePreview();
+        setTimeout(() => document.getElementById('qInput').focus(), 50);
+    }
+
+    function saveEntry() {
+	if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+        const q = document.getElementById('qInput').value.trim();
+        const sub = document.getElementById('tInput').value.trim();
+		// ⭐ STORE LAST USED SUBTOPIC
+if(sub){
+    lastUsedSubtopic = sub;
+}
+        const a = document.getElementById('aInput').value.trim();
+        
+        if (!q || !a) return alert("Required fields missing");
+
+        let targetId;
+
+        if (editId) {
+            // Updating an existing entry
+            const idx = data[currentModule][currentSubmodule].findIndex(i => i.id == editId);
+            data[currentModule][currentSubmodule][idx] = { id: editId, q, subtopic: sub, a };
+            targetId = editId;
+        } else {
+            // Creating a new entry
+            targetId = Date.now();
+            data[currentModule][currentSubmodule].push({ id: targetId, q, subtopic: sub, a });
+        }
+
+        save(); 
+        
+        // 1. Refresh the UI components
+        renderSidebarIndex(); 
+        renderQuestions();
+        
+        // 2. Switch back to list view and jump to the entry
+        showListView();
+        scrollToQuestion(targetId);
+    }
+
+    function deleteEntry(id) {
+	if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+        if (confirm("Delete?")) { 
+            data[currentModule][currentSubmodule] = data[currentModule][currentSubmodule].filter(i => i.id != id); 
+            save(); renderSidebarIndex(); renderQuestions(); 
+        }
+    }
+
+    function addModule() {
+	if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+        const name = prompt("Module Name:");
+        if (name && !data[name]) { data[name] = {}; save(); renderDashboard(); }
+    }
+
+    function addSubmodule() {
+	if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+        const name = prompt("Submodule Name:");
+        if (name && !data[currentModule][name]) { data[currentModule][name] = []; save(); renderSubmodules(); }
+    }
+
+    function deleteCurrentModule() {
+	if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+        if (confirm("Delete module?")) { delete data[currentModule]; save(); showDashboard(); }
+    }
+
+    function deleteCurrentSubmodule() {
+	if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+        if (confirm("Delete submodule?")) { delete data[currentModule][currentSubmodule]; save(); showSubmoduleView(); }
+    }
+
+    function updatePreview() { 
+        document.getElementById('livePreview').innerHTML = marked.parse(document.getElementById('aInput').value); 
+        Prism.highlightAll();
+    }
+
+    function toggleTheme() { 
+        const body = document.body;
+        body.classList.toggle('dark'); 
+        const prismLink = document.getElementById('prism-theme');
+        prismLink.href = body.classList.contains('dark') ? 
+            "https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-one-dark.min.css" : 
+            "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
+    }
+
+    function exportData() {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = "backup.json"; a.click();
+    }
+
+    document.getElementById('importFile').onchange = (e) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => { data = JSON.parse(ev.target.result); save(); renderDashboard(); };
+        reader.readAsText(e.target.files[0]);
+    };
+	// Helper to highlight text
+	function highlightText(text, query) {
+		if (!query) return text;
+
+		const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+		const regex = new RegExp(`(${escapedQuery})`, 'gi');
+
+		return text.replace(regex, '<span class="highlighted">$1</span>');
+	}
+	function highlightHTML(html, query) {
+
+    if (!query) return html;
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+
+    function walk(node) {
+
+        if (node.nodeType === 3) { // TEXT NODE
+
+            const replaced = node.nodeValue.replace(regex,
+                '<span class="highlighted">$1</span>');
+
+            if (replaced !== node.nodeValue) {
+                const span = document.createElement("span");
+                span.innerHTML = replaced;
+                node.replaceWith(...span.childNodes);
+            }
+        }
+
+        else if (node.nodeType === 1 &&
+            node.tagName !== "SCRIPT" &&
+            node.tagName !== "STYLE" &&
+            node.tagName !== "CODE" &&
+            node.tagName !== "PRE") {
+
+            [...node.childNodes].forEach(walk);
+        }
+    }
+
+    walk(tempDiv);
+
+    return tempDiv.innerHTML;	
+	}
+
+    function renderDashboard() {
+        const grid = document.getElementById('moduleGrid');
+        grid.innerHTML = "";
+        Object.keys(data).forEach(m => {
+            const card = document.createElement('div');
+            card.className = "module-card";
+            const subCount = Object.keys(data[m]).length;
+            const totalItems = Object.values(data[m]).reduce((sum, arr) => sum + arr.length, 0);
+            card.innerHTML = `<h3>${m}</h3><p style="font-size:12px; color:var(--accent); font-weight:normal;">${subCount} Submodules, ${totalItems} Items</p>`;
+            card.onclick = () => openModule(m);
+            grid.appendChild(card);
+        });
+    }
+	function renderGlobalSearch() {
+		globalSearchMatches = [];
+		globalCurrentMatchIndex = -1;
+        const term = document.getElementById('globalSearch').value.toLowerCase();
+        const resultsArea = document.getElementById('globalResults');
+        const resultsList = document.getElementById('resultsList');
+        const moduleGrid = document.getElementById('moduleGrid');
+        const clearBtn = document.getElementById('clearBtn');
+
+        clearBtn.style.display = term ? 'block' : 'none';
+
+        if (!term) {
+
+			resultsArea.style.display = 'none';
+			moduleGrid.style.opacity = '1';
+
+			const counter = document.getElementById("globalMatchCounter");
+			if(counter){
+				counter.style.display = "none";
+			}
+
+			globalSearchMatches = [];
+			globalCurrentMatchIndex = -1;
+
+			return;
+		}
+
+        resultsList.innerHTML = "";
+        resultsArea.style.display = 'block';
+        moduleGrid.style.opacity = '0.3';
+
+        let matches = [];
+
+        Object.keys(data).forEach(modName => {
+            Object.keys(data[modName]).forEach(subName => {
+                data[modName][subName].forEach(item => {
+                    const content = (item.q + " " + (item.subtopic || "") + " " + item.a).toLowerCase();
+                    if (content.includes(term)) {
+                        matches.push({ modName, subName, item });
+                    }
+                });
+            });
+        });
+
+        if (matches.length === 0) {
+            resultsList.innerHTML = "<p style='opacity:0.6'>No matches found.</p>";
+        } else {
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = "card";
+				div.id = "global-q-" + match.item.id;
+
+				if(term){
+					globalSearchMatches.push(div.id);
+				}
+                div.style.cursor = "pointer";
+                div.style.borderLeft = "4px solid var(--primary)";
+                
+                
+
+                div.innerHTML = `
+						<div style="font-size:10px;
+						text-transform:uppercase;
+						color:var(--accent);
+						margin-bottom:8px;">
+						${match.modName} › ${match.subName}
+						</div>
+
+						<h3 style="margin-bottom:6px;">
+						${highlightText(match.item.q, term)}
+						</h3>
+
+						<div style="font-size:11px;
+						opacity:0.6;
+						margin-bottom:10px;">
+						${match.item.subtopic || 'General'}
+						</div>
+
+						<div class="markdown-body">
+						${highlightHTML(marked.parse(match.item.a), term)}
+						</div>
+`				;
+                div.onclick = () => {
+                    openModule(match.modName);
+                    openSubmodule(match.subName);
+                    scrollToQuestion(match.item.id);
+                    document.getElementById('globalSearch').value = "";
+                    resultsArea.style.display = 'none';
+                    moduleGrid.style.opacity = '1';
+                };
+                resultsList.appendChild(div);
+            });
+        }
+		Prism.highlightAll();
+		updateGlobalMatchCounter();
+    }
+	function clearGlobalSearch() {
+
+    const input = document.getElementById('globalSearch');
+
+    input.value = "";
+    input.focus();
+
+    globalSearchMatches = [];
+    globalCurrentMatchIndex = -1;
+
+    const counter = document.getElementById("globalMatchCounter");
+    if(counter){
+        counter.style.display = "none";
+    }
+
+    renderGlobalSearch();
+}
+	function renderModuleSearch() {
+	moduleSearchMatches = [];
+    moduleCurrentMatchIndex = -1;
+    const term = document.getElementById('moduleSearch').value.toLowerCase();
+	const clearBtn = document.getElementById('moduleClearBtn');
+	if (clearBtn) clearBtn.style.display = term ? 'block' : 'none';
+    const resultsBox = document.getElementById('moduleSearchResults');
+    const grid = document.getElementById('submoduleGrid');
+
+  if (!term) {
+
+    resultsBox.style.display = 'none';
+    grid.style.display = 'grid';
+
+    // ⭐ HIDE COUNTER WHEN EMPTY SEARCH
+    const counter = document.getElementById("moduleMatchCounter");
+    if(counter){
+        counter.style.display = "none";
+    }
+
+    moduleSearchMatches = [];
+    moduleCurrentMatchIndex = -1;
+
+    return;
+}
+
+    resultsBox.innerHTML = "";
+    resultsBox.style.display = 'block';
+    grid.style.display = 'none';
+
+    let matches = [];
+
+    Object.keys(data[currentModule]).forEach(subName => {
+
+        data[currentModule][subName].forEach(item => {
+
+            const content =
+                (item.q + " " + (item.subtopic || "") + " " + item.a)
+                .toLowerCase();
+
+            if (content.includes(term)) {
+                matches.push({ subName, item });
+            }
+
+        });
+
+    });
+
+    if (matches.length === 0) {
+        resultsBox.innerHTML =
+            "<p style='opacity:0.6'>No matches found.</p>";
+        return;
+    }
+
+    matches.forEach(match => {
+
+        const div = document.createElement('div');
+        div.className = "card";
+		div.id = "module-q-" + match.item.id;
+
+		if(term){
+			moduleSearchMatches.push(div.id);
+		}
+        div.style.cursor = "pointer";
+        div.style.borderLeft = "4px solid var(--primary)";
+
+        div.innerHTML = `
+            <div style="font-size:10px;
+            text-transform:uppercase;
+            color:var(--accent);
+            margin-bottom:8px;">
+            ${currentModule} › ${match.subName}
+            </div>
+
+            <h3 style="margin-bottom:6px;">
+            ${highlightText(match.item.q, term)}
+            </h3>
+
+            <div style="font-size:11px;
+            opacity:0.6;
+            margin-bottom:10px;">
+            ${match.item.subtopic || 'General'}
+            </div>
+
+            <div class="markdown-body module-answer">
+            ${marked.parse(match.item.a)}
+            </div>
+        `;
+
+        div.onclick = () => {
+            openSubmodule(match.subName);
+            scrollToQuestion(match.item.id);
+        };
+
+        resultsBox.appendChild(div);
+
+    });
+
+    Prism.highlightAll();
+
+    document.querySelectorAll('.module-answer').forEach(el => {
+        el.innerHTML = highlightHTML(el.innerHTML, term);
+    });
+	updateModuleMatchCounter();	
+}
+	function clearModuleSearch() {
+
+    document.getElementById('moduleSearch').value = "";
+
+    document.getElementById('moduleSearchResults').style.display = 'none';
+
+    document.getElementById('submoduleGrid').style.display = 'grid';
+
+    document.getElementById('moduleClearBtn').style.display = 'none';
+
+    // ⭐ RESET MATCHES
+    moduleSearchMatches = [];
+    moduleCurrentMatchIndex = -1;
+
+    // ⭐ HIDE COUNTER
+    const counter = document.getElementById("moduleMatchCounter");
+    if(counter){
+        counter.style.display = "none";
+    }
+}
+
+    function renderSubmodules() {
+        const grid = document.getElementById('submoduleGrid');
+        grid.innerHTML = "";
+        if (!currentModule || !data[currentModule]) return;
+        Object.keys(data[currentModule]).forEach(s => {
+            const card = document.createElement('div');
+            card.className = "module-card";
+            card.innerHTML = `<h3>${s}</h3><p style="font-size:12px; color:var(--accent); font-weight:normal;">${data[currentModule][s].length} Items</p>`;
+            card.onclick = () => openSubmodule(s);
+            grid.appendChild(card);
+        });
+    }
+
+    function autoResize(textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+    }
+	function toggleGroup(topic, el) {
+
+		const group = document.querySelector(
+			`.group-list-container[data-topic-group="${topic}"]`
+		);
+
+		if (!group) return;
+
+		if (group.style.display === "none") {
+
+			group.style.display = "block";
+			el.innerText = "▼";
+
+		} else {
+
+			group.style.display = "none";
+			el.innerText = "▶";
+
+		}
+	}
+	function collapseAllGroups() {
+
+    document
+        .querySelectorAll('.group-list-container')
+        .forEach(group => {
+            group.style.display = "none";
+        });
+
+    document
+        .querySelectorAll('.collapse-icon')
+        .forEach(icon => {
+            icon.innerText = "▶";
+        });
+
+}
+function expandAllGroups() {
+
+    document
+        .querySelectorAll('.group-list-container')
+        .forEach(group => {
+            group.style.display = "block";
+        });
+
+    document
+        .querySelectorAll('.collapse-icon')
+        .forEach(icon => {
+            icon.innerText = "▼";
+        });
+
+}
+function toggleAllGroups() {
+
+    const btn = document.getElementById('toggleAllBtn');
+
+    if (!isAllCollapsed) {
+
+        // COLLAPSE ALL
+        document
+            .querySelectorAll('.group-list-container')
+            .forEach(group => {
+                group.style.display = "none";
+            });
+
+        document
+            .querySelectorAll('.collapse-icon')
+            .forEach(icon => {
+                icon.innerText = "▶";
+            });
+
+        btn.innerText = "⏬ Expand All";
+        isAllCollapsed = true;
+
+    }
+
+    else {
+
+        // EXPAND ALL
+        document
+            .querySelectorAll('.group-list-container')
+            .forEach(group => {
+                group.style.display = "block";
+            });
+
+        document
+            .querySelectorAll('.collapse-icon')
+            .forEach(icon => {
+                icon.innerText = "▼";
+            });
+
+        btn.innerText = "⏫ Collapse All";
+        isAllCollapsed = false;
+
+    }
+
+}
+	function toggleScroll() {
+
+		const area = document.querySelector('.content-area');
+		const btn = document.getElementById('scrollToggleBtn');
+
+		// If near top → go bottom
+		if (area.scrollTop < area.scrollHeight / 2) {
+
+			area.scrollTo({
+				top: area.scrollHeight,
+				behavior: 'smooth'
+			});
+
+			btn.innerText = "↑";
+
+		}
+
+		// If near bottom → go top
+		else {
+
+			area.scrollTo({
+				top: 0,
+				behavior: 'smooth'
+			});
+
+			btn.innerText = "↓";
+
+		}
+	}
+	function addPDFHeader(pdf,pageWidth){
+
+		pdf.setFont("Helvetica","bold");
+		pdf.setFontSize(12);
+		pdf.setTextColor(37,99,235);   // Blue
+
+		pdf.text(currentModule,10,8);
+
+		pdf.setFont("Helvetica","normal");
+		pdf.setFontSize(9);
+		pdf.setTextColor(0,0,0);
+
+		pdf.text(currentSubmodule,10,13);
+
+		// Divider Line
+		pdf.setDrawColor(200,200,200);
+		pdf.line(10,15,pageWidth-10,15);
+	}
+	function showPDFProgress(){
+
+    cancelPDFExport = false;
+
+    const box = document.getElementById("pdfProgressBox");
+
+    box.style.background = getComputedStyle(document.body).getPropertyValue('--card');
+    box.style.color = getComputedStyle(document.body).getPropertyValue('--text');
+    box.style.borderColor = getComputedStyle(document.body).getPropertyValue('--border');
+
+    document.getElementById("pdfProgressBar").style.background =
+        getComputedStyle(document.body).getPropertyValue('--primary');
+
+    document.getElementById("pdfProgressText").style.color =
+        getComputedStyle(document.body).getPropertyValue('--text');
+
+    box.style.display="block";
+}
+function updateGlobalMatchCounter(){
+
+    const counter = document.getElementById("globalMatchCounter");
+
+    if(!counter) return;
+
+    if(globalSearchMatches.length === 0){
+
+        counter.style.display = "none";
+        return;
+    }
+
+    counter.style.display = "block";
+
+    counter.innerText =
+        (globalCurrentMatchIndex + 1) +
+        " / " +
+        globalSearchMatches.length;
+}
+function goToNextGlobalSearchMatch(){
+
+    if(globalSearchMatches.length === 0) return;
+
+    globalCurrentMatchIndex++;
+
+    if(globalCurrentMatchIndex >= globalSearchMatches.length){
+        globalCurrentMatchIndex = 0;
+    }
+
+    const id = globalSearchMatches[globalCurrentMatchIndex];
+    const el = document.getElementById(id);
+
+    if(el){
+
+        el.scrollIntoView({
+            behavior:'smooth',
+            block:'center'
+        });
+
+        el.style.borderColor = "#f59e0b";
+
+        setTimeout(()=>{
+            el.style.borderColor = "var(--border)";
+        },800);
+    }
+
+    updateGlobalMatchCounter();
+}
+function goToPreviousGlobalSearchMatch(){
+
+    if(globalSearchMatches.length === 0) return;
+
+    globalCurrentMatchIndex--;
+
+    if(globalCurrentMatchIndex < 0){
+        globalCurrentMatchIndex = globalSearchMatches.length - 1;
+    }
+
+    const id = globalSearchMatches[globalCurrentMatchIndex];
+    const el = document.getElementById(id);
+
+    if(el){
+
+        el.scrollIntoView({
+            behavior:'smooth',
+            block:'center'
+        });
+
+        el.style.borderColor = "#f59e0b";
+
+        setTimeout(()=>{
+            el.style.borderColor = "var(--border)";
+        },800);
+    }
+
+    updateGlobalMatchCounter();
+}
+function hidePDFProgress(){
+    document.getElementById("pdfProgressBox").style.display="none";
+}
+
+function updatePDFProgress(percent){
+    document.getElementById("pdfProgressBar").style.width = percent + "%";
+    document.getElementById("pdfProgressText").innerText = percent + "%";
+}
+	
+	
+let cancelPDFExport = false;
+	async function exportSubmodulePDF() {
+		if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+		showPDFProgress();
+		if (!currentModule || !currentSubmodule) return;
+
+		const items = data[currentModule][currentSubmodule];
+		let total = items.length;
+		let count = 0;
+
+		if (!items.length) {
+			alert("Nothing to export!");
+            hidePDFProgress();
+			return;
+		}
+
+		document.body.style.cursor = "wait";
+
+		const { jsPDF } = window.jspdf;
+		const pdf = new jsPDF("p", "mm", "a4");
+
+		const pageWidth = 210;
+		const pageHeight = 297;
+		const margin = 10;
+        
+		const usableWidth = pageWidth - margin * 2;
+        // Strict boundary to prevent writing into the bottom margin
+		const pageBottomMargin = pageHeight - margin; 
+
+		addPDFHeader(pdf, pageWidth);
+
+		let yPosition = margin + 10; // Start below the header
+
+		for (let item of items) {
+            if(cancelPDFExport){
+                console.log("PDF Export Cancelled");
+                return;
+            }
+
+			// Create question container
+			const div = document.createElement("div");
+
+			div.style.width = "800px";
+			div.style.padding = "20px";
+			div.style.background = "#fff";
+			div.style.color = "#000";
+			div.style.fontFamily = "Inter";
+			div.style.border = "1px solid #ddd";
+			div.style.marginBottom = "20px";
+
+			div.innerHTML = `
+			<div style="color:#6b7280; font-size:11px; font-weight:700; margin-bottom:6px;">
+				${item.subtopic || 'General'}
+			</div>
+			<h2 class="pdf-question-title" style="margin-top:0; margin-bottom:10px; color:#2563eb; font-size:16px; font-weight:700; line-height:1.4; word-wrap:break-word;">
+				${item.q}
+			</h2>
+			<div class="markdown-body" style="color:#000; font-size:13px; line-height:1.6; word-wrap:break-word;">
+				${marked.parse(item.a)}
+			</div>
+			`;
+            div.classList.add("pdf-hidden-render");
+            document.body.appendChild(div);
+			Prism.highlightAllUnder(div);
+			
+            // --- Formatting Styles ---
+            div.querySelectorAll('p, span, li, blockquote').forEach(el=>{ el.style.color = "#000"; });
+			div.querySelectorAll('.pdf-question-title').forEach(q=>{ q.style.setProperty('color','#2563eb','important'); });
+			div.querySelectorAll('.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6').forEach(h=>{
+				if(!h.classList.contains('pdf-question-title')){
+					h.style.setProperty('color','#000','important');
+					h.style.setProperty('font-weight','700','important');
+				}
+			});
+			div.querySelectorAll('.markdown-body li').forEach(li=>{ li.style.setProperty('color','#000','important'); });
+			div.querySelectorAll('.markdown-body blockquote').forEach(b=>{ b.style.setProperty('color','#000','important'); });
+			div.querySelectorAll('table').forEach(t=>{ t.style.background="#fff"; t.style.borderCollapse="collapse"; });
+			div.querySelectorAll('th').forEach(th=>{ th.style.background="#fff"; th.style.color="#000"; th.style.border="1px solid #ccc"; });
+			div.querySelectorAll('td').forEach(td=>{ td.style.background="#fff"; td.style.color="#000"; td.style.border="1px solid #ccc"; });
+			div.querySelectorAll('tr').forEach(tr=>{ tr.style.background="#fff"; });
+			div.querySelectorAll('pre').forEach(pre=>{ pre.style.background="#f6f8fa"; pre.style.color="#000"; });
+			div.querySelectorAll('blockquote').forEach(b=>{ b.style.setProperty('color','#000','important'); });
+			div.querySelectorAll('li').forEach(li=>{ li.style.setProperty('color','#000','important'); });
+			div.querySelectorAll('code').forEach(code=>{ code.style.background="#f6f8fa"; code.style.color="#000"; });
+
+			await new Promise(r => setTimeout(r, 100));
+
+			const canvas = await html2canvas(div, {
+                scale: 4,                // 4K QUALITY
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                backgroundColor: "#ffffff",
+                windowWidth: div.scrollWidth,
+                windowHeight: div.scrollHeight
+            });
+
+			const imgWidth = usableWidth;
+            // Calculate pixel to mm ratio
+            const pxPerMm = canvas.width / imgWidth;
+            const imgHeight = canvas.height / pxPerMm;
+
+            let currentPxY = 0;
+
+            // If a block is large but we only have a tiny bit of space left, bump it to the next page early to avoid awkward tiny headers
+            if ((pageBottomMargin - yPosition) < 30 && imgHeight > 30) {
+                pdf.addPage();
+                addPDFHeader(pdf, pageWidth);
+                yPosition = margin + 10;
+            }
+
+            // Slice Canvas until we reach the end of the element
+            while (currentPxY < canvas.height) {
+                // Determine space left on the PDF page in mm & convert to pixels
+                let spaceLeftMm = pageBottomMargin - yPosition;
+                let spaceLeftPx = spaceLeftMm * pxPerMm;
+                
+                // Grab either the remaining space on the page, or the remainder of the image—whichever is smaller
+                let sliceHeightPx = Math.min(spaceLeftPx, canvas.height - currentPxY);
+                let sliceHeightMm = sliceHeightPx / pxPerMm;
+
+                // Create a temporary canvas specifically for this slice
+                let tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = sliceHeightPx;
+                let ctx = tempCanvas.getContext('2d');
+                
+                // Draw only the slice segment from the master canvas
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                ctx.drawImage(
+                    canvas, 
+                    0, currentPxY, canvas.width, sliceHeightPx, // Source coordinates
+                    0, 0, canvas.width, sliceHeightPx           // Destination coordinates
+                );
+
+                let sliceData = tempCanvas.toDataURL("image/png");
+
+                // Put slice on PDF
+                pdf.addImage(sliceData, "PNG", margin, yPosition, imgWidth, sliceHeightMm, undefined, "FAST");
+
+                // Update trackers
+                currentPxY += sliceHeightPx;
+                yPosition += sliceHeightMm;
+
+                // If there's still more image to draw, the page is full. Create a new one.
+                if (currentPxY < canvas.height) {
+                    pdf.addPage();
+                    addPDFHeader(pdf, pageWidth);
+                    yPosition = margin + 10; 
+                } else {
+                    // Item finished, add a small gap before the next question
+                    yPosition += 10;
+                    
+                    // If the gap pushes us too close to the end, make a new page for the next loop
+                    if (yPosition > pageBottomMargin - 20) {
+                        pdf.addPage();
+                        addPDFHeader(pdf, pageWidth);
+                        yPosition = margin + 10;
+                    }
+                }
+            }
+
+			document.body.removeChild(div);
+			count++;
+			let percent = Math.round((count/total)*100);
+			updatePDFProgress(percent);
+			await new Promise(r=>setTimeout(r,50));
+		}
+
+		pdf.save(`${currentModule}-${currentSubmodule}.pdf`);
+		hidePDFProgress();
+
+		document.body.style.cursor = "default";
+	}
+	function mapIndexWithScroll() {
+
+		const cards = document.querySelectorAll('.card[id^="q-"]');
+		const navBtns = document.querySelectorAll('.nav-btn');
+		const sidebar = document.querySelector('.sidebar');
+
+		let currentId = null;
+
+		cards.forEach(card => {
+
+			const rect = card.getBoundingClientRect();
+
+			if (rect.top >= 100 && rect.top <= 250) {
+				currentId = card.id.replace("q-", "");
+			}
+
+		});
+
+		if (!currentId) return;
+
+		navBtns.forEach(btn => {
+
+			btn.classList.remove("active-index");
+
+			if (btn.dataset.id == currentId) {
+
+				btn.classList.add("active-index");
+
+				// ⭐ THIS IS THE MAGIC LINE
+				btn.scrollIntoView({
+					behavior: "smooth",
+					block: "center"
+				});
+
+			}
+
+		});
+	}
+
+    showDashboard();
+	document.getElementById("cancelPDFBtn").onclick = function(){
+
+    cancelPDFExport = true;
+
+    hidePDFProgress();
+
+    document.body.style.cursor = "default";
+}
+</script>
+</html>
+
+</body>
