@@ -693,6 +693,18 @@ justify-content:center;
 }
 
 }
+#addVideoModal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:rgba(0,0,0,0.5);
+z-index:100000;   /* higher than sidebar/header */
+justify-content:center;
+align-items:center;
+}
     </style>
 </head>
 <body class="dark">
@@ -780,6 +792,12 @@ justify-content:center;
         title="Ebook Library">
         📚 <span>E-Books</span>
         </button>
+		
+		<button class="btn"
+		onclick="openVideoPage()"
+		title="Learning Videos">
+		🎥 <span>Videos</span>
+		</button>
 
     </div>
 
@@ -933,6 +951,7 @@ style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
 
 </div>
 
+
 <!-- ⭐ SEARCH ROW -->
 <div class="search-container" style="margin-bottom:20px;">
     <div class="search-wrapper">
@@ -993,6 +1012,7 @@ font-size:14px;
     </div>
 
 </div>
+
 
 <div id="submoduleView">
 
@@ -1220,6 +1240,9 @@ font-size:14px;
     // Updated data structure: { moduleName: { subModuleName: [ {id, q, subtopic, a}, ... ], ... }, ... }
     let data = JSON.parse(localStorage.getItem("devmaster_db_v7")) || { "Getting Started": {} };
 	let ebooks = JSON.parse(localStorage.getItem("ebooks_db")) || [];
+	let videos = JSON.parse(localStorage.getItem("videos_db")) || [];
+	let isVideoDeleteMode = false;
+	let selectedVideos = new Set();
     let currentModule = null;
     let currentSubmodule = null;
     let editId = null;
@@ -1494,16 +1517,286 @@ selectedBooks = new Set();
 
     renderEbooks();
 }
+function toggleVideoDeleteMode(){
+
+isVideoDeleteMode = !isVideoDeleteMode;
+selectedVideos = new Set();
+
+const btn=document.getElementById("deleteVideosBtn");
+
+if(isVideoDeleteMode){
+btn.innerHTML="❌ <span>Cancel Delete</span>";
+btn.classList.remove("btn-outline");
+}
+else{
+btn.innerHTML="🗑 <span>Delete Videos</span>";
+btn.classList.add("btn-outline");
+}
+
+renderVideos();
+}
 function openEbookPage(){
 
-    document.getElementById('dashboardView').style.display='none';
-    document.getElementById('submoduleView').style.display='none';
-    document.getElementById('moduleWorkspace').style.display='none';
-    document.getElementById('ebookView').style.display='block';
+   hideAllViews();
+document.getElementById('ebookView').style.display='block';
 
     document.getElementById('dashboardControls').style.display='none';
 
     renderEbooks();
+}
+function openVideoPage(){
+
+    hideAllViews();
+    document.getElementById('videoView').style.display='block';
+
+    document.getElementById('dashboardControls').style.display='none';
+
+    renderVideos();
+}
+function convertYoutubeLink(link){
+
+let idMatch = link.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+
+if(idMatch){
+return "https://www.youtube.com/embed/" + idMatch[1];
+}
+
+return link;
+}
+
+function showVideoModal(){
+document.getElementById("addVideoModal").style.display="flex";
+}
+function closeVideoModal(){
+document.getElementById("addVideoModal").style.display="none";
+}
+function addVideo(){
+
+let title=document.getElementById("videoTitleInput").value;
+let topic=document.getElementById("videoTopicInput").value;
+let link=document.getElementById("videoLinkInput").value;
+
+if(!title || !link){
+alert("Title and Link Required!");
+return;
+}
+
+videos.push({
+id:Date.now(),
+title:title,
+topic:topic || "General",
+link:link   // ✅ store ORIGINAL link
+});
+
+localStorage.setItem("videos_db",JSON.stringify(videos));
+
+closeVideoModal();
+renderVideos();
+}
+
+function renderVideos(){
+
+const grid = document.getElementById("videoGrid");
+grid.innerHTML = "";
+
+const term = document.getElementById("videoSearch")?.value?.toLowerCase() || "";
+
+const clearBtn = document.getElementById("videoClearBtn");
+if(clearBtn){
+    clearBtn.style.display = term ? "block" : "none";
+}
+
+// ⭐ FILTER
+const filtered = videos.filter(v=>
+(v.title||"").toLowerCase().includes(term) ||
+(v.topic||"").toLowerCase().includes(term)
+);
+
+// ⭐ EMPTY
+if(filtered.length === 0){
+grid.innerHTML="<p style='opacity:0.6'>No videos found.</p>";
+return;
+}
+
+// ⭐ LOOP
+filtered.forEach(v=>{
+
+const card=document.createElement("div");
+card.className="ebook-card";
+card.style.position="relative";
+
+let checkboxHTML="";
+
+// ⭐ DELETE MODE CHECKBOX
+if(isVideoDeleteMode){
+
+checkboxHTML=`
+<input type="checkbox"
+${selectedVideos.has(v.id) ? "checked" : ""}
+onchange="selectVideo(${v.id},this)"
+style="
+position:absolute;
+top:10px;
+right:10px;
+width:18px;
+height:18px;
+z-index:5;
+">
+`;
+}
+
+// ⭐ GET THUMBNAIL
+let thumbnail = getYoutubeThumbnail(v.link);
+
+card.innerHTML=`
+${checkboxHTML}
+
+<div style="
+width:100%;
+aspect-ratio:16/9;
+border-radius:10px;
+overflow:hidden;
+margin-bottom:10px;
+position:relative;
+cursor:pointer;
+">
+
+<img src="${thumbnail}"
+style="
+width:100%;
+height:100%;
+object-fit:cover;
+">
+
+<div style="
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.3);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:32px;
+color:white;
+">
+▶
+</div>
+
+</div>
+
+<h3 style="font-size:14px;margin:0;">
+${highlightText(v.title,term)}
+</h3>
+
+<small style="opacity:0.6;">
+${highlightText(v.topic || "",term)}
+</small>
+`;
+
+// ⭐ OPEN YOUTUBE ONLY WHEN NOT DELETE MODE
+if(!isVideoDeleteMode){
+card.onclick=()=>{
+window.open(v.link,'_blank','noopener,noreferrer');}
+}
+
+grid.appendChild(card);
+
+});
+
+// ⭐ DELETE BUTTON
+if(isVideoDeleteMode && selectedVideos.size > 0){
+
+const delBtn=document.createElement("button");
+
+delBtn.className="btn";
+delBtn.style.marginTop="15px";
+delBtn.innerText=
+"Delete Selected ("+selectedVideos.size+")";
+
+delBtn.onclick=deleteSelectedVideos;
+
+grid.appendChild(delBtn);
+}
+
+}
+function selectVideo(id,checkbox){
+
+if(checkbox.checked){
+selectedVideos.add(id);
+}
+else{
+selectedVideos.delete(id);
+}
+
+renderVideos();
+}
+function deleteSelectedVideos(){
+
+if(!confirm("Delete selected videos?")) return;
+
+videos=videos.filter(v=>
+!selectedVideos.has(v.id)
+);
+
+localStorage.setItem(
+"videos_db",
+JSON.stringify(videos)
+);
+
+selectedVideos=new Set();
+isVideoDeleteMode=false;
+
+document.getElementById("deleteVideosBtn")
+.innerHTML="🗑 Delete Videos";
+
+renderVideos();
+}
+function getYoutubeThumbnail(link){
+
+let videoId = "";
+
+// watch?v=abc123
+let watchMatch = link.match(/v=([^&]+)/);
+
+// youtu.be/abc123
+let shortMatch = link.match(/youtu\.be\/([^?]+)/);
+
+// embed/abc123
+let embedMatch = link.match(/embed\/([^?]+)/);
+
+if(watchMatch){
+videoId = watchMatch[1];
+}
+else if(shortMatch){
+videoId = shortMatch[1];
+}
+else if(embedMatch){
+videoId = embedMatch[1];
+}
+
+if(videoId){
+return "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg";
+}
+
+return "";
+}
+function openVideo(link){
+
+document.getElementById("videoPlayerBox").style.display="block";
+document.getElementById("videoPlayer").src=link;
+document.body.style.overflow="hidden";
+}
+function goBackToVideos(){
+
+document.getElementById("videoPlayerBox").style.display="none";
+document.getElementById("videoPlayer").src="";
+document.body.style.overflow="auto";
+}
+function clearVideoSearch(){
+document.getElementById("videoSearch").value="";
+renderVideos();
 }
 function addBookPrompt(){
 
@@ -2041,16 +2334,30 @@ function looksLikeDiagram(code){
         }
         renderSidebarIndex();
     }
+	function hideAllViews(){
+
+    const views = [
+        'dashboardView',
+        'submoduleView',
+        'moduleWorkspace',
+        'ebookView',
+        'videoView'
+    ];
+
+    views.forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.style.display = 'none';
+    });
+}
 
 	function showDashboard() {
 
     currentModule = null;
     currentSubmodule = null;
 
+    hideAllViews();
+
     document.getElementById('dashboardView').style.display = 'block';
-    document.getElementById('submoduleView').style.display = 'none';
-    document.getElementById('moduleWorkspace').style.display = 'none';
-    document.getElementById('ebookView').style.display='none';
 
     document.getElementById('hamburger').style.display = 'none';
     document.getElementById('headerNewBtn').style.display = 'none';
@@ -2058,7 +2365,6 @@ function looksLikeDiagram(code){
 
     document.getElementById('dashboardControls').style.display = 'flex';
 
-    // ⭐ HIDE EBOOK BACK BUTTON
     document.getElementById('ebookBackBtn').style.display = 'none';
 
     renderDashboard();
@@ -3950,6 +4256,146 @@ style="flex:2"
 onclick="saveBookFromModal()">
 Add Book
 </button>
+
+</div>
+
+</div>
+
+</div>
+<div id="videoView"
+style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
+
+<!-- HEADER -->
+<div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+
+<button class="btn btn-outline"
+onclick="showDashboard()">
+←
+</button>
+
+<h1 style="margin:0; color:var(--primary);">
+🎥 Learning Videos
+</h1>
+
+<div style="margin-left:auto; display:flex; gap:8px;">
+
+<button class="btn"
+onclick="showVideoModal()">
+➕ <span>Add Video</span>
+</button>
+
+<button class="btn btn-outline"
+id="deleteVideosBtn"
+onclick="toggleVideoDeleteMode()">
+🗑 <span>Delete Videos</span>
+</button>
+
+</div>
+
+</div>
+
+<!-- SEARCH -->
+<div class="search-container" style="margin-bottom:20px;">
+<div class="search-wrapper">
+
+<input id="videoSearch"
+placeholder="🔍 Search videos..."
+oninput="renderVideos()">
+
+<button id="videoClearBtn"
+class="clear-search"
+onclick="clearVideoSearch()">
+✖
+</button>
+
+</div>
+</div>
+
+<div id="videoGrid" class="ebook-grid"></div>
+
+<!-- VIDEO PLAYER -->
+<div id="videoPlayerBox"
+style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:rgba(0,0,0,0.9);
+z-index:9999;
+">
+
+<button onclick="goBackToVideos()"
+style="
+position:absolute;
+top:20px;
+left:20px;
+z-index:10000;
+background:var(--primary);
+color:white;
+border:none;
+padding:8px 16px;
+border-radius:6px;
+cursor:pointer;
+font-size:14px;
+">
+← Back
+</button>
+
+<iframe id="videoPlayer"
+style="width:100%;height:100%;border:none;">
+</iframe>
+
+</div>
+<div id="addVideoModal"
+style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+z-index:9999;
+justify-content:center;
+align-items:center;
+">
+
+<div style="
+background:#1e1e1e;
+padding:20px;
+border-radius:10px;
+width:400px;
+display:flex;
+flex-direction:column;
+gap:10px;
+">
+
+<h3>Add Learning Video</h3>
+
+<input id="videoTitleInput"
+placeholder="Video Title">
+
+<input id="videoTopicInput"
+placeholder="Topic (Spring Boot / Microservices)">
+
+<input id="videoLinkInput"
+placeholder="YouTube Link">
+
+<div style="display:flex; gap:8px; margin-top:10px;">
+
+<button class="btn"
+onclick="addVideo()">
+Save
+</button>
+
+<button class="btn btn-outline"
+onclick="closeVideoModal()">
+Cancel
+</button>
+
+</div>
 
 </div>
 
