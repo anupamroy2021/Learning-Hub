@@ -722,6 +722,7 @@ justify-content:center;
     <div class="logo" onclick="showDashboard()">
         ⚡ <span>LEARNING HUB</span>
     </div>
+	
 
 </div>
 
@@ -903,33 +904,52 @@ Cancel Export
 style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
 
     <!-- HEADER -->
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+    <!-- ⭐ TITLE ROW -->
+<div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
 
-        <button class="btn btn-outline"
-        onclick="showDashboard()">
-        ←
+    <button class="btn btn-outline"
+    onclick="showDashboard()">
+    ←
+    </button>
+
+    <h1 style="margin:0; color:var(--primary);">
+    📚 E-Books
+    </h1>
+
+    <div style="margin-left:auto; display:flex; gap:8px;">
+
+        <button class="btn"
+        onclick="openAddBookModal()">
+        ➕ <span>Add Book</span>
         </button>
 
-        <h1 style="margin:0; color:var(--primary);">
-        📚 E-Books
-        </h1>
-
-        <div style="margin-left:auto; display:flex; gap:8px;">
-
-            <button class="btn"
-			onclick="openAddBookModal()">
-			➕ <span>Add Book</span>
-			</button>
-
-            <button class="btn btn-outline"
-			id="deleteBooksBtn"
-			onclick="toggleDeleteMode()">
-			🗑 <span>Delete Books</span>
-			</button>
-
-        </div>
+        <button class="btn btn-outline"
+        id="deleteBooksBtn"
+        onclick="toggleDeleteMode()">
+        🗑 <span>Delete Books</span>
+        </button>
 
     </div>
+
+</div>
+
+<!-- ⭐ SEARCH ROW -->
+<div class="search-container" style="margin-bottom:20px;">
+    <div class="search-wrapper">
+
+        <input id="ebookSearch"
+        placeholder="🔍 Search books by title or author..."
+        oninput="renderEbooks()"
+        style="padding-right:95px;">
+
+        <button id="ebookClearBtn"
+        class="clear-search"
+        onclick="clearEbookSearch()">
+        ✖
+        </button>
+
+    </div>
+</div>
 
     <!-- ⭐ MOVE THIS INSIDE -->
 	<div id="ebookGrid" class="ebook-grid"></div>
@@ -1109,8 +1129,13 @@ font-size:14px;
         <button class="btn btn-outline edit-action"
             onclick="exportSubmodulePDF()"
             style="font-size:11px;">
-            📄 Export PDF
+            📄 <span>Export PDF</span>
         </button>
+		<button class="btn edit-action"
+		onclick="exportSubmoduleTextPDF()"
+		style="font-size:11px;">
+		📑 <span>Copyable PDF</span>
+		</button>
 
     </div>
 </div>
@@ -1540,10 +1565,44 @@ function renderEbooks(){
     const grid = document.getElementById("ebookGrid");
     grid.innerHTML = "";
 
-    ebooks.forEach(book=>{
+    const term =
+    document.getElementById("ebookSearch")?.value
+    ?.toLowerCase() || "";
+
+    const clearBtn =
+    document.getElementById("ebookClearBtn");
+
+    if(clearBtn){
+        clearBtn.style.display =
+        term ? "block" : "none";
+    }
+
+    const filteredBooks =
+    ebooks.filter(book=>{
+
+        return (
+            (book.title || "")
+            .toLowerCase()
+            .includes(term)
+
+            ||
+
+            (book.author || "")
+            .toLowerCase()
+            .includes(term)
+        );
+    });
+
+    if(filteredBooks.length === 0){
+        grid.innerHTML =
+        "<p style='opacity:0.6'>No books found.</p>";
+        return;
+    }
+
+    filteredBooks.forEach(book=>{
 
         const card = document.createElement("div");
-		card.className="ebook-card";
+        card.className="ebook-card";
         card.style.position="relative";
 
         let checkboxHTML = "";
@@ -1586,11 +1645,11 @@ object-fit:cover;
 </div>
 
 <h3 style="font-size:14px; margin:0;">
-📘 ${book.title}
+📘 ${highlightText(book.title,term)}
 </h3>
 
 <small style="opacity:0.6;">
-${book.author || ""}
+${highlightText(book.author || "",term)}
 </small>
 `;
 
@@ -1603,7 +1662,6 @@ ${book.author || ""}
         grid.appendChild(card);
     });
 
-    // ⭐ Add Delete Selected Button
     if(isDeleteMode && selectedBooks.size > 0){
 
         const delBtn = document.createElement("button");
@@ -1618,6 +1676,19 @@ ${book.author || ""}
 
         grid.appendChild(delBtn);
     }
+}
+function clearEbookSearch(){
+
+    document.getElementById("ebookSearch").value = "";
+
+    const btn =
+    document.getElementById("ebookClearBtn");
+
+    if(btn){
+        btn.style.display = "none";
+    }
+
+    renderEbooks();
 }
 function getDriveThumbnail(link){
 
@@ -3355,6 +3426,430 @@ let cancelPDFExport = false;
 
 		document.body.style.cursor = "default";
 	}
+	const PDF_STYLE = {
+
+    headerColor : [37,99,235],
+    textColor : [0,0,0],
+    subtopicColor : [120,120,120],
+
+    questionSize : 13,
+    subtopicSize : 9,
+    normalSize : 10,
+    codeSize : 9,
+
+    lineGap : 5,
+    blockGap : 6,
+    sectionGap : 10,
+
+    codeBg : [245,245,245],
+    quoteLine : [180,180,180]
+
+};
+function cleanCodeBlock(code){
+
+return code
+
+.replace(/\r\n/g,"\n")      // windows line break
+.replace(/\r/g,"\n")
+.replace(/\t/g,"    ")      // tab → 4 spaces
+.replace(/[^\x20-\x7E\n]/g,"");   // KEEP NEWLINE!
+}
+async function exportSubmoduleTextPDF(){
+
+if(isReadOnlyMode){
+    alert("Reading Mode Enabled");
+    return;
+}
+
+if (!currentModule || !currentSubmodule) return;
+
+const items = data[currentModule][currentSubmodule];
+const { jsPDF } = window.jspdf;
+const pdf = new jsPDF("p","mm","a4");
+
+let y = 20;
+const margin = 10;
+const usableWidth = 190;
+
+let x = margin;
+const lineHeight = 5;
+
+const PRIMARY = [37,99,235];
+const GREY = [120,120,120];
+const BORDER = [210,210,210];
+
+// ===== PAGE HEADER =====
+function addHeader(){
+    pdf.setFont("Helvetica","bold");
+    pdf.setFontSize(12);
+    pdf.setTextColor(...PRIMARY);
+    pdf.text(cleanText(currentModule),10,8);
+
+    pdf.setFontSize(9);
+    pdf.setTextColor(0,0,0);
+    pdf.text(cleanText(currentSubmodule),10,13);
+
+    pdf.setDrawColor(...BORDER);
+    pdf.line(10,15,200,15);
+}
+
+addHeader();
+
+// ===== PAGE BREAK =====
+function checkPageBreak(requiredHeight=lineHeight){
+    if(y + requiredHeight > 280){
+        pdf.addPage();
+        addHeader();
+        y = 20;
+        x = margin;
+    }
+}
+
+// ===== INLINE WRITER =====
+function writeInline(text,font="Helvetica",style="normal"){
+    pdf.setFont(font,style);
+    pdf.setFontSize(10);
+	pdf.setTextColor(37,99,235);   // ⭐ ANSWER BLUE
+    text = cleanText(text);
+    let words = text.split(" ");
+
+    words.forEach(word=>{
+        let w = pdf.getTextWidth(word+" ");
+
+        if(x + w > margin + usableWidth){
+            checkPageBreak(lineHeight);
+            y += lineHeight;
+            x = margin;
+        }
+
+        pdf.text(word+" ",x,y);
+        x += w;
+    });
+}
+
+// ===== BULLET WRITER =====
+function writeBullet(text){
+
+    pdf.setFont("Helvetica","normal");
+    pdf.setFontSize(10);
+
+    text = cleanText(text);
+    let words = text.split(" ");
+    let bulletIndent = 4;
+
+    x = margin + bulletIndent;
+
+    words.forEach(word=>{
+        let w = pdf.getTextWidth(word+" ");
+
+        if(x + w > margin + usableWidth){
+            checkPageBreak(lineHeight);
+            y += lineHeight;
+            x = margin + bulletIndent;
+        }
+
+        pdf.text(word+" ",x,y);
+        x += w;
+    });
+
+    y += lineHeight;
+    x = margin;
+}
+
+// ===== INLINE PARSER =====
+function parseInline(el){
+
+    x = margin;
+
+    el.childNodes.forEach(node=>{
+
+        if(node.nodeType === 3){
+            let txt = cleanText(node.textContent);
+            if(txt.trim().length>0){
+                writeInline(txt,"Helvetica","normal");
+            }
+        }
+
+        if(node.nodeName === "BR"){
+            checkPageBreak(lineHeight);
+            y += lineHeight;
+            x = margin;
+        }
+
+        if(node.tagName === "STRONG"){
+            writeInline(node.innerText,"Helvetica","bold");
+        }
+
+        if(node.tagName === "EM"){
+            writeInline(node.innerText,"Helvetica","italic");
+        }
+
+        if(node.tagName === "CODE"){
+            pdf.setFillColor(245,245,245);
+            let t = cleanText(node.innerText);
+            let w = pdf.getTextWidth(" "+t+" ");
+
+            if(x + w > margin + usableWidth){
+                checkPageBreak(lineHeight);
+                y += lineHeight;
+                x = margin;
+            }
+
+            pdf.rect(x-1,y-3,w+2,4,"F");
+            writeInline(" "+t+" ","Courier","normal");
+        }
+
+        if(node.tagName === "A"){
+            pdf.setTextColor(...PRIMARY);
+            let url = node.href;
+            let t = cleanText(node.innerText);
+            let w = pdf.getTextWidth(t+" ");
+
+            if(x + w > margin + usableWidth){
+                checkPageBreak(lineHeight);
+                y += lineHeight;
+                x = margin;
+            }
+
+            pdf.textWithLink(t+" ",x,y,{url:url});
+            x += w;
+            pdf.setTextColor(0,0,0);
+        }
+    });
+
+    y += lineHeight;
+    x = margin;
+}
+
+// ===== MAIN LOOP =====
+for(let item of items){
+
+    pdf.setFont("Helvetica","bold");
+    pdf.setFontSize(9);
+    pdf.setTextColor(...GREY);
+    checkPageBreak(6);
+    pdf.text(cleanText(item.subtopic || "General"),margin,y);
+    y+=5;
+		// ===== QUESTION TITLE =====
+	pdf.setFont("Helvetica","bold");
+	pdf.setFontSize(12);
+	pdf.setTextColor(0,0,0);   // BLACK TITLE
+
+	x = margin;
+
+	let qWords = cleanText(item.q).split(" ");
+
+	qWords.forEach(word=>{
+		let w = pdf.getTextWidth(word+" ");
+
+		if(x + w > margin + usableWidth){
+			checkPageBreak(lineHeight);
+			y += lineHeight;
+			x = margin;
+		}
+
+		pdf.text(word+" ",x,y);
+		x += w;
+	});
+
+	y += 6;
+	x = margin;
+    let html = marked.parse(item.a);
+    let temp = document.createElement("div");
+    temp.innerHTML = html;
+
+    for(let node of temp.children){
+
+        // ===== HEADINGS =====
+        if(["H1","H2","H3","H4"].includes(node.tagName)){
+
+            checkPageBreak(6);
+            pdf.setFont("Helvetica","bold");
+            pdf.setFontSize(12);
+			pdf.setTextColor(0,0,0);   // ⭐ TITLE BLACK
+
+            x = margin;
+            let words = cleanText(node.innerText).split(" ");
+
+            words.forEach(word=>{
+                let w = pdf.getTextWidth(word+" ");
+                if(x + w > margin + usableWidth){
+                    checkPageBreak(lineHeight);
+                    y += lineHeight;
+                    x = margin;
+                }
+                pdf.text(word+" ",x,y);
+                x += w;
+            });
+
+            y += 6;
+            x = margin;
+        }
+
+        // ===== HR =====
+        if(node.tagName === "HR"){
+            checkPageBreak(lineHeight);
+            pdf.setDrawColor(200);
+            pdf.line(margin,y,margin+usableWidth,y);
+            y+=5;
+        }
+
+        // ===== PARAGRAPH =====
+        if(node.tagName === "P"){
+            parseInline(node);
+            y+=2;
+        }
+
+        // ===== LIST =====
+        if(node.tagName === "UL"){
+            node.querySelectorAll("li").forEach(li=>{
+                checkPageBreak(lineHeight);
+                pdf.setFont("Helvetica","bold");
+                pdf.text("•",margin,y);
+                writeBullet(li.innerText);
+            });
+            y+=3;
+        }
+
+       // ===== CODE BLOCK (WRAPPED) =====
+		if(node.tagName === "PRE"){
+
+			let code = cleanCodeBlock(node.innerText);
+
+			pdf.setFont("Courier","normal");
+			pdf.setFontSize(11);
+			pdf.setTextColor(0,0,0);
+
+			let lines = code.split("\n");
+
+			let wrappedLines = [];
+
+			lines.forEach(line=>{
+
+				let wrapped = pdf.splitTextToSize(
+					line,
+					usableWidth - 6
+				);
+
+				if(wrapped.length === 0){
+					wrappedLines.push(" ");
+				}else{
+					wrapped.forEach(w=>wrappedLines.push(w));
+				}
+			});
+
+			const codeLineHeight = 6;
+
+			wrappedLines.forEach(line=>{
+
+				checkPageBreak(codeLineHeight);
+
+				// ⭐ Background EXACT HEIGHT (NO EXTRA)
+				pdf.setFillColor(246,248,250);
+				pdf.rect(
+					margin-1,
+					y-3,
+					usableWidth+2,
+					codeLineHeight,
+					"F"
+				);
+
+				pdf.setFont("Courier","normal");
+				pdf.text(line, margin, y);
+
+				y += codeLineHeight;
+			});
+
+			// ⭐ ONLY SMALL GAP AFTER BLOCK
+			y += 2;
+		}
+
+        // ===== TABLE =====
+        if(node.tagName === "TABLE"){
+
+            let head = [];
+            let body = [];
+
+            node.querySelectorAll("thead tr").forEach(tr=>{
+                let row=[];
+                tr.querySelectorAll("th").forEach(th=>{
+                    row.push(cleanText(th.innerText));
+                });
+                head.push(row);
+            });
+
+            node.querySelectorAll("tbody tr").forEach(tr=>{
+                let row=[];
+                tr.querySelectorAll("td").forEach(td=>{
+                    row.push(cleanText(td.innerText));
+                });
+                body.push(row);
+            });
+
+            checkPageBreak(20);
+
+            pdf.autoTable({
+                startY:y,
+                head:head,
+                body:body,
+                styles:{fontSize:8,cellPadding:3},
+                headStyles:{fillColor:PRIMARY,textColor:[255,255,255]},
+                theme:'grid'
+            });
+
+            y = pdf.lastAutoTable.finalY + 5;
+        }
+    }
+
+    checkPageBreak(lineHeight);
+    pdf.setDrawColor(...BORDER);
+    pdf.line(margin,y,margin+usableWidth,y);
+    y+=8;
+}
+
+pdf.save(`${currentModule}-${currentSubmodule}-COPYABLE.pdf`);
+}
+function cleanText(text){
+
+if(!text) return "";
+
+return text
+
+// ICON SAFE REPLACEMENT
+.replace(/✔/g,"[OK] ")
+.replace(/✖/g,"[X] ")
+.replace(/⚠/g,"[!] ")
+.replace(/⭐/g,"[*] ")
+.replace(/👉/g,"-> ")
+.replace(/🔹|🔸|🔺|🔻/g,"- ")
+.replace(/📌|📍|📘|📗|📙/g,"- ")
+.replace(/🚀/g,"-> ")
+.replace(/🔥/g,"* ")
+.replace(/💡/g,"- ")
+.replace(/🎯/g,"- ")
+.replace(/📚/g,"- ")
+.replace(/📄/g,"- ")
+
+// SYMBOL FIX
+.replace(/→/g,"->")
+.replace(/≤/g,"<=")
+.replace(/≥/g,">=")
+.replace(/²/g,"^2")
+.replace(/³/g,"^3")
+
+// QUOTES
+.replace(/[“”]/g,'"')
+.replace(/[‘’]/g,"'")
+
+// DASHES
+.replace(/–|—/g,"-")
+
+// DOTS
+.replace(/…/g,"...")
+
+// REMOVE LEFTOVER NON PRINTABLE
+.replace(/[^\x20-\x7E]/g,"");
+}
 	function mapIndexWithScroll() {
 
 		const cards = document.querySelectorAll('.card[id^="q-"]');
