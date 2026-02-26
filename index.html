@@ -2899,7 +2899,8 @@ if(sub){
     const backup = {
 
         learning_data : data,
-        ebook_data : ebooks
+        ebook_data : ebooks,
+        video_data : videos   // ⭐ ADD THIS
 
     };
 
@@ -2932,8 +2933,13 @@ if(sub){
             ebooks = imported.ebook_data;
         }
 
+		if(imported.video_data){
+		    videos = imported.video_data;
+		}
+		
         localStorage.setItem("devmaster_db_v7",JSON.stringify(data));
         localStorage.setItem("ebooks_db",JSON.stringify(ebooks));
+		localStorage.setItem("videos_db", JSON.stringify(videos));
 
         renderDashboard();
         renderEbooks();
@@ -4404,3 +4410,4 @@ Cancel
 </div>
 </body>
 </html>
+
