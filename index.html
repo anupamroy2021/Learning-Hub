@@ -614,13 +614,10 @@ display:table-cell !important;
 
 /* READ MODE DISABLE ONLY EDIT ACTIONS */
 
-.read-mode .edit-action {
+/* ================= READ MODE HIDE EDIT UI ================= */
 
-    opacity: 0.45;
-    pointer-events: none;
-    cursor: not-allowed !important;
-    filter: grayscale(80%);
-    border:1px dashed var(--border);
+.read-mode .edit-action {
+    display: none !important;
 }
 .ebook-grid{
 
@@ -701,10 +698,73 @@ left:0;
 width:100vw;
 height:100vh;
 background:rgba(0,0,0,0.5);
-z-index:100000;   /* higher than sidebar/header */
+z-index:100000;
+
 justify-content:center;
 align-items:center;
+padding:10px;
+overflow-y:auto;
 }
+.video-modal-content{
+
+background:var(--card);
+border-radius:16px;
+padding:20px;
+width:100%;
+max-width:420px;
+display:flex;
+flex-direction:column;
+gap:12px;
+
+max-height:90vh;
+overflow-y:auto;
+
+animation:fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn{
+from{transform:translateY(20px); opacity:0;}
+to{transform:translateY(0); opacity:1;}
+}
+@media(max-width:600px){
+
+.video-modal-content{
+
+padding:16px;
+border-radius:14px;
+
+width:95%;
+max-width:400px;
+
+margin:auto;
+
+position:relative;
+
+animation:fadeIn 0.2s ease;
+}
+}
+
+@keyframes slideUp{
+from{transform:translateY(100%);}
+to{transform:translateY(0);}
+}
+
+.menu-item{
+    width:100%;
+    padding:10px 14px;
+    background:none;
+    border:none;
+    text-align:left;
+    cursor:pointer;
+    color:var(--text);
+    font-size:14px;
+}
+
+.menu-item:hover{
+    background:var(--primary);
+    color:white;
+}
+/*
     </style>
 </head>
 <body class="dark">
@@ -758,48 +818,62 @@ align-items:center;
     <b>+</b> <span>New Entry</span>
     </button>
 
-    <div id="dashboardControls">
+    <div id="dashboardControls" style="position:relative;">
 
-        <button class="btn btn-outline"
-        onclick="toggleTheme()"
-        title="Toggle Theme">
-        🌓
+    <!-- DASHBOARD MENU BUTTON -->
+    <button class="btn btn-outline"
+        onclick="toggleDashboardMenu(event)"
+        title="Menu">
+        ☰
+    </button>
+
+    <!-- DROPDOWN MENU -->
+    <div id="dashboardMenu"
+        style="
+        display:none;
+        position:absolute;
+        right:0;
+        top:45px;
+        background:var(--card);
+        border:1px solid var(--border);
+        border-radius:10px;
+        min-width:180px;
+        box-shadow:0 5px 20px rgba(0,0,0,0.15);
+        z-index:10000;
+        overflow:hidden;
+        ">
+
+        <button class="menu-item" onclick="toggleTheme()">
+            🌓 Theme
         </button>
 
-        <input type="file" id="importFile" hidden accept=".json">
-
-        <button class="btn btn-outline"
-        onclick="document.getElementById('importFile').click()"
-        title="Import JSON">
-        📥 <span>Import</span>
-        </button>
-
-        <button class="btn"
-        onclick="exportData()"
-        title="Export JSON">
-        📤 <span>Export</span>
-        </button>
-
-        <button class="btn btn-outline"
-        id="readModeBtn"
-        onclick="toggleReadMode()"
-        title="Toggle Reading Mode">
-        📖 <span>Reading Mode</span>
-        </button>
-
-        <button class="btn"
-        onclick="openEbookPage()"
-        title="Ebook Library">
-        📚 <span>E-Books</span>
-        </button>
-		
-		<button class="btn"
-		onclick="openVideoPage()"
-		title="Learning Videos">
-		🎥 <span>Videos</span>
+       <button class="menu-item"
+		onclick="event.stopPropagation(); document.getElementById('importFile').click();">
+		📥 Import
 		</button>
 
+        <button class="menu-item"
+            onclick="exportData()">
+            📤 Export
+        </button>
+
+        <button class="menu-item" onclick="toggleReadMode(); event.stopPropagation();">
+            📖 Reading Mode
+        </button>
+
+        <button class="menu-item"
+            onclick="openEbookPage()">
+            📚 E-Books
+        </button>
+
+        <button class="menu-item"
+            onclick="openVideoPage()">
+            🎥 Videos
+        </button>
+
     </div>
+
+</div>
 
 </div>
 
@@ -936,12 +1010,12 @@ style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
 
     <div style="margin-left:auto; display:flex; gap:8px;">
 
-        <button class="btn"
+        <button class="btn edit-action"
         onclick="openAddBookModal()">
         ➕ <span>Add Book</span>
         </button>
 
-        <button class="btn btn-outline"
+        <button class="btn btn-outline edit-action"
         id="deleteBooksBtn"
         onclick="toggleDeleteMode()">
         🗑 <span>Delete Books</span>
@@ -1565,10 +1639,21 @@ return link;
 }
 
 function showVideoModal(){
-document.getElementById("addVideoModal").style.display="flex";
+
+const modal=document.getElementById("addVideoModal");
+
+modal.style.display="flex";
+document.body.style.overflow="hidden";
+
 }
+
 function closeVideoModal(){
-document.getElementById("addVideoModal").style.display="none";
+
+const modal=document.getElementById("addVideoModal");
+
+modal.style.display="none";
+document.body.style.overflow="auto";
+
 }
 function addVideo(){
 
@@ -1782,6 +1867,19 @@ return "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg";
 
 return "";
 }
+
+function toggleDashboardMenu(e){
+
+    if(e) e.stopPropagation();
+
+    const menu = document.getElementById("dashboardMenu");
+
+    menu.style.display =
+        menu.style.display === "block"
+        ? "none"
+        : "block";
+}
+
 function openVideo(link){
 
 document.getElementById("videoPlayerBox").style.display="block";
@@ -2188,31 +2286,41 @@ function goToPreviousModuleSearchMatch(){
 
     updateModuleMatchCounter();
 }
+function showReadModeToast(message){
+
+    const toast = document.getElementById("readModeToast");
+
+    toast.innerText = message;
+
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0px)";
+
+    setTimeout(()=>{
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(20px)";
+    },2000);
+}
+
 function toggleReadMode(){
 
     isReadOnlyMode = !isReadOnlyMode;
 
-    const btn = document.getElementById("readModeBtn");
-
     if(isReadOnlyMode){
-
-        btn.innerHTML = "🔒 <span>Read Only</span>";
 
         document.body.classList.add("read-mode");
 
-        // Disable header buttons manually
-        document.getElementById('headerNewBtn').disabled = true;
-        document.getElementById('lockBtn').disabled = true;
+        
+
+        showReadModeToast("🔒 Reading Mode Enabled");
 
     }
     else{
 
-        btn.innerHTML = "📖 <span>Reading Mode</span>";
-
         document.body.classList.remove("read-mode");
 
-        document.getElementById('headerNewBtn').disabled = false;
-        document.getElementById('lockBtn').disabled = false;
+       
+
+        showReadModeToast("🔓 Reading Mode Disabled");
     }
 }
 
@@ -2349,7 +2457,49 @@ function looksLikeDiagram(code){
         if(el) el.style.display = 'none';
     });
 }
+window.addEventListener("DOMContentLoaded", function(){
 
+    const importInput = document.getElementById('importFile');
+
+    if(importInput){
+
+        importInput.onchange = function(e){
+
+            if(!e.target.files || !e.target.files[0]) return;
+
+            const reader = new FileReader();
+
+            reader.onload = (ev) => {
+
+                const imported = JSON.parse(ev.target.result);
+
+                if(imported.learning_data){
+                    data = imported.learning_data;
+                }
+
+                if(imported.ebook_data){
+                    ebooks = imported.ebook_data;
+                }
+
+                if(imported.video_data){
+                    videos = imported.video_data;
+                }
+
+                localStorage.setItem("devmaster_db_v7",JSON.stringify(data));
+                localStorage.setItem("ebooks_db",JSON.stringify(ebooks));
+                localStorage.setItem("videos_db",JSON.stringify(videos));
+
+                renderDashboard();
+                renderEbooks();
+
+                alert("Backup Restored Successfully!");
+            };
+
+            reader.readAsText(e.target.files[0]);
+        };
+    }
+
+});
 	function showDashboard() {
 
     currentModule = null;
@@ -2915,40 +3065,7 @@ if(sub){
     a.click();
 }
 
-    document.getElementById('importFile').onchange = (e) => {
-
-    const reader = new FileReader();
-
-    reader.onload = (ev) => {
-
-        const imported = JSON.parse(ev.target.result);
-
-        // 📘 Learning Data
-        if(imported.learning_data){
-            data = imported.learning_data;
-        }
-
-        // 📚 Ebook Data
-        if(imported.ebook_data){
-            ebooks = imported.ebook_data;
-        }
-
-		if(imported.video_data){
-		    videos = imported.video_data;
-		}
-		
-        localStorage.setItem("devmaster_db_v7",JSON.stringify(data));
-        localStorage.setItem("ebooks_db",JSON.stringify(ebooks));
-		localStorage.setItem("videos_db", JSON.stringify(videos));
-
-        renderDashboard();
-        renderEbooks();
-
-        alert("Backup Restored Successfully!");
-    };
-
-    reader.readAsText(e.target.files[0]);
-};
+    
 	// Helper to highlight text
 	function highlightText(text, query) {
 		if (!query) return text;
@@ -4200,6 +4317,16 @@ return text
 
 		});
 	}
+	window.addEventListener("click",function(e){
+
+    const menu = document.getElementById("dashboardMenu");
+
+    if(!menu) return;
+
+    if(!e.target.closest("#dashboardControls")){
+        menu.style.display = "none";
+    }
+});
 
     showDashboard();
 	document.getElementById("cancelPDFBtn").onclick = function(){
@@ -4280,17 +4407,17 @@ onclick="showDashboard()">
 </button>
 
 <h1 style="margin:0; color:var(--primary);">
-🎥 Learning Videos
+🎥 Videos
 </h1>
 
 <div style="margin-left:auto; display:flex; gap:8px;">
 
-<button class="btn"
+<button class="btn edit-action"
 onclick="showVideoModal()">
 ➕ <span>Add Video</span>
 </button>
 
-<button class="btn btn-outline"
+<button class="btn btn-outline edit-action"
 id="deleteVideosBtn"
 onclick="toggleVideoDeleteMode()">
 🗑 <span>Delete Videos</span>
@@ -4354,60 +4481,73 @@ style="width:100%;height:100%;border:none;">
 </iframe>
 
 </div>
-<div id="addVideoModal"
+<div id="addVideoModal">
+
+    <div class="video-modal-content">
+
+        <h3 style="margin-bottom:10px;">🎥 Add Video</h3>
+
+        <input 
+        id="videoTitleInput"
+        placeholder="Video Title">
+
+        <input 
+        id="videoTopicInput"
+        placeholder="Topic (Optional)">
+
+        <input 
+        id="videoLinkInput"
+        placeholder="YouTube Link">
+
+        <div style="display:flex; gap:10px; margin-top:10px;">
+
+            <button 
+            class="btn btn-outline"
+            style="flex:1;"
+            onclick="closeVideoModal()">
+            Cancel
+            </button>
+
+            <button 
+            class="btn"
+            style="flex:1;"
+            onclick="addVideo()">
+            Add
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+<!-- ===== READING MODE TOAST ===== -->
+<div id="readModeToast"
 style="
-display:none;
 position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.6);
-z-index:9999;
-justify-content:center;
-align-items:center;
+bottom:30px;
+right:30px;
+background:var(--card);
+color:var(--text);
+border:1px solid var(--border);
+padding:10px 16px;
+border-radius:8px;
+box-shadow:0 4px 15px rgba(0,0,0,0.2);
+font-size:13px;
+z-index:99999;
+opacity:0;
+transform:translateY(20px);
+transition:0.3s;
+pointer-events:none;
 ">
-
-<div style="
-background:#1e1e1e;
-padding:20px;
-border-radius:10px;
-width:400px;
-display:flex;
-flex-direction:column;
-gap:10px;
-">
-
-<h3>Add Learning Video</h3>
-
-<input id="videoTitleInput"
-placeholder="Video Title">
-
-<input id="videoTopicInput"
-placeholder="Topic (Spring Boot / Microservices)">
-
-<input id="videoLinkInput"
-placeholder="YouTube Link">
-
-<div style="display:flex; gap:8px; margin-top:10px;">
-
-<button class="btn"
-onclick="addVideo()">
-Save
-</button>
-
-<button class="btn btn-outline"
-onclick="closeVideoModal()">
-Cancel
-</button>
-
+Reading Mode Enabled
 </div>
-
-</div>
-
-</div>
-
-</div>
+<input 
+type="file"
+id="importFile"
+accept=".json"
+style="display:none"
+/>
 </body>
 </html>
-
