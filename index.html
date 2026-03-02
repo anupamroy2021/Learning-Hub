@@ -1332,7 +1332,8 @@ font-size:14px;
 	let globalSearchMatches = [];
     let globalCurrentMatchIndex = -1;
 	let isDeleteMode = false;
-   let selectedBooks = new Set();
+    let selectedBooks = new Set();
+    let lastReadingState = JSON.parse(localStorage.getItem("learninghub_last_state")) || null;
     const save = () => { localStorage.setItem("devmaster_db_v7", JSON.stringify(data)); };
 	
 	function wrapSelection(textarea, before, after = before) {
@@ -1574,6 +1575,37 @@ ${pasted}
     }
 
 });
+function saveReadingState(entryId = null){
+
+    if(!currentModule || !currentSubmodule) return;
+
+    const scrollArea = document.querySelector('.content-area');
+
+    let questionTitle = "";
+
+    if(entryId){
+        const entry = data[currentModule][currentSubmodule]
+        ?.find(i => i.id == entryId);
+
+        if(entry){
+            questionTitle = entry.q;
+        }
+    }
+
+    const state = {
+        module : currentModule,
+        submodule : currentSubmodule,
+        entryId : entryId,
+        question : questionTitle,
+        scrollTop : scrollArea ? scrollArea.scrollTop : 0,
+        time : Date.now()
+    };
+
+    localStorage.setItem(
+        "learninghub_last_state",
+        JSON.stringify(state)
+    );
+}
 function toggleDeleteMode(){
 
     isDeleteMode = !isDeleteMode;
@@ -2498,6 +2530,24 @@ window.addEventListener("DOMContentLoaded", function(){
             reader.readAsText(e.target.files[0]);
         };
     }
+setTimeout(()=>{
+
+    const savedState =
+    localStorage.getItem("learninghub_last_state");
+
+    if(savedState){
+
+        const state = JSON.parse(savedState);
+
+        // ⭐ Don't show popup if user was on dashboard only
+        if(state.module && state.submodule){
+
+            showResumePopup();
+
+        }
+    }
+
+},1000);
 
 });
 	function showDashboard() {
@@ -4279,6 +4329,112 @@ return text
 // REMOVE LEFTOVER NON PRINTABLE
 .replace(/[^\x20-\x7E]/g,"");
 }
+function resumeLastReading(){
+
+    const state = JSON.parse(localStorage.getItem("learninghub_last_state"));
+
+    if(!state) return;
+
+    openModule(state.module);
+
+    setTimeout(()=>{
+        openSubmodule(state.submodule);
+
+        setTimeout(()=>{
+            showListView();
+
+            setTimeout(()=>{
+                
+                const area = document.querySelector('.content-area');
+
+                if(state.entryId){
+                    scrollToQuestion(state.entryId);
+                }
+
+                if(area && state.scrollTop){
+                    area.scrollTop = state.scrollTop;
+                }
+
+            },400);
+
+        },400);
+
+    },400);
+}
+function showResumePopup(){
+
+    const state =
+    JSON.parse(localStorage.getItem("learninghub_last_state"));
+
+    if(!state) return;
+
+    const text =
+    document.getElementById("resumePopupText");
+
+    let title =
+    state.question
+    ? state.question
+    : state.module + " › " + state.submodule;
+
+    let timeAgo =
+    state.time
+    ? getTimeAgo(state.time)
+    : "";
+
+    text.innerHTML = `
+    <b style="color:var(--primary); display:block; margin-bottom:4px;">
+    ${title}
+    </b>
+
+    <small style="opacity:0.6;">
+    ${state.module} › ${state.submodule}
+    </small>
+
+    <br>
+
+    <small style="
+    opacity:0.5;
+    font-size:11px;
+    ">
+    Last read ${timeAgo}
+    </small>
+    `;
+
+    document.getElementById("resumePopup")
+    .style.display = "flex";
+}
+function getTimeAgo(timestamp){
+
+    const seconds =
+    Math.floor((Date.now() - timestamp)/1000);
+
+    const minutes = Math.floor(seconds/60);
+    const hours = Math.floor(minutes/60);
+    const days = Math.floor(hours/24);
+
+    if(seconds < 60)
+        return "Just now";
+
+    if(minutes < 60)
+        return minutes + " min ago";
+
+    if(hours < 24)
+        return hours + " hrs ago";
+
+    if(days < 7)
+        return days + " days ago";
+
+    return Math.floor(days/7) + " weeks ago";
+}
+function resumeLastReadingFromPopup(){
+    document.getElementById("resumePopup").style.display = "none";
+    resumeLastReading();
+}
+
+function startFreshReading(){
+    document.getElementById("resumePopup")
+    .style.display = "none";
+}
 	function mapIndexWithScroll() {
 
 		const cards = document.querySelectorAll('.card[id^="q-"]');
@@ -4316,6 +4472,11 @@ return text
 			}
 
 		});
+		// ⭐ SAVE LAST POSITION AUTOMATICALLY
+		const activeBtn = document.querySelector('.nav-btn.active-index');
+		if(activeBtn){
+			saveReadingState(activeBtn.dataset.id);
+		}
 	}
 	window.addEventListener("click",function(e){
 
@@ -4549,5 +4710,55 @@ id="importFile"
 accept=".json"
 style="display:none"
 />
+
+<!-- ===== CONTINUE READING POPUP ===== -->
+<div id="resumePopup" style="
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:rgba(0,0,0,0.6);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:99999;
+">
+
+<div style="
+background:var(--card);
+color:var(--text);
+padding:25px;
+border-radius:14px;
+border:1px solid var(--border);
+width:320px;
+text-align:center;
+box-shadow:0 5px 20px rgba(0,0,0,0.3);
+animation:fadeIn 0.25s ease;
+">
+
+<h3 style="margin-bottom:10px;">📖 Continue Reading?</h3>
+
+<p id="resumePopupText"
+style="font-size:13px; opacity:0.7; margin-bottom:15px;">
+You were reading last time
+</p>
+
+<div style="display:flex; gap:10px;">
+<button class="btn btn-outline"
+style="flex:1"
+onclick="startFreshReading()">
+Start Fresh
+</button>
+
+<button class="btn"
+style="flex:1"
+onclick="resumeLastReadingFromPopup()">
+Resume
+</button>
+</div>
+
+</div>
+</div>
 </body>
 </html>
