@@ -860,6 +860,10 @@ to{transform:translateY(0);}
         <button class="menu-item" onclick="toggleReadMode(); event.stopPropagation();">
             📖 Reading Mode
         </button>
+		<button class="menu-item"
+			onclick="toggleModuleDragLock()">
+			🧩 Rearrange Modules
+		</button>
 
         <button class="menu-item"
             onclick="openEbookPage()">
@@ -1333,6 +1337,9 @@ font-size:14px;
     let globalCurrentMatchIndex = -1;
 	let isDeleteMode = false;
     let selectedBooks = new Set();
+	let isModuleLocked = true;
+	let moduleSortable = null;
+    let submoduleSortable = null;
     let lastReadingState = JSON.parse(localStorage.getItem("learninghub_last_state")) || null;
     const save = () => { localStorage.setItem("devmaster_db_v7", JSON.stringify(data)); };
 	
@@ -1604,6 +1611,35 @@ function saveReadingState(entryId = null){
     localStorage.setItem(
         "learninghub_last_state",
         JSON.stringify(state)
+    );
+}
+function toggleModuleDragLock(){
+
+    if(isReadOnlyMode){
+        alert("Reading Mode Enabled");
+        return;
+    }
+
+    isModuleLocked = !isModuleLocked;
+
+    if(moduleSortable){
+        moduleSortable.option(
+            "disabled",
+            isModuleLocked
+        );
+    }
+
+    if(submoduleSortable){
+        submoduleSortable.option(
+            "disabled",
+            isModuleLocked
+        );
+    }
+
+    alert(
+        isModuleLocked
+        ? "🔒 Rearranging Locked"
+        : "🔓 Rearranging Enabled"
     );
 }
 function toggleDeleteMode(){
@@ -2569,8 +2605,42 @@ setTimeout(()=>{
 
     renderDashboard();
     document.getElementById('scrollToggleBtn').style.display = 'none';
+	setTimeout(initModuleSortable,100);
 }
-	
+	function initSubmoduleSortable(){
+
+    const grid =
+    document.getElementById("submoduleGrid");
+
+    if(submoduleSortable) return;
+
+    submoduleSortable =
+    new Sortable(grid,{
+
+        animation:150,
+        ghostClass:'sortable-ghost',
+        disabled:isModuleLocked,
+
+        onEnd:()=>{
+
+            let newSub={};
+
+            grid
+            .querySelectorAll('.module-card')
+            .forEach(card=>{
+
+                let name=
+                card.dataset.submodule;
+
+                newSub[name]=
+                data[currentModule][name];
+            });
+
+            data[currentModule]=newSub;
+            save();
+        }
+    });
+}
 	function goBackToDashboard(){
 
     currentModule = null;
@@ -2600,6 +2670,7 @@ setTimeout(()=>{
 		document.getElementById('moduleWorkspace').style.display = 'none';
 
 		renderSubmodules();
+		setTimeout(initSubmoduleSortable,100);
 	}
 
    function showSubmoduleView() {
@@ -3164,19 +3235,70 @@ if(sub){
     return tempDiv.innerHTML;	
 	}
 
-    function renderDashboard() {
-        const grid = document.getElementById('moduleGrid');
-        grid.innerHTML = "";
-        Object.keys(data).forEach(m => {
-            const card = document.createElement('div');
-            card.className = "module-card";
-            const subCount = Object.keys(data[m]).length;
-            const totalItems = Object.values(data[m]).reduce((sum, arr) => sum + arr.length, 0);
-            card.innerHTML = `<h3>${m}</h3><p style="font-size:12px; color:var(--accent); font-weight:normal;">${subCount} Submodules, ${totalItems} Items</p>`;
-            card.onclick = () => openModule(m);
-            grid.appendChild(card);
-        });
-    }
+  function renderDashboard() {
+
+    const grid = document.getElementById('moduleGrid');
+    grid.innerHTML = "";
+
+    Object.keys(data).forEach(m => {
+
+        const card = document.createElement('div');
+        card.className = "module-card";
+        card.dataset.module = m;
+
+        const subCount = Object.keys(data[m]).length;
+        const totalItems =
+        Object.values(data[m])
+        .reduce((sum, arr) => sum + arr.length, 0);
+
+        card.innerHTML =
+        `<h3>${m}</h3>
+        <p style="font-size:12px;
+        color:var(--accent);
+        font-weight:normal;">
+        ${subCount} Submodules,
+        ${totalItems} Items
+        </p>`;
+
+        card.onclick = () => openModule(m);
+
+        grid.appendChild(card);
+    });
+  
+}
+function initModuleSortable(){
+
+    const grid =
+    document.getElementById("moduleGrid");
+
+    if(moduleSortable) return;
+
+    moduleSortable =
+    new Sortable(grid,{
+
+        animation:150,
+        ghostClass:'sortable-ghost',
+        disabled:isModuleLocked,
+
+        onEnd:()=>{
+
+            let newData={};
+
+            grid
+            .querySelectorAll('.module-card')
+            .forEach(card=>{
+
+                let name=
+                card.dataset.module;
+
+                newData[name]=data[name];
+            });
+
+            data=newData;
+            save();
+        }
+    });
+}
 	function renderGlobalSearch() {
 		globalSearchMatches = [];
 		globalCurrentMatchIndex = -1;
@@ -3417,17 +3539,66 @@ if(sub){
 }
 
     function renderSubmodules() {
-        const grid = document.getElementById('submoduleGrid');
-        grid.innerHTML = "";
-        if (!currentModule || !data[currentModule]) return;
-        Object.keys(data[currentModule]).forEach(s => {
-            const card = document.createElement('div');
-            card.className = "module-card";
-            card.innerHTML = `<h3>${s}</h3><p style="font-size:12px; color:var(--accent); font-weight:normal;">${data[currentModule][s].length} Items</p>`;
-            card.onclick = () => openSubmodule(s);
-            grid.appendChild(card);
-        });
-    }
+
+    const grid =
+    document.getElementById('submoduleGrid');
+
+    grid.innerHTML = "";
+
+    if (!currentModule ||
+        !data[currentModule]) return;
+
+    Object.keys(data[currentModule])
+    .forEach(s => {
+
+        const card =
+        document.createElement('div');
+
+        card.className = "module-card";
+        card.dataset.submodule = s;
+
+        card.innerHTML =
+        `<h3>${s}</h3>
+        <p style="font-size:12px;
+        color:var(--accent);
+        font-weight:normal;">
+        ${data[currentModule][s].length}
+        Items
+        </p>`;
+
+        card.onclick = () =>
+        openSubmodule(s);
+
+        grid.appendChild(card);
+    });
+
+    new Sortable(grid,{
+        animation:150,
+        disabled:isModuleLocked,
+        ghostClass:'sortable-ghost',
+
+        onEnd:()=>{
+
+            let newSub = {};
+
+            grid
+            .querySelectorAll('.module-card')
+            .forEach(card=>{
+
+                let name =
+                card.dataset.submodule;
+
+                newSub[name] =
+                data[currentModule][name];
+            });
+
+            data[currentModule] =
+            newSub;
+
+            save();
+        }
+    });
+}
 
     function autoResize(textarea) {
         textarea.style.height = "auto";
@@ -4762,4 +4933,3 @@ Resume
 </div>
 </body>
 </html>
-
