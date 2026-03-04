@@ -61,7 +61,517 @@ blockquote{
     padding-left:10px;
     color:#555;
 }
-/* ================= PDF EXPORT STYLING ================= */
+/* ===== CUSTOM PROMPT / CONFIRM MODAL ===== */
+#customDialogOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(2px);
+}
+#customDialogOverlay.active { display: flex; }
+.custom-dialog {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: fadeInUp 0.2s ease;
+}
+.custom-dialog h4 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+.custom-dialog p {
+    font-size: 13px;
+    opacity: 0.6;
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+.custom-dialog input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.custom-dialog input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    outline: none;
+}
+.custom-dialog-actions { display: flex; gap: 8px; }
+
+/* ================= FEATURE STYLES ================= */
+
+/* QOTD Banner */
+#qotdBanner {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.4s ease both;
+}
+#qotdBanner::before {
+    content: '💡';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 48px;
+    opacity: 0.15;
+}
+#qotdBanner .qotd-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.8;
+    margin-bottom: 6px;
+}
+#qotdBanner .qotd-question {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+#qotdBanner .qotd-answer {
+    font-size: 13px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: none;
+    backdrop-filter: blur(4px);
+    line-height: 1.5;
+}
+#qotdBanner .qotd-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+#qotdBanner .qotd-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+#qotdBanner .qotd-btn:hover { background: rgba(255,255,255,0.35); }
+
+/* Flashcard Mode */
+#flashcardModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 10002;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.flashcard-box {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid var(--border);
+    animation: fadeInUp 0.3s ease;
+    position: relative;
+}
+.flashcard-card {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 28px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: border-color 0.2s, transform 0.15s;
+    perspective: 1000px;
+    position: relative;
+    overflow: hidden;
+}
+.flashcard-card:hover { border-color: var(--primary); transform: scale(1.01); }
+.flashcard-question {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+}
+.flashcard-answer {
+    display: none;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+    opacity: 0.85;
+    text-align: left;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.flashcard-hint {
+    font-size: 11px;
+    opacity: 0.4;
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.flashcard-progress {
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.5;
+    margin-bottom: 14px;
+}
+.flashcard-nav {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: space-between;
+    align-items: center;
+}
+.flashcard-source {
+    font-size: 10px;
+    opacity: 0.4;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+/* Interview Practice */
+#interviewModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 10002;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+.interview-box {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 700px;
+    border: 1px solid var(--border);
+    animation: fadeInUp 0.3s ease;
+    margin: auto;
+}
+.interview-timer {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--primary);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 2px;
+}
+.interview-timer.warning { color: #f59e0b; }
+.interview-timer.danger  { color: var(--danger); animation: timerPulse 0.5s infinite; }
+@keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.interview-q-card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+}
+.interview-q-card.revealed { border-color: var(--primary); }
+.interview-q-num {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+.interview-q-text { font-size: 15px; font-weight: 600; color: var(--text); }
+.interview-q-answer {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    opacity: 0.8;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+/* Weak Topics */
+#weakTopicsModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 10002;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+.weak-topics-box {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid var(--border);
+    animation: fadeInUp 0.3s ease;
+    margin: auto;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+.weak-topic-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+.weak-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.weak-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+.weak-topic-name { font-size: 13px; font-weight: 600; min-width: 130px; }
+.weak-count { font-size: 11px; opacity: 0.5; min-width: 40px; text-align: right; }
+
+.streak-widget {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin-bottom: 14px;
+    animation: fadeInUp 0.35s ease both;
+    flex-wrap: wrap;
+}
+.streak-fire {
+    font-size: 20px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(245,158,11,0.4));
+    animation: fireWiggle 1.8s ease-in-out infinite;
+}
+@keyframes fireWiggle {
+    0%,100% { transform: rotate(-5deg) scale(1); }
+    50%      { transform: rotate(5deg) scale(1.08); }
+}
+.streak-info { display: flex; align-items: center; gap: 8px; }
+.streak-count {
+    font-size: 16px;
+    font-weight: 800;
+    color: #f59e0b;
+    line-height: 1;
+}
+.streak-label { font-size: 11px; opacity: 0.55; }
+.streak-best { font-size: 10px; opacity: 0.4; white-space: nowrap; }
+.streak-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-left: auto;
+}
+.streak-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 700;
+    border: 2px solid var(--border);
+    color: var(--text);
+    opacity: 0.35;
+    transition: all 0.3s;
+}
+.streak-dot.active {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: white;
+    opacity: 1;
+    box-shadow: 0 2px 6px rgba(245,158,11,0.35);
+}
+.streak-dot.today {
+    border-color: #f59e0b;
+    opacity: 0.7;
+    animation: dotPulse 1.5s ease-in-out infinite;
+}
+@keyframes dotPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+    50%      { box-shadow: 0 0 0 4px rgba(245,158,11,0); }
+}
+
+/* ===== PROGRESS TRACKING ===== */
+.module-card { position: relative; overflow: hidden; }
+.module-progress-bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 0 0 16px 16px;
+    transition: width 0.6s ease;
+}
+.module-progress-label {
+    font-size: 11px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.mastery-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.badge-mastered  { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+.badge-learning  { background: #3b82f622; color: #3b82f6; border: 1px solid #3b82f644; }
+.badge-new       { background: #94a3b822; color: #94a3b8; border: 1px solid #94a3b844; }
+
+/* Entry mastery toggle button */
+.mastery-btn {
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text);
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.mastery-btn:hover { border-color: var(--primary); color: var(--primary); }
+.mastery-btn.mastered { background:#22c55e22; color:#22c55e; border-color:#22c55e44; }
+.mastery-btn.learning { background:#3b82f622; color:#3b82f6; border-color:#3b82f644; }
+
+/* Progress modal */
+#progressModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 10002;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+.progress-box {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%;
+    max-width: 620px;
+    border: 1px solid var(--border);
+    animation: fadeInUp 0.3s ease;
+    margin: auto;
+    max-height: 88vh;
+    overflow-y: auto;
+}
+.progress-module-row {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+.progress-module-row:last-child { border-bottom: none; margin-bottom: 0; }
+.progress-module-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.progress-bar-track {
+    height: 10px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.progress-stats {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    opacity: 0.6;
+    flex-wrap: wrap;
+}
+
+/* ===== Practice Mode Dashboard Buttons ===== */
+.practice-toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.practice-btn {
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.practice-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-1px); }
+
 
 .pdf-wrapper{
     padding:40px;
@@ -298,6 +808,7 @@ display:table-cell !important;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 		}
 
 		.icon-btn svg {
@@ -309,11 +820,36 @@ display:table-cell !important;
 			background: var(--primary);
 			color: white;
 			border-color: var(--primary);
+			transform: scale(1.1);
 		}
 
 		.delete-btn:hover {
 			background: var(--danger);
 			border-color: var(--danger);
+		}
+
+		/* Card fade-in-up entrance animation */
+		@keyframes fadeInUp {
+			from { opacity: 0; transform: translateY(18px); }
+			to   { opacity: 1; transform: translateY(0); }
+		}
+		.module-card {
+			animation: fadeInUp 0.35s ease both;
+		}
+		.ebook-card {
+			animation: fadeInUp 0.35s ease both;
+		}
+		/* Skeleton shimmer for loading placeholders */
+		@keyframes shimmer {
+			from { background-position: -200% 0; }
+			to   { background-position: 200% 0; }
+		}
+		.skeleton {
+			background: linear-gradient(90deg, var(--border) 25%, var(--card) 50%, var(--border) 75%);
+			background-size: 200% 100%;
+			animation: shimmer 1.5s infinite;
+			border-radius: 8px;
+			height: 20px;
 		}
 		.collapse-icon {
 			cursor: pointer;
@@ -391,7 +927,7 @@ display:table-cell !important;
         .sidebar { 
             width: 300px; background: var(--sidebar); border-right: 1px solid var(--border); 
             display: flex; flex-direction: column; padding: 1rem; overflow-y: auto;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 200;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; z-index: 200;
         }
         .sidebar.collapsed { width: 0; padding: 0; border: none; overflow: hidden; opacity: 0; pointer-events: none; }
 
@@ -423,6 +959,7 @@ display:table-cell !important;
             width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; 
             cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.9rem; margin-bottom: 2px;
             display: flex; gap: 8px; align-items: center;
+            transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
         }
         .nav-btn:hover { background: var(--card); color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
@@ -485,6 +1022,7 @@ display:table-cell !important;
         .markdown-body table th, .markdown-body table td { border: 1px solid var(--border); padding: 6px 13px; }
         code[class*="language-"], pre[class*="language-"] { font-family: 'Fira Code', monospace !important; font-size: 13px !important; }
 
+
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); z-index: 150; }
         .overlay.active { display: block; }
 
@@ -496,15 +1034,18 @@ display:table-cell !important;
         }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
-        .module-card { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); cursor: pointer; text-align: center; transition: transform 0.2s; }
-        .module-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+        .module-card { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); cursor: pointer; text-align: center; transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+        .module-card:hover { transform: translateY(-6px); border-color: var(--primary); box-shadow: 0 12px 30px rgba(37, 99, 235, 0.15); }
         .card { background: var(--card); padding: 1.2rem; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); }
         .editor-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; height: 100%; }
         .form-box, .preview-box { background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-        textarea, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; }
-        .btn { padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; }
+        textarea, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        textarea:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); outline: none; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--primary); color: white; transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease; }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-        .btn:active { transform: scale(0.95); }
+        .btn-outline:hover { filter: none; box-shadow: none; border-color: var(--primary); color: var(--primary); }
+        .btn:active { transform: scale(0.95); box-shadow: none; filter: none; }
 		.nav-btn.active-index {
 			background: var(--primary);
 			color: white;
@@ -534,6 +1075,15 @@ display:table-cell !important;
 			z-index: 999;
 
 			box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+			animation: btnPulse 2s infinite;
+			transition: transform 0.2s ease;
+		}
+		.scroll-toggle-btn:hover {
+			transform: scale(1.1);
+		}
+		@keyframes btnPulse {
+			0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+			50% { box-shadow: 0 4px 22px rgba(37, 99, 235, 0.55); }
 		}
 		/* ================= PRISM SYMBOL GREY BG FIX ================= */
 
@@ -660,14 +1210,15 @@ padding:15px;
 border-radius:16px;
 border:1px solid var(--border);
 cursor:pointer;
-transition:0.2s;
+transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 text-align:center;
 
 }
 .ebook-card:hover{
 
-transform:translateY(-4px);
+transform:translateY(-6px);
 border-color:var(--primary);
+box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
 
 }
 @media(max-width:600px){
@@ -758,11 +1309,13 @@ to{transform:translateY(0);}
     cursor:pointer;
     color:var(--text);
     font-size:14px;
+    transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
 }
 
 .menu-item:hover{
     background:var(--primary);
     color:white;
+    padding-left: 20px;
 }
 /*
     </style>
@@ -950,6 +1503,37 @@ Cancel Export
     <h1>Dashboard</h1>
     <button class="btn edit-action" onclick="addModule()">+ Create Module</button>
 	</div>
+
+    <!-- QOTD Banner -->
+    <div id="qotdBanner" style="display:none;">
+        <div class="qotd-label">⚡ Question of the Day</div>
+        <div class="qotd-question" id="qotdText">Loading...</div>
+        <div class="qotd-answer markdown-body" id="qotdAnswer"></div>
+        <div class="qotd-actions">
+            <button class="qotd-btn" onclick="toggleQotdAnswer()">👁 Reveal Answer</button>
+            <button class="qotd-btn" onclick="refreshQotd()">🔀 New Question</button>
+            <button class="qotd-btn" onclick="document.getElementById('qotdBanner').style.display='none'">✕ Dismiss</button>
+        </div>
+    </div>
+
+    <!-- Practice Toolbar -->
+    <div class="practice-toolbar">
+        <button class="practice-btn" onclick="openFlashcardMode()">🃏 Flashcard Mode</button>
+        <button class="practice-btn" onclick="openInterviewMode()">🎯 Interview Practice</button>
+        <button class="practice-btn" onclick="openWeakTopics()">📊 Weak Topics</button>
+
+    </div>
+
+    <!-- Streak Widget -->
+    <div class="streak-widget" id="streakWidget">
+        <div class="streak-fire">🔥</div>
+        <div class="streak-info">
+            <div class="streak-count" id="streakCount">0</div>
+            <div class="streak-label">day streak</div>
+        </div>
+        <div class="streak-best" id="streakBest">Best: 0 days</div>
+        <div class="streak-dots" id="streakDots"></div>
+    </div>
 
 	<div class="search-container">
     <div class="search-wrapper">
@@ -2604,6 +3188,9 @@ setTimeout(()=>{
     document.getElementById('ebookBackBtn').style.display = 'none';
 
     renderDashboard();
+    initQotd();
+    recordStreakToday();
+    renderStreakWidget();
     document.getElementById('scrollToggleBtn').style.display = 'none';
 	setTimeout(initModuleSortable,100);
 }
@@ -2921,17 +3508,18 @@ function openSubmodule(name) {
 
 				if(term){
 					searchMatches.push(card.id);
-				}                
+				}
+				// Track view for weak topic detection
+				trackView(item.id);
 				card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                         <span style="color:var(--accent); font-size:12px; font-weight:700;">${highlightText(item.subtopic || 'General', term)}</span>
-                        <div style="display:flex; gap:6px;">
+                        <div style="display:flex; gap:6px; align-items:center;">
 							<button class="icon-btn edit-action"
 								title="Edit Entry"
 								onclick="openEditor('${item.id}')">
 								<i data-lucide="pencil"></i>
 							</button>
-
 							<button class="icon-btn delete-btn edit-action"
 								title="Delete Entry"
 								onclick="deleteEntry('${item.id}')">
@@ -3118,37 +3706,53 @@ if(sub){
     }
 
     function addModule() {
-	if(isReadOnlyMode){
-    alert("Reading Mode Enabled");
-    return;
-}
-        const name = prompt("Module Name:");
-        if (name && !data[name]) { data[name] = {}; save(); renderDashboard(); }
+        if(isReadOnlyMode){ showReadModeToast("Reading Mode Enabled"); return; }
+        openCustomPrompt({
+            title: '📦 New Module',
+            placeholder: 'Module name...',
+            confirmText: 'Create',
+            onConfirm: (name) => {
+                if (!name) return;
+                if (data[name]) { showReadModeToast('Module already exists!'); return; }
+                data[name] = {}; save(); renderDashboard();
+            }
+        });
     }
 
     function addSubmodule() {
-	if(isReadOnlyMode){
-    alert("Reading Mode Enabled");
-    return;
-}
-        const name = prompt("Submodule Name:");
-        if (name && !data[currentModule][name]) { data[currentModule][name] = []; save(); renderSubmodules(); }
+        if(isReadOnlyMode){ showReadModeToast("Reading Mode Enabled"); return; }
+        openCustomPrompt({
+            title: '📁 New Submodule',
+            placeholder: 'Submodule name...',
+            confirmText: 'Create',
+            onConfirm: (name) => {
+                if (!name) return;
+                if (data[currentModule][name]) { showReadModeToast('Submodule already exists!'); return; }
+                data[currentModule][name] = []; save(); renderSubmodules();
+            }
+        });
     }
 
     function deleteCurrentModule() {
-	if(isReadOnlyMode){
-    alert("Reading Mode Enabled");
-    return;
-}
-        if (confirm("Delete module?")) { delete data[currentModule]; save(); showDashboard(); }
+        if(isReadOnlyMode){ showReadModeToast("Reading Mode Enabled"); return; }
+        openCustomConfirm({
+            title: 'Delete Module?',
+            message: `"${currentModule}" and all its contents will be permanently deleted.`,
+            confirmText: 'Delete',
+            danger: true,
+            onConfirm: () => { delete data[currentModule]; save(); showDashboard(); }
+        });
     }
 
     function deleteCurrentSubmodule() {
-	if(isReadOnlyMode){
-    alert("Reading Mode Enabled");
-    return;
-}
-        if (confirm("Delete submodule?")) { delete data[currentModule][currentSubmodule]; save(); showSubmoduleView(); }
+        if(isReadOnlyMode){ showReadModeToast("Reading Mode Enabled"); return; }
+        openCustomConfirm({
+            title: 'Delete Submodule?',
+            message: `"${currentSubmodule}" and all its entries will be permanently deleted.`,
+            confirmText: 'Delete',
+            danger: true,
+            onConfirm: () => { delete data[currentModule][currentSubmodule]; save(); showSubmoduleView(); }
+        });
     }
 
     function updatePreview() { 
@@ -3253,18 +3857,22 @@ if(sub){
 
         card.innerHTML =
         `<h3>${m}</h3>
-        <p style="font-size:12px;
-        color:var(--accent);
-        font-weight:normal;">
-        ${subCount} Submodules,
-        ${totalItems} Items
-        </p>`;
+        <p style="font-size:12px; color:var(--accent); font-weight:normal; margin-bottom:6px;">
+        ${subCount} Submodules, ${totalItems} Items
+        </p>
+        `;
 
         card.onclick = () => openModule(m);
 
         grid.appendChild(card);
     });
-  
+
+    // Destroy old Sortable instance so new cards work correctly
+    if (moduleSortable) {
+        moduleSortable.destroy();
+        moduleSortable = null;
+    }
+    setTimeout(initModuleSortable, 100);
 }
 function initModuleSortable(){
 
@@ -3572,7 +4180,12 @@ function initModuleSortable(){
         grid.appendChild(card);
     });
 
-    new Sortable(grid,{
+    if (submoduleSortable) {
+        submoduleSortable.destroy();
+        submoduleSortable = null;
+    }
+
+    submoduleSortable = new Sortable(grid,{
         animation:150,
         disabled:isModuleLocked,
         ghostClass:'sortable-ghost',
@@ -4660,7 +5273,554 @@ function startFreshReading(){
     }
 });
 
-    showDashboard();
+
+// =============================================
+// HELPER: Get all entries across data
+// =============================================
+function getAllEntries() {
+    const all = [];
+    Object.keys(data).forEach(mod => {
+        Object.keys(data[mod]).forEach(sub => {
+            (data[mod][sub] || []).forEach(item => {
+                all.push({ ...item, _mod: mod, _sub: sub });
+            });
+        });
+    });
+    return all;
+}
+
+// =============================================
+// VIEW TRACKING (for Weak Topics)
+// =============================================
+let viewCounts = JSON.parse(localStorage.getItem('lh_view_counts') || '{}');
+function trackView(entryId) {
+    viewCounts[entryId] = (viewCounts[entryId] || 0) + 1;
+    localStorage.setItem('lh_view_counts', JSON.stringify(viewCounts));
+}
+function resetViewCounts() {
+    if (!confirm('Reset all view tracking data?')) return;
+    viewCounts = {};
+    localStorage.setItem('lh_view_counts', JSON.stringify(viewCounts));
+    renderWeakTopics();
+}
+
+// =============================================
+// 1. QUESTION OF THE DAY
+// =============================================
+let qotdRevealed = false;
+let qotdEntry = null;
+
+function initQotd() {
+    const entries = getAllEntries();
+    if (entries.length === 0) return;
+
+    const today = new Date().toDateString();
+    const savedDate = localStorage.getItem('lh_qotd_date');
+    const savedId = localStorage.getItem('lh_qotd_id');
+
+    let entry = null;
+    if (savedDate === today && savedId) {
+        entry = entries.find(e => String(e.id) === String(savedId));
+    }
+    if (!entry) {
+        entry = entries[Math.floor(Math.random() * entries.length)];
+        localStorage.setItem('lh_qotd_date', today);
+        localStorage.setItem('lh_qotd_id', String(entry.id));
+    }
+
+    qotdEntry = entry;
+    qotdRevealed = false;
+    document.getElementById('qotdText').textContent = entry.q;
+    document.getElementById('qotdAnswer').innerHTML = marked.parse(entry.a);
+    document.getElementById('qotdAnswer').style.display = 'none';
+    document.getElementById('qotdBanner').style.display = 'block';
+}
+
+function toggleQotdAnswer() {
+    if (!qotdEntry) return;
+    qotdRevealed = !qotdRevealed;
+    const ans = document.getElementById('qotdAnswer');
+    ans.style.display = qotdRevealed ? 'block' : 'none';
+    if (qotdRevealed) trackView(qotdEntry.id);
+    document.querySelector('#qotdBanner .qotd-btn').textContent = qotdRevealed ? '🙈 Hide Answer' : '👁 Reveal Answer';
+    Prism.highlightAll();
+}
+
+function refreshQotd() {
+    const entries = getAllEntries();
+    if (entries.length === 0) return;
+    const entry = entries[Math.floor(Math.random() * entries.length)];
+    localStorage.setItem('lh_qotd_id', String(entry.id));
+    localStorage.setItem('lh_qotd_date', new Date().toDateString());
+    qotdEntry = entry;
+    qotdRevealed = false;
+    document.getElementById('qotdText').textContent = entry.q;
+    document.getElementById('qotdAnswer').innerHTML = marked.parse(entry.a);
+    document.getElementById('qotdAnswer').style.display = 'none';
+    document.querySelector('#qotdBanner .qotd-btn').textContent = '👁 Reveal Answer';
+}
+
+// =============================================
+// 2. FLASHCARD MODE
+// =============================================
+let fcDeck = [];
+let fcIndex = 0;
+let fcRevealed = false;
+
+function populateFlashcardSelects() {
+    const modSel = document.getElementById('fcModuleSelect');
+    modSel.innerHTML = '<option value="__all__">All Modules</option>';
+    Object.keys(data).forEach(m => {
+        modSel.innerHTML += `<option value="${m}">${m}</option>`;
+    });
+    loadFlashcardDeck();
+}
+
+function loadFlashcardDeck() {
+    const mod = document.getElementById('fcModuleSelect').value;
+    const sub = document.getElementById('fcSubSelect').value;
+
+    // Update submodule dropdown
+    const subSel = document.getElementById('fcSubSelect');
+    const currentSub = subSel.value;
+    subSel.innerHTML = '<option value="__all__">All Submodules</option>';
+    const mods = mod === '__all__' ? Object.keys(data) : [mod];
+    mods.forEach(m => {
+        Object.keys(data[m] || {}).forEach(s => {
+            subSel.innerHTML += `<option value="${m}||${s}">${m} › ${s}</option>`;
+        });
+    });
+
+    let entries = [];
+    mods.forEach(m => {
+        const subs = sub !== '__all__' && sub.startsWith(m + '||')
+            ? [sub.split('||')[1]]
+            : Object.keys(data[m] || {});
+        subs.forEach(s => {
+            (data[m][s] || []).forEach(item => entries.push({ ...item, _mod: m, _sub: s }));
+        });
+    });
+
+    fcDeck = entries.sort(() => Math.random() - 0.5);
+    fcIndex = 0;
+    fcRevealed = false;
+    renderFlashcard();
+}
+
+function renderFlashcard() {
+    const total = fcDeck.length;
+    document.getElementById('fcTotal').textContent = total;
+    if (total === 0) {
+        document.getElementById('fcQuestion').textContent = 'No entries found.';
+        document.getElementById('fcAnswer').style.display = 'none';
+        document.getElementById('fcSource').textContent = '';
+        document.getElementById('fcCurrent').textContent = '0';
+        document.getElementById('fcHint').style.display = 'none';
+        return;
+    }
+    const entry = fcDeck[fcIndex];
+    document.getElementById('fcCurrent').textContent = fcIndex + 1;
+    document.getElementById('fcQuestion').textContent = entry.q;
+    document.getElementById('fcAnswer').innerHTML = marked.parse(entry.a);
+    document.getElementById('fcAnswer').style.display = 'none';
+    document.getElementById('fcSource').textContent = `${entry._mod} › ${entry._sub}`;
+    document.getElementById('fcHint').style.display = 'flex';
+    fcRevealed = false;
+    trackView(entry.id);
+    Prism.highlightAll();
+}
+
+function revealFlashcard() {
+    if (fcDeck.length === 0) return;
+    fcRevealed = !fcRevealed;
+    document.getElementById('fcAnswer').style.display = fcRevealed ? 'block' : 'none';
+    document.getElementById('fcHint').style.display = fcRevealed ? 'none' : 'flex';
+    Prism.highlightAll();
+}
+
+function nextFlashcard() {
+    if (fcDeck.length === 0) return;
+    fcIndex = (fcIndex + 1) % fcDeck.length;
+    fcRevealed = false;
+    renderFlashcard();
+}
+
+function prevFlashcard() {
+    if (fcDeck.length === 0) return;
+    fcIndex = (fcIndex - 1 + fcDeck.length) % fcDeck.length;
+    fcRevealed = false;
+    renderFlashcard();
+}
+
+function shuffleFlashcards() {
+    fcDeck = fcDeck.sort(() => Math.random() - 0.5);
+    fcIndex = 0;
+    fcRevealed = false;
+    renderFlashcard();
+}
+
+function openFlashcardMode() {
+    const entries = getAllEntries();
+    if (entries.length === 0) { alert('No entries yet! Add some content first.'); return; }
+    populateFlashcardSelects();
+    document.getElementById('flashcardModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFlashcardMode() {
+    document.getElementById('flashcardModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+// =============================================
+// 3. INTERVIEW PRACTICE MODE
+// =============================================
+let ivTimer = null;
+let ivTimeLeft = 600;
+
+function populateInterviewSelect() {
+    const sel = document.getElementById('ivModuleSelect');
+    sel.innerHTML = '<option value="__all__">All Modules</option>';
+    Object.keys(data).forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
+}
+
+function openInterviewMode() {
+    const entries = getAllEntries();
+    if (entries.length === 0) { alert('No entries yet! Add some content first.'); return; }
+    populateInterviewSelect();
+    document.getElementById('interviewSetup').style.display = 'block';
+    document.getElementById('interviewSession').style.display = 'none';
+    document.getElementById('interviewModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeInterviewMode() {
+    clearInterval(ivTimer);
+    ivTimer = null;
+    document.getElementById('interviewModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function startInterview() {
+    clearInterval(ivTimer);
+    const mod = document.getElementById('ivModuleSelect').value;
+    const count = parseInt(document.getElementById('ivCountSelect').value);
+    ivTimeLeft = parseInt(document.getElementById('ivTimeSelect').value);
+
+    let entries = getAllEntries();
+    if (mod !== '__all__') entries = entries.filter(e => e._mod === mod);
+
+    entries = entries.sort(() => Math.random() - 0.5).slice(0, count);
+
+    if (entries.length === 0) { alert('Not enough entries in this module.'); return; }
+
+    document.getElementById('interviewSetup').style.display = 'none';
+    document.getElementById('interviewSession').style.display = 'block';
+
+    const list = document.getElementById('ivQuestionList');
+    list.innerHTML = '';
+    entries.forEach((entry, i) => {
+        const card = document.createElement('div');
+        card.className = 'interview-q-card';
+        card.id = 'iv-card-' + i;
+        card.innerHTML = `
+            <div class="interview-q-num">Q${i + 1} · ${entry._mod} › ${entry._sub}</div>
+            <div class="interview-q-text">${entry.q}</div>
+            <div class="interview-q-answer markdown-body" id="iv-ans-${i}">${marked.parse(entry.a)}</div>
+            <button onclick="toggleIvAnswer(${i})" style="margin-top:10px; background:none; border:1px solid var(--border); color:var(--text); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:12px; transition:background 0.15s;">👁 Show Answer</button>
+        `;
+        list.appendChild(card);
+        trackView(entry.id);
+    });
+    Prism.highlightAll();
+
+    updateIvTimer();
+    ivTimer = setInterval(() => {
+        ivTimeLeft--;
+        updateIvTimer();
+        if (ivTimeLeft <= 0) {
+            clearInterval(ivTimer);
+            ivTimer = null;
+            document.getElementById('ivTimer').textContent = "⏰ Time's Up!";
+        }
+    }, 1000);
+}
+
+function toggleIvAnswer(i) {
+    const ans = document.getElementById('iv-ans-' + i);
+    const card = document.getElementById('iv-card-' + i);
+    const btn = card.querySelector('button');
+    const visible = ans.style.display === 'block';
+    ans.style.display = visible ? 'none' : 'block';
+    btn.textContent = visible ? '👁 Show Answer' : '🙈 Hide Answer';
+    card.classList.toggle('revealed', !visible);
+    Prism.highlightAll();
+}
+
+function revealAllAnswers() {
+    document.querySelectorAll('.interview-q-answer').forEach((el, i) => {
+        el.style.display = 'block';
+        const card = document.getElementById('iv-card-' + i);
+        if (card) {
+            card.classList.add('revealed');
+            const btn = card.querySelector('button');
+            if (btn) btn.textContent = '🙈 Hide Answer';
+        }
+    });
+    Prism.highlightAll();
+}
+
+function updateIvTimer() {
+    const el = document.getElementById('ivTimer');
+    const mins = Math.floor(ivTimeLeft / 60).toString().padStart(2, '0');
+    const secs = (ivTimeLeft % 60).toString().padStart(2, '0');
+    el.textContent = `${mins}:${secs}`;
+    el.className = 'interview-timer';
+    if (ivTimeLeft <= 60) el.classList.add('danger');
+    else if (ivTimeLeft <= 120) el.classList.add('warning');
+}
+
+// =============================================
+// 4. WEAK TOPIC DETECTION
+// =============================================
+function openWeakTopics() {
+    document.getElementById('weakTopicsModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    renderWeakTopics();
+}
+
+function closeWeakTopics() {
+    document.getElementById('weakTopicsModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function renderWeakTopics() {
+    const entries = getAllEntries();
+    if (entries.length === 0) {
+        document.getElementById('weakTopicsList').innerHTML = '<p style="opacity:0.5">No entries yet.</p>';
+        return;
+    }
+
+    // Group by topic, sum view counts
+    const topicStats = {};
+    entries.forEach(entry => {
+        const topic = entry.subtopic || 'General';
+        if (!topicStats[topic]) topicStats[topic] = { views: 0, count: 0 };
+        topicStats[topic].views += (viewCounts[entry.id] || 0);
+        topicStats[topic].count++;
+    });
+
+    // Sort by average views ascending (least viewed = weakest)
+    const sorted = Object.entries(topicStats)
+        .map(([topic, stats]) => ({ topic, avg: stats.views / stats.count, ...stats }))
+        .sort((a, b) => a.avg - b.avg);
+
+    const maxAvg = Math.max(...sorted.map(s => s.avg), 1);
+
+    const list = document.getElementById('weakTopicsList');
+    list.innerHTML = '';
+
+    sorted.forEach((stat, i) => {
+        const pct = Math.round((stat.avg / maxAvg) * 100);
+        const heat = pct < 20 ? '#ef4444' : pct < 50 ? '#f59e0b' : '#22c55e';
+        const badge = i === 0 ? ' 🔴' : i === 1 ? ' 🟠' : i === 2 ? ' 🟡' : '';
+
+        const row = document.createElement('div');
+        row.className = 'weak-topic-row';
+        row.innerHTML = `
+            <span class="weak-topic-name">${stat.topic}${badge}</span>
+            <div class="weak-bar-wrap">
+                <div class="weak-bar" style="width:${pct}%; background:${heat};"></div>
+            </div>
+            <span class="weak-count">${Math.round(stat.avg * 10) / 10} views</span>
+        `;
+        list.appendChild(row);
+    });
+}
+
+// =============================================
+// PATCH renderQuestions to track views
+// =============================================
+const _origRenderQuestions = renderQuestions;
+// We patch via override after definition — handled inline in renderQuestions body below
+
+
+// =============================================
+// MASTERY TRACKING
+// =============================================
+let masteryData = JSON.parse(localStorage.getItem('lh_mastery') || '{}');
+// mastery values: 'mastered' | 'learning' | undefined (new)
+
+function saveMastery() {
+    localStorage.setItem('lh_mastery', JSON.stringify(masteryData));
+}
+
+function cycleMastery(entryId) {
+    const cur = masteryData[entryId];
+    if (!cur)           masteryData[entryId] = 'learning';
+    else if (cur === 'learning')  masteryData[entryId] = 'mastered';
+    else                delete masteryData[entryId];
+    saveMastery();
+    renderQuestions();
+    // Refresh module cards if on dashboard
+    if (document.getElementById('dashboardView').style.display !== 'none') renderDashboard();
+}
+
+function getMasteryLabel(entryId) {
+    return masteryData[entryId] || 'new';
+}
+
+// =============================================
+// STUDY STREAK
+// =============================================
+let streakData = JSON.parse(localStorage.getItem('lh_streak') || '{"dates":[],"best":0}');
+
+function recordStreakToday() {
+    const today = new Date().toDateString();
+    if (!streakData.dates.includes(today)) {
+        streakData.dates.push(today);
+        // Keep last 365 days only
+        streakData.dates = streakData.dates.slice(-365);
+        const cur = calcCurrentStreak();
+        if (cur > (streakData.best || 0)) streakData.best = cur;
+        localStorage.setItem('lh_streak', JSON.stringify(streakData));
+    }
+}
+
+function calcCurrentStreak() {
+    if (!streakData.dates.length) return 0;
+    const sorted = [...streakData.dates].sort((a,b) => new Date(b) - new Date(a));
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 864e5).toDateString();
+    // Must have studied today or yesterday to keep streak alive
+    if (sorted[0] !== today && sorted[0] !== yesterday) return 0;
+    let streak = 1;
+    for (let i = 0; i < sorted.length - 1; i++) {
+        const diff = (new Date(sorted[i]) - new Date(sorted[i+1])) / 864e5;
+        if (Math.round(diff) === 1) streak++;
+        else break;
+    }
+    return streak;
+}
+
+function renderStreakWidget() {
+    const streak = calcCurrentStreak();
+    const best = streakData.best || 0;
+    document.getElementById('streakCount').textContent = streak;
+    document.getElementById('streakBest').textContent = `Best: ${best} day${best !== 1 ? 's' : ''}`;
+
+    // Build last 7 days dots
+    const dots = document.getElementById('streakDots');
+    dots.innerHTML = '';
+    const days = ['S','M','T','W','T','F','S'];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 864e5);
+        const ds = d.toDateString();
+        const dot = document.createElement('div');
+        dot.className = 'streak-dot';
+        dot.title = ds;
+        dot.textContent = days[d.getDay()];
+        if (streakData.dates.includes(ds)) dot.classList.add('active');
+        else if (i === 0) dot.classList.add('today');
+        dots.appendChild(dot);
+    }
+
+    // Hide widget if 0 streak and no history
+    document.getElementById('streakWidget').style.display =
+        (streak > 0 || streakData.dates.length > 0) ? 'flex' : 'none';
+}
+
+// =============================================
+// PROGRESS MODAL
+// =============================================
+function openProgressModal() {
+    document.getElementById('progressModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    renderProgressModal();
+}
+
+function closeProgressModal() {
+    document.getElementById('progressModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function renderProgressModal() {
+    const allEntries = getAllEntries();
+    const total = allEntries.length;
+    const mastered = allEntries.filter(e => masteryData[e.id] === 'mastered').length;
+    const learning = allEntries.filter(e => masteryData[e.id] === 'learning').length;
+    const newCount = total - mastered - learning;
+    const pct = total ? Math.round((mastered / total) * 100) : 0;
+
+    // Summary cards
+    document.getElementById('progressSummary').innerHTML = `
+        <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
+            <div style="font-size:22px; font-weight:800; color:#22c55e;">${mastered}</div>
+            <div style="font-size:11px; opacity:0.6; margin-top:2px;">Mastered</div>
+        </div>
+        <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
+            <div style="font-size:22px; font-weight:800; color:#3b82f6;">${learning}</div>
+            <div style="font-size:11px; opacity:0.6; margin-top:2px;">Learning</div>
+        </div>
+        <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
+            <div style="font-size:22px; font-weight:800; color:var(--text);">${newCount}</div>
+            <div style="font-size:11px; opacity:0.6; margin-top:2px;">Not Started</div>
+        </div>
+        <div style="flex:1; min-width:100px; background: linear-gradient(135deg,var(--primary),var(--accent)); border-radius:12px; padding:12px 16px; text-align:center;">
+            <div style="font-size:22px; font-weight:800; color:white;">${pct}%</div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.75); margin-top:2px;">Overall</div>
+        </div>
+    `;
+
+    // Per-module breakdown
+    const list = document.getElementById('progressModuleList');
+    list.innerHTML = '';
+    Object.keys(data).forEach(mod => {
+        const modEntries = [];
+        Object.values(data[mod]).forEach(arr => modEntries.push(...arr));
+        if (!modEntries.length) return;
+
+        const mMastered = modEntries.filter(e => masteryData[e.id] === 'mastered').length;
+        const mLearning = modEntries.filter(e => masteryData[e.id] === 'learning').length;
+        const mTotal = modEntries.length;
+        const mPct = Math.round((mMastered / mTotal) * 100);
+
+        const row = document.createElement('div');
+        row.className = 'progress-module-row';
+        row.innerHTML = `
+            <div class="progress-module-name">
+                <span>${mod}</span>
+                <span style="font-size:12px; color:var(--primary); font-weight:800;">${mPct}%</span>
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" style="width:${mPct}%"></div>
+            </div>
+            <div class="progress-stats">
+                <span>✅ ${mMastered} mastered</span>
+                <span>📘 ${mLearning} learning</span>
+                <span>⬜ ${mTotal - mMastered - mLearning} not started</span>
+                <span style="margin-left:auto;">${mTotal} total entries</span>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+}
+
+	showDashboard();
+	// Stagger card animations on dashboard render
+	function staggerCards(selector) {
+		document.querySelectorAll(selector).forEach((el, i) => {
+			el.style.animationDelay = (i * 0.06) + 's';
+		});
+	}
+	const _origRenderModules = window.renderModules;
+	// Patch grid renders to apply stagger after DOM update
+	const gridObserver = new MutationObserver(() => {
+		staggerCards('#moduleGrid .module-card');
+		staggerCards('#ebookGrid .ebook-card');
+		staggerCards('#videoGrid .ebook-card');
+	});
+	gridObserver.observe(document.body, { childList: true, subtree: true });
 	document.getElementById("cancelPDFBtn").onclick = function(){
 
     cancelPDFExport = true;
@@ -4669,6 +5829,59 @@ function startFreshReading(){
 
     document.body.style.cursor = "default";
 }
+
+// ===== CUSTOM DIALOG =====
+let _dialogCallback = null;
+
+function openCustomPrompt({ title, placeholder, confirmText, onConfirm }) {
+    document.getElementById('customDialogTitle').textContent = title;
+    document.getElementById('customDialogMessage').textContent = '';
+    document.getElementById('customDialogMessage').style.display = 'none';
+    const input = document.getElementById('customDialogInput');
+    input.style.display = 'block';
+    input.placeholder = placeholder || '';
+    input.value = '';
+    const btn = document.getElementById('customDialogConfirmBtn');
+    btn.textContent = confirmText || 'Confirm';
+    btn.style.background = 'var(--primary)';
+    _dialogCallback = () => onConfirm(input.value.trim());
+    document.getElementById('customDialogOverlay').classList.add('active');
+    setTimeout(() => input.focus(), 80);
+    input.onkeydown = (e) => { if (e.key === 'Enter') confirmCustomDialog(); if (e.key === 'Escape') closeCustomDialog(); };
+}
+
+function openCustomConfirm({ title, message, confirmText, danger, onConfirm }) {
+    document.getElementById('customDialogTitle').textContent = title;
+    const msg = document.getElementById('customDialogMessage');
+    msg.textContent = message || '';
+    msg.style.display = message ? 'block' : 'none';
+    document.getElementById('customDialogInput').style.display = 'none';
+    const btn = document.getElementById('customDialogConfirmBtn');
+    btn.textContent = confirmText || 'Confirm';
+    btn.style.background = danger ? 'var(--danger)' : 'var(--primary)';
+    _dialogCallback = onConfirm;
+    document.getElementById('customDialogOverlay').classList.add('active');
+}
+
+function confirmCustomDialog() {
+    const cb = _dialogCallback;
+    closeCustomDialog();
+    if (cb) cb();
+}
+
+function closeCustomDialog() {
+    document.getElementById('customDialogOverlay').classList.remove('active');
+    _dialogCallback = null;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmBtn = document.getElementById('customDialogConfirmBtn');
+    if (confirmBtn) confirmBtn.onclick = confirmCustomDialog;
+    const overlay = document.getElementById('customDialogOverlay');
+    if (overlay) overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeCustomDialog();
+    });
+});
 </script>
 <!-- ================= ADD BOOK MODAL ================= -->
 
@@ -4931,5 +6144,111 @@ Resume
 
 </div>
 </div>
+<!-- ================= FLASHCARD MODAL ================= -->
+<div id="flashcardModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10002; align-items:center; justify-content:center; padding:20px;">
+<div class="flashcard-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="margin:0;">🃏 Flashcard Mode</h3>
+        <button class="btn btn-outline" onclick="closeFlashcardMode()" style="padding:4px 10px;">✕</button>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+        <select id="fcModuleSelect" style="flex:1; min-width:120px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);" onchange="loadFlashcardDeck()">
+            <option value="__all__">All Modules</option>
+        </select>
+        <select id="fcSubSelect" style="flex:1; min-width:120px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);" onchange="loadFlashcardDeck()">
+            <option value="__all__">All Submodules</option>
+        </select>
+    </div>
+    <div class="flashcard-progress"><span id="fcCurrent">1</span> / <span id="fcTotal">0</span></div>
+    <div class="flashcard-card" id="flashcardFace" onclick="revealFlashcard()">
+        <div class="flashcard-source" id="fcSource"></div>
+        <div class="flashcard-question" id="fcQuestion">No entries found.</div>
+        <div class="flashcard-answer markdown-body" id="fcAnswer"></div>
+        <div class="flashcard-hint" id="fcHint">👆 Tap to reveal answer</div>
+    </div>
+    <div class="flashcard-nav">
+        <button class="btn btn-outline" onclick="prevFlashcard()">← Prev</button>
+        <button class="btn btn-outline" onclick="shuffleFlashcards()" title="Shuffle">🔀</button>
+        <button class="btn" onclick="nextFlashcard()">Next →</button>
+    </div>
+</div>
+</div>
+
+<!-- ================= INTERVIEW PRACTICE MODAL ================= -->
+<div id="interviewModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10002; align-items:center; justify-content:center; padding:20px; overflow-y:auto;">
+<div class="interview-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="margin:0;">🎯 Interview Practice</h3>
+        <button class="btn btn-outline" onclick="closeInterviewMode()" style="padding:4px 10px;">✕</button>
+    </div>
+    <div id="interviewSetup">
+        <p style="opacity:0.7; margin-bottom:16px; font-size:14px;">Pick a module and start a mock interview with random questions and a timer.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+            <select id="ivModuleSelect" style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                <option value="__all__">All Modules</option>
+            </select>
+            <select id="ivCountSelect" style="width:120px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                <option value="5">5 Questions</option>
+                <option value="10" selected>10 Questions</option>
+                <option value="15">15 Questions</option>
+                <option value="20">20 Questions</option>
+            </select>
+            <select id="ivTimeSelect" style="width:140px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                <option value="300">5 min timer</option>
+                <option value="600" selected>10 min timer</option>
+                <option value="900">15 min timer</option>
+                <option value="1800">30 min timer</option>
+            </select>
+        </div>
+        <button class="btn" style="width:100%;" onclick="startInterview()">🚀 Start Interview</button>
+    </div>
+    <div id="interviewSession" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div>
+                <div style="font-size:11px; opacity:0.5; text-transform:uppercase; letter-spacing:1px;">Time Remaining</div>
+                <div class="interview-timer" id="ivTimer">10:00</div>
+            </div>
+            <div style="text-align:right;">
+                <button class="btn btn-outline" style="font-size:12px;" onclick="revealAllAnswers()">👁 Reveal All</button>
+            </div>
+        </div>
+        <div id="ivQuestionList"></div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-outline" style="flex:1;" onclick="closeInterviewMode()">End Session</button>
+            <button class="btn" style="flex:1;" onclick="startInterview()">🔀 New Round</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ================= WEAK TOPICS MODAL ================= -->
+<div id="weakTopicsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10002; align-items:center; justify-content:center; padding:20px; overflow-y:auto;">
+<div class="weak-topics-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="margin:0;">📊 Weak Topic Detection</h3>
+        <button class="btn btn-outline" onclick="closeWeakTopics()" style="padding:4px 10px;">✕</button>
+    </div>
+    <p style="opacity:0.6; font-size:13px; margin-bottom:16px;">Topics ranked by how rarely their entries have been viewed.</p>
+    <div id="weakTopicsList"></div>
+    <div style="margin-top:16px; display:flex; gap:8px;">
+        <button class="btn btn-outline" style="flex:1; font-size:12px;" onclick="resetViewCounts()">🗑 Reset Tracking</button>
+        <button class="btn btn-outline" onclick="closeWeakTopics()" style="padding:6px 16px;">Close</button>
+    </div>
+</div>
+</div>
+
+<!-- ================= CUSTOM DIALOG ================= -->
+<div id="customDialogOverlay">
+    <div class="custom-dialog" id="customDialogBox">
+        <h4 id="customDialogTitle"></h4>
+        <p id="customDialogMessage"></p>
+        <input id="customDialogInput" type="text" style="display:none;" />
+        <div class="custom-dialog-actions">
+            <button class="btn btn-outline" style="flex:1;" onclick="closeCustomDialog()">Cancel</button>
+            <button class="btn" id="customDialogConfirmBtn" onclick="confirmCustomDialog()" style="flex:1;">Confirm</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
