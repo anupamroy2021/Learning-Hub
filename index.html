@@ -874,7 +874,6 @@ display:table-cell !important;
             .btn { padding: 10px; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
             #lockBtn b { display: none; }
             .logo span { display: none; }
-            #hamburger { display: flex !important; }
             .header-actions-mobile {
                 display: flex;
                 flex-direction: column;
@@ -3406,14 +3405,14 @@ setTimeout(()=>{
     hideAllViews();
 
     document.getElementById('dashboardView').style.display = 'block';
-
-    document.getElementById('hamburger').style.display = 'none';
+    document.getElementById("hamburger").style.display = "none";
     document.getElementById('headerNewBtn').style.display = 'none';
     document.getElementById('lockBtn').style.display = 'none';
 
     document.getElementById('dashboardControls').style.display = 'flex';
 
     document.getElementById('ebookBackBtn').style.display = 'none';
+	
 
     renderDashboard();
     initQotd();
@@ -3480,7 +3479,7 @@ setTimeout(()=>{
 		currentModule = name;
 
 		document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none';
-
+        document.getElementById("hamburger").style.display = "none";
 		document.getElementById('currentModuleTitle').textContent = name;
 		document.getElementById('dashboardView').style.display = 'none';
 		document.getElementById('submoduleView').style.display = 'block';
