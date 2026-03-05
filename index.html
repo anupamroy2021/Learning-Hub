@@ -6,6 +6,7 @@
     <title>Learning Hub</title>
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css">
 	<script src="https://unpkg.com/lucide@latest"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -375,17 +376,11 @@ blockquote{
 .streak-widget {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 14px;
-    margin-bottom: 14px;
-    animation: fadeInUp 0.35s ease both;
-    flex-wrap: wrap;
+    gap: 6px;
+    animation: fadeInUp 0.3s ease both;
 }
 .streak-fire {
-    font-size: 20px;
+    font-size: 16px;
     line-height: 1;
     filter: drop-shadow(0 2px 4px rgba(245,158,11,0.4));
     animation: fireWiggle 1.8s ease-in-out infinite;
@@ -394,33 +389,33 @@ blockquote{
     0%,100% { transform: rotate(-5deg) scale(1); }
     50%      { transform: rotate(5deg) scale(1.08); }
 }
-.streak-info { display: flex; align-items: center; gap: 8px; }
+.streak-info { display: flex; align-items: center; gap: 4px; }
 .streak-count {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 800;
     color: #f59e0b;
     line-height: 1;
 }
-.streak-label { font-size: 11px; opacity: 0.55; }
-.streak-best { font-size: 10px; opacity: 0.4; white-space: nowrap; }
+.streak-label { font-size: 11px; opacity: 0.5; }
+.streak-best { display: none; }
 .streak-dots {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     align-items: center;
-    margin-left: auto;
+    margin-left: 4px;
 }
 .streak-dot {
-    width: 22px;
-    height: 22px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 8px;
+    font-size: 7px;
     font-weight: 700;
-    border: 2px solid var(--border);
+    border: 1.5px solid var(--border);
     color: var(--text);
-    opacity: 0.35;
+    opacity: 0.3;
     transition: all 0.3s;
 }
 .streak-dot.active {
@@ -874,13 +869,12 @@ display:table-cell !important;
             padding: 5px 10px; border-radius: 6px; 
         }
 
-        /* Responsive UI Fixes */
         @media (max-width: 650px) {
             .btn span { display: none; }
             .btn { padding: 10px; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
-            #lockBtn b { display: none; } /* Hide "Locked/Unlocked" text on mobile */
+            #lockBtn b { display: none; }
             .logo span { display: none; }
-            .menu-toggle { display: block; }
+            #hamburger { display: flex !important; }
             .header-actions-mobile {
                 display: flex;
                 flex-direction: column;
@@ -969,7 +963,7 @@ display:table-cell !important;
             border: 2px solid var(--border); background: var(--card); color: var(--text); outline: none;
         }
 
-        .content-area { flex: 1; overflow-y: auto; padding: 1rem; position: relative; scroll-behavior: smooth; }
+        .content-area { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; position: relative; scroll-behavior: smooth; }
         .section-separator {
             margin: 30px 0 15px 0; padding-bottom: 8px; border-bottom: 2px solid var(--border);
             color: var(--primary); font-size: 1.2rem; font-weight: 800; text-transform: uppercase;
@@ -1034,8 +1028,97 @@ display:table-cell !important;
         }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
-        .module-card { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid var(--border); cursor: pointer; text-align: center; transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
-        .module-card:hover { transform: translateY(-6px); border-color: var(--primary); box-shadow: 0 12px 30px rgba(37, 99, 235, 0.15); }
+        .module-card {
+            background: var(--card);
+            padding: 0;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .module-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+            border-color: transparent;
+        }
+        .module-card-banner {
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            gap: 6px;
+        }
+        .module-card-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.08);
+        }
+        .module-card-icon {
+            font-size: 28px;
+            z-index: 1;
+            line-height: 1;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            color: rgba(255,255,255,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .module-card-icon i {
+            font-size: 28px;
+            color: rgba(255,255,255,0.95);
+        }
+        .module-card-initial {
+            font-size: 13px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.95);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            z-index: 1;
+            letter-spacing: 0.3px;
+            user-select: none;
+            text-align: center;
+            padding: 0 14px;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        .module-card-body {
+            padding: 16px 18px 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .module-card-body h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .module-card-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .module-card-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            opacity: 0.75;
+        }
         .card { background: var(--card); padding: 1.2rem; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); }
         .editor-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; height: 100%; }
         .form-box, .preview-box { background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
@@ -1050,41 +1133,45 @@ display:table-cell !important;
 			background: var(--primary);
 			color: white;
 		}
-		.scroll-toggle-btn {
-
+		.scroll-btn-group {
 			position: fixed;
-			right: 25px;
-			bottom: 25px;
-
-			width: 45px;
-			height: 45px;
-
+			right: 20px;
+			bottom: 24px;
+			display: none;
+			flex-direction: column;
+			align-items: center;
+			gap: 6px;
+			z-index: 999;
+		}
+		.scroll-btn {
+			width: 40px;
+			height: 40px;
 			border-radius: 50%;
 			border: none;
-
+			background: var(--card);
+			color: var(--text);
+			font-size: 16px;
+			cursor: pointer;
+			box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+			border: 1px solid var(--border);
+			transition: background 0.15s, transform 0.15s, opacity 0.2s;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0.4;
+			pointer-events: none;
+		}
+		.scroll-btn.active {
+			opacity: 1;
+			pointer-events: all;
 			background: var(--primary);
 			color: white;
-
-			font-size: 20px;
-			font-weight: bold;
-
-			cursor: pointer;
-
-			display: none;
-
-			z-index: 999;
-
-			box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-			animation: btnPulse 2s infinite;
-			transition: transform 0.2s ease;
+			border-color: var(--primary);
 		}
-		.scroll-toggle-btn:hover {
+		.scroll-btn:hover {
 			transform: scale(1.1);
 		}
-		@keyframes btnPulse {
-			0%, 100% { box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-			50% { box-shadow: 0 4px 22px rgba(37, 99, 235, 0.55); }
-		}
+
 		/* ================= PRISM SYMBOL GREY BG FIX ================= */
 
 /* Remove GitHub markdown inline code bg INSIDE code blocks */
@@ -1300,27 +1387,118 @@ from{transform:translateY(100%);}
 to{transform:translateY(0);}
 }
 
-.menu-item{
-    width:100%;
-    padding:10px 14px;
-    background:none;
-    border:none;
-    text-align:left;
-    cursor:pointer;
-    color:var(--text);
-    font-size:14px;
-    transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+.menu-item {
+    width: 100%;
+    padding: 9px 16px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    letter-spacing: 0.01em;
 }
 
-.menu-item:hover{
-    background:var(--primary);
-    color:white;
-    padding-left: 20px;
+.menu-item:hover {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    transform: translateX(2px);
+}
+
+.menu-section-label {
+    padding: 8px 16px 4px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.4;
 }
 /*
+/* ===== WELCOME SPLASH ===== */
+#welcomeSplash {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+#welcomeSplash.hide {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.04);
+}
+.splash-logo {
+    font-size: 3rem;
+    font-weight: 900;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: splashFadeUp 0.6s ease 0.2s forwards;
+}
+.splash-logo span {
+    background: linear-gradient(135deg, #2563eb, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.splash-tagline {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: splashFadeUp 0.6s ease 0.45s forwards;
+}
+.splash-bar-wrap {
+    width: 180px;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    opacity: 0;
+    animation: splashFadeUp 0.5s ease 0.6s forwards;
+}
+.splash-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2563eb, #6366f1);
+    border-radius: 10px;
+    animation: splashBarFill 1s ease 0.7s forwards;
+}
+@keyframes splashFadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes splashBarFill {
+    to { width: 100%; }
+}
     </style>
 </head>
 <body class="dark">
+
+<!-- ===== WELCOME SPLASH ===== -->
+<div id="welcomeSplash">
+    <img src="https://cdn.jsdelivr.net/gh/anupamroy2021/Learning-Hub/logo.png" style="width:160px; height:160px; object-fit:contain; opacity:0; transform:translateY(24px); animation: splashFadeUp 0.6s ease 0.2s forwards;" alt="Learning Hub Logo">
+	<div class="splash-logo"><span>LEARNING HUB</span></div>
+    <div class="splash-tagline">Your personal knowledge base</div>
+    <div class="splash-bar-wrap">
+        <div class="splash-bar"></div>
+    </div>
+</div>
 
 <header>
 
@@ -1336,16 +1514,16 @@ to{transform:translateY(0);}
     </button>
 
     <!-- Sidebar Toggle -->
-    <button class="menu-toggle"
+    <button class="btn btn-outline"
     id="hamburger"
     onclick="toggleSidebar()"
-    style="position:relative; z-index:10000;">
+    style="display:none; position:relative; z-index:10000;">
     ☰
     </button>
 
     <!-- Logo -->
     <div class="logo" onclick="showDashboard()">
-        ⚡ <span>LEARNING HUB</span>
+        <img src="https://cdn.jsdelivr.net/gh/anupamroy2021/Learning-Hub/logo.png" style="width:32px; height:32px; object-fit:contain;" alt="Logo"> <span>LEARNING HUB</span>
     </div>
 	
 
@@ -1371,6 +1549,37 @@ to{transform:translateY(0);}
     <b>+</b> <span>New Entry</span>
     </button>
 
+    <!-- Header Streak Widget (dashboard only) -->
+    <div id="streakWidget" class="streak-widget" style="display:none; background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:5px 10px; position:relative; cursor:default;">
+        <span class="streak-fire">🔥</span>
+        <span class="streak-count" id="streakCount">0</span>
+
+        <!-- Hover tooltip -->
+        <div id="streakTooltip" style="
+            display:none;
+            position:absolute;
+            top:calc(100% + 10px);
+            right:0;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:14px 16px;
+            min-width:200px;
+            box-shadow:0 8px 24px rgba(0,0,0,0.15);
+            z-index:10001;
+            white-space:nowrap;
+        ">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                <span style="font-size:20px;">🔥</span>
+                <div>
+                    <div style="font-size:16px; font-weight:800; color:#f59e0b;" id="streakTooltipCount">0 day streak</div>
+                    <div style="font-size:11px; opacity:0.5;" id="streakBest">Best: 0 days</div>
+                </div>
+            </div>
+            <div id="streakDots" class="streak-dots" style="justify-content:center;"></div>
+        </div>
+    </div>
+
     <div id="dashboardControls" style="position:relative;">
 
     <!-- DASHBOARD MENU BUTTON -->
@@ -1386,46 +1595,64 @@ to{transform:translateY(0);}
         display:none;
         position:absolute;
         right:0;
-        top:45px;
+        top:48px;
         background:var(--card);
         border:1px solid var(--border);
-        border-radius:10px;
-        min-width:180px;
-        box-shadow:0 5px 20px rgba(0,0,0,0.15);
+        border-radius:14px;
+        min-width:210px;
+        box-shadow:0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
         z-index:10000;
         overflow:hidden;
+        padding:6px;
+        backdrop-filter: blur(8px);
         ">
 
+        <!-- Appearance -->
+        <div class="menu-section-label">Appearance</div>
         <button class="menu-item" onclick="toggleTheme()">
-            🌓 Theme
+            🌓 Toggle Theme
         </button>
-
-       <button class="menu-item"
-		onclick="event.stopPropagation(); document.getElementById('importFile').click();">
-		📥 Import
-		</button>
-
-        <button class="menu-item"
-            onclick="exportData()">
-            📤 Export
-        </button>
-
         <button class="menu-item" onclick="toggleReadMode(); event.stopPropagation();">
             📖 Reading Mode
         </button>
-		<button class="menu-item"
-			onclick="toggleModuleDragLock()">
-			🧩 Rearrange Modules
-		</button>
 
-        <button class="menu-item"
-            onclick="openEbookPage()">
+        <hr style="border:none; border-top:1px solid var(--border); margin:6px 0;">
+
+        <!-- Library -->
+        <div class="menu-section-label">Library</div>
+        <button class="menu-item" onclick="openEbookPage()">
             📚 E-Books
         </button>
-
-        <button class="menu-item"
-            onclick="openVideoPage()">
+        <button class="menu-item" onclick="openVideoPage()">
             🎥 Videos
+        </button>
+        <button class="menu-item" onclick="toggleModuleDragLock()">
+            🧩 Rearrange Modules
+        </button>
+
+        <hr style="border:none; border-top:1px solid var(--border); margin:6px 0;">
+
+        <!-- Practice -->
+        <div class="menu-section-label">Practice</div>
+        <button class="menu-item" onclick="document.getElementById('dashboardMenu').style.display='none'; openFlashcardMode()">
+            🃏 Flashcard Mode
+        </button>
+        <button class="menu-item" onclick="document.getElementById('dashboardMenu').style.display='none'; openInterviewMode()">
+            🎯 Interview Practice
+        </button>
+        <button class="menu-item" onclick="document.getElementById('dashboardMenu').style.display='none'; openWeakTopics()">
+            📊 Weak Topics
+        </button>
+
+        <hr style="border:none; border-top:1px solid var(--border); margin:6px 0;">
+
+        <!-- Data -->
+        <div class="menu-section-label">Data</div>
+        <button class="menu-item" onclick="event.stopPropagation(); document.getElementById('importFile').click();">
+            📥 Import
+        </button>
+        <button class="menu-item" onclick="exportData()">
+            📤 Export
         </button>
 
     </div>
@@ -1499,10 +1726,17 @@ Cancel Export
 </div>
 
 <div id="dashboardView">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; flex-wrap:wrap; gap:10px;">
     <h1>Dashboard</h1>
-    <button class="btn edit-action" onclick="addModule()">+ Create Module</button>
-	</div>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; background:var(--bg); border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+            <button id="sortBtn-default" onclick="setModuleSort('default')" style="padding:6px 12px; border:none; background:var(--primary); color:white; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.15s;">Default</button>
+            <button id="sortBtn-asc" onclick="setModuleSort('asc')" style="padding:6px 12px; border:none; background:none; color:var(--text); font-size:12px; font-weight:600; cursor:pointer; transition:background 0.15s;">A → Z</button>
+            <button id="sortBtn-desc" onclick="setModuleSort('desc')" style="padding:6px 12px; border:none; background:none; color:var(--text); font-size:12px; font-weight:600; cursor:pointer; transition:background 0.15s;">Z → A</button>
+        </div>
+        <button class="btn edit-action" onclick="addModule()">+ Create Module</button>
+    </div>
+    </div>
 
     <!-- QOTD Banner -->
     <div id="qotdBanner" style="display:none;">
@@ -1516,24 +1750,9 @@ Cancel Export
         </div>
     </div>
 
-    <!-- Practice Toolbar -->
-    <div class="practice-toolbar">
-        <button class="practice-btn" onclick="openFlashcardMode()">🃏 Flashcard Mode</button>
-        <button class="practice-btn" onclick="openInterviewMode()">🎯 Interview Practice</button>
-        <button class="practice-btn" onclick="openWeakTopics()">📊 Weak Topics</button>
 
-    </div>
 
-    <!-- Streak Widget -->
-    <div class="streak-widget" id="streakWidget">
-        <div class="streak-fire">🔥</div>
-        <div class="streak-info">
-            <div class="streak-count" id="streakCount">0</div>
-            <div class="streak-label">day streak</div>
-        </div>
-        <div class="streak-best" id="streakBest">Best: 0 days</div>
-        <div class="streak-dots" id="streakDots"></div>
-    </div>
+
 
 	<div class="search-container">
     <div class="search-wrapper">
@@ -1678,17 +1897,20 @@ font-size:14px;
 
 <div id="submoduleView">
 
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div style="display:flex; align-items:center; gap:15px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:12px;">
            <button id="moduleBackBtn"
 				class="btn btn-outline"
 				onclick="goBackToDashboard()">
 				←
 			</button>
-            <h1 id="currentModuleTitle">Module</h1>
+            <div>
+                <div style="font-size:11px; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Module</div>
+                <h1 id="currentModuleTitle" style="margin:0; font-size:1.4rem;">Module</h1>
+            </div>
         </div>
 
-        <div class="header-actions-mobile">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <button class="btn edit-action"
                 onclick="addSubmodule()">+ Create Submodule</button>
 
@@ -1696,11 +1918,15 @@ font-size:14px;
                 style="background:none;
                 border:1px solid var(--danger);
                 color:var(--danger);
-                padding:4px 8px;
-                border-radius:4px;
-                font-size:11px;
-                cursor:pointer;">
-                Delete Module
+                padding:6px 12px;
+                border-radius:8px;
+                font-size:12px;
+                font-weight:600;
+                cursor:pointer;
+                transition: background 0.15s, color 0.15s;"
+                onmouseover="this.style.background='var(--danger)';this.style.color='white'"
+                onmouseout="this.style.background='none';this.style.color='var(--danger)'">
+                🗑 Delete Module
             </button>
         </div>
     </div>
@@ -1774,24 +2000,22 @@ font-size:14px;
     <main class="content-area">
         <div id="listView">
             <!-- Updated Header with Back Button -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
 
     <!-- LEFT SIDE -->
-    <div style="display:flex; align-items:center; gap:10px;">
+    <div style="display:flex; align-items:center; gap:12px;">
         <button id="backBtn" class="btn btn-outline"
 			onclick="showSubmoduleView()"
-			title="Back to Submodules"
-			style="padding:6px 10px;">
+			title="Back to Submodules">
 			←
 		</button>
-        <h2 id="currentSubmoduleTitle"
-			style="
-			color:var(--primary);
-			margin:0;
-			line-height:1;
-			">
-            Submodule
-        </h2>
+        <div>
+            <div style="font-size:11px; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Submodule</div>
+            <h2 id="currentSubmoduleTitle"
+                style="color:var(--primary); margin:0; line-height:1;">
+                Submodule
+            </h2>
+        </div>
     </div>
 
     <!-- RIGHT SIDE (FIXED ORDER) -->
@@ -1801,11 +2025,15 @@ font-size:14px;
             style="background:none;
             border:1px solid var(--danger);
             color:var(--danger);
-            padding:4px 8px;
-            border-radius:4px;
-            font-size:11px;
-            cursor:pointer;">
-            Delete Submodule
+            padding:6px 12px;
+            border-radius:8px;
+            font-size:12px;
+            font-weight:600;
+            cursor:pointer;
+            transition: background 0.15s, color 0.15s;"
+            onmouseover="this.style.background='var(--danger)';this.style.color='white'"
+            onmouseout="this.style.background='none';this.style.color='var(--danger)'">
+            🗑 Delete Submodule
         </button>
 
         <button class="btn btn-outline edit-action"
@@ -1892,10 +2120,11 @@ font-size:14px;
             </div>
         </div>
     </main>
-	<button id="scrollToggleBtn" class="scroll-toggle-btn"
-        onclick="toggleScroll()">
-    ↓
-    </button>
+	<div id="scrollBtnGroup" class="scroll-btn-group">
+		<button id="scrollUpBtn" class="scroll-btn" onclick="scrollUp()" title="Scroll to top">↑</button>
+
+		<button id="scrollDownBtn" class="scroll-btn active" onclick="scrollDown()" title="Scroll to bottom">↓</button>
+	</div>
 </div>
 
 <script>
@@ -1922,6 +2151,7 @@ font-size:14px;
 	let isDeleteMode = false;
     let selectedBooks = new Set();
 	let isModuleLocked = true;
+	let moduleSort = 'default';
 	let moduleSortable = null;
     let submoduleSortable = null;
     let lastReadingState = JSON.parse(localStorage.getItem("learninghub_last_state")) || null;
@@ -2200,27 +2430,21 @@ function saveReadingState(entryId = null){
 function toggleModuleDragLock(){
 
     if(isReadOnlyMode){
-        alert("Reading Mode Enabled");
+        showReadModeToast("Reading Mode Enabled");
         return;
     }
 
     isModuleLocked = !isModuleLocked;
 
     if(moduleSortable){
-        moduleSortable.option(
-            "disabled",
-            isModuleLocked
-        );
+        moduleSortable.option("disabled", isModuleLocked);
     }
 
     if(submoduleSortable){
-        submoduleSortable.option(
-            "disabled",
-            isModuleLocked
-        );
+        submoduleSortable.option("disabled", isModuleLocked);
     }
 
-    alert(
+    showReadModeToast(
         isModuleLocked
         ? "🔒 Rearranging Locked"
         : "🔓 Rearranging Enabled"
@@ -2266,7 +2490,7 @@ function openEbookPage(){
    hideAllViews();
 document.getElementById('ebookView').style.display='block';
 
-    document.getElementById('dashboardControls').style.display='none';
+    document.getElementById('dashboardControls').style.display='none'; document.getElementById('streakWidget').style.display='none';
 
     renderEbooks();
 }
@@ -2275,7 +2499,7 @@ function openVideoPage(){
     hideAllViews();
     document.getElementById('videoView').style.display='block';
 
-    document.getElementById('dashboardControls').style.display='none';
+    document.getElementById('dashboardControls').style.display='none'; document.getElementById('streakWidget').style.display='none';
 
     renderVideos();
 }
@@ -3108,6 +3332,10 @@ function looksLikeDiagram(code){
         const el = document.getElementById(id);
         if(el) el.style.display = 'none';
     });
+
+    // Hide streak from header when leaving dashboard
+    const sw = document.getElementById('streakWidget');
+    if (sw) sw.style.display = 'none';
 }
 window.addEventListener("DOMContentLoaded", function(){
 
@@ -3167,7 +3395,7 @@ setTimeout(()=>{
         }
     }
 
-},1000);
+}, 4200);
 
 });
 	function showDashboard() {
@@ -3191,7 +3419,7 @@ setTimeout(()=>{
     initQotd();
     recordStreakToday();
     renderStreakWidget();
-    document.getElementById('scrollToggleBtn').style.display = 'none';
+    document.getElementById('scrollBtnGroup').style.display = 'none';
 	setTimeout(initModuleSortable,100);
 }
 	function initSubmoduleSortable(){
@@ -3244,12 +3472,14 @@ setTimeout(()=>{
     document.getElementById('dashboardControls').style.display = 'flex';
 
     renderDashboard();
+    recordStreakToday();
+    renderStreakWidget();
 }
 
     function openModule(name) {
 		currentModule = name;
 
-		document.getElementById('dashboardControls').style.display = 'none'; // ⭐ ADD THIS
+		document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none';
 
 		document.getElementById('currentModuleTitle').textContent = name;
 		document.getElementById('dashboardView').style.display = 'none';
@@ -3262,7 +3492,7 @@ setTimeout(()=>{
 
    function showSubmoduleView() {
 
-		document.getElementById('dashboardControls').style.display = 'none'; // ⭐ ADD THIS
+		document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none';
 
 		currentSubmodule = null;
 
@@ -3275,12 +3505,12 @@ setTimeout(()=>{
 		document.getElementById('lockBtn').style.display = 'none';
 
 		renderSubmodules();
-		document.getElementById('scrollToggleBtn').style.display = 'none';
+		document.getElementById('scrollBtnGroup').style.display = 'none';
 	}
 
 function openSubmodule(name) {
 
-    document.getElementById('dashboardControls').style.display = 'none';
+    document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none';
     currentSubmodule = name;
 
     const submoduleSearch = document.getElementById('search');
@@ -3303,48 +3533,27 @@ function openSubmodule(name) {
     setTimeout(() => {
 
 		const area = document.querySelector('.content-area');
-		const btn = document.getElementById('scrollToggleBtn');
 
 		if (area) {
 
-			btn.style.display = 'block'; // ⭐ SHOW BUTTON
+			document.getElementById('scrollBtnGroup').style.display = 'flex';
 
-			area.addEventListener('scroll', function () {
-
-				// ⭐ STOP AUTO SCROLL IF USER SCROLLS
-				if (scrollAnim) {
-					cancelAnimationFrame(scrollAnim);
-					scrollAnim = null;
-				}
-
-				// ⭐ INDEX MAPPING
+			function updateScrollUI() {
+				if (scrollAnim) { cancelAnimationFrame(scrollAnim); scrollAnim = null; }
 				mapIndexWithScroll();
 
-				// ⭐ ARROW SWITCH
-				if (area.scrollTop > area.scrollHeight / 2) {
-					btn.innerText = "↑";
-				} else {
-					btn.innerText = "↓";
-				}
+				const scrollTop = area.scrollTop;
+				const maxScroll = area.scrollHeight - area.clientHeight;
 
-			});
-			area.addEventListener('wheel', () => {
+				// Up/down button active states
+				document.getElementById('scrollUpBtn').classList.toggle('active', scrollTop > 50);
+				document.getElementById('scrollDownBtn').classList.toggle('active', scrollTop < maxScroll - 50);
+			}
 
-				if (scrollAnim) {
-					cancelAnimationFrame(scrollAnim);
-					scrollAnim = null;
-				}
-
-			});
-			area.addEventListener('touchmove', () => {
-
-				if (scrollAnim) {
-					cancelAnimationFrame(scrollAnim);
-					scrollAnim = null;
-				}
-
-			});
-
+			area.addEventListener('scroll', updateScrollUI);
+			area.addEventListener('wheel', updateScrollUI);
+			area.addEventListener('touchmove', updateScrollUI);
+			updateScrollUI();
 		}
 
 	}, 300);
@@ -3695,14 +3904,17 @@ if(sub){
     }
 
     function deleteEntry(id) {
-	if(isReadOnlyMode){
-    alert("Reading Mode Enabled");
-    return;
-}
-        if (confirm("Delete?")) { 
-            data[currentModule][currentSubmodule] = data[currentModule][currentSubmodule].filter(i => i.id != id); 
-            save(); renderSidebarIndex(); renderQuestions(); 
-        }
+        if (isReadOnlyMode) { showReadModeToast("Reading Mode Enabled"); return; }
+        openCustomConfirm({
+            title: '🗑 Delete Entry',
+            message: 'Are you sure you want to delete this entry? This cannot be undone.',
+            confirmText: 'Delete',
+            danger: true,
+            onConfirm: () => {
+                data[currentModule][currentSubmodule] = data[currentModule][currentSubmodule].filter(i => i.id != id);
+                save(); renderSidebarIndex(); renderQuestions();
+            }
+        });
     }
 
     function addModule() {
@@ -3839,31 +4051,150 @@ if(sub){
     return tempDiv.innerHTML;	
 	}
 
+  function setModuleSort(order) {
+    moduleSort = order;
+    ['default','asc','desc'].forEach(o => {
+        const btn = document.getElementById('sortBtn-' + o);
+        if (!btn) return;
+        btn.style.background = (o === order) ? 'var(--primary)' : 'none';
+        btn.style.color = (o === order) ? 'white' : 'var(--text)';
+    });
+    renderDashboard();
+  }
+
+  function getTitleIcon(title) {
+    const t = title.toLowerCase();
+
+    // Flaticon brand icons (fi fi-brands-*)
+    const brandIcons = [
+      [['javascript','js'],       'javascript'],
+      [['typescript','ts'],       'typescript'],
+      [['python'],                'python'],
+      [['java'],                  'java'],
+      [['react'],                 'react'],
+      [['vue'],                   'vuejs'],
+      [['angular'],               'angular'],
+      [['node','nodejs'],         'nodejs'],
+      [['php'],                   'php'],
+      [['swift'],                 'swift'],
+      [['kotlin'],                'kotlin'],
+      [['rust'],                  'rust'],
+      [['go','golang'],           'go'],
+      [['ruby'],                  'ruby'],
+      [['html'],                  'html5'],
+      [['css'],                   'css3'],
+      [['docker'],                'docker'],
+      [['git'],                   'git'],
+      [['github'],                'github'],
+      [['aws'],                   'aws'],
+      [['firebase'],              'firebase'],
+      [['mongodb'],               'mongodb'],
+      [['mysql'],                 'mysql'],
+      [['redis'],                 'redis'],
+      [['linux'],                 'linux'],
+      [['android'],               'android'],
+      [['flutter'],               'flutter'],
+      [['figma'],                 'figma'],
+      [['tailwind'],              'tailwindcss'],
+      [['graphql'],               'graphql'],
+      [['redux'],                 'redux'],
+      [['nextjs','next.js','next js'], 'nextjs'],
+    ];
+
+    for (const [keywords, icon] of brandIcons) {
+      if (keywords.some(k => t.includes(k)))
+        return `<i class="fi fi-brands-${icon}" style="font-size:28px;"></i>`;
+    }
+
+    // Emoji fallbacks
+    const emojiIcons = [
+      [['c++','cpp','c#','csharp'],   '🔧'],
+      [['algorithm','algo'],          '🧮'],
+      [['data structure','linked list','tree','graph','heap','queue','stack'], '🌳'],
+      [['sorting','searching'],       '🔍'],
+      [['dynamic programming','dp'],  '🧠'],
+      [['recursion'],                 '🔁'],
+      [['complexity','big o'],        '📈'],
+      [['system design','architecture'], '🏗️'],
+      [['design pattern'],            '🎭'],
+      [['cloud','azure','gcp'],       '☁️'],
+      [['kubernetes','k8s','container'], '🐳'],
+      [['devops','ci/cd','pipeline'], '⚙️'],
+      [['bash','shell','unix'],       '🐧'],
+      [['network','tcp','http','dns','socket'], '📡'],
+      [['security','auth','oauth','jwt','encryption'], '🔐'],
+      [['database','db','sql','postgres','oracle'], '🗄️'],
+      [['nosql'],                     '📦'],
+      [['machine learning','ml','ai','deep learning','neural','nlp'], '🤖'],
+      [['data science','analytics','pandas','numpy'], '📊'],
+      [['computer vision'],           '👁️'],
+      [['test','testing','jest','unit','e2e'], '🧪'],
+      [['debug','debugging'],         '🐛'],
+      [['interview','prep'],          '🎯'],
+      [['os','operating system','process','thread','memory'], '💻'],
+      [['blockchain','crypto','web3'], '⛓️'],
+      [['game','unity','unreal'],     '🎮'],
+      [['math','mathematics'],        '➗'],
+      [['api','rest'],                '🔌'],
+      [['microservice','distributed'], '🌐'],
+    ];
+
+    for (const [keywords, emoji] of emojiIcons) {
+      if (keywords.some(k => t.includes(k))) return emoji;
+    }
+
+    return '📘';
+  }
+
   function renderDashboard() {
+
+    const MODULE_GRADIENTS = [
+        'linear-gradient(135deg, #667eea, #764ba2)',
+        'linear-gradient(135deg, #f093fb, #f5576c)',
+        'linear-gradient(135deg, #4facfe, #00f2fe)',
+        'linear-gradient(135deg, #43e97b, #38f9d7)',
+        'linear-gradient(135deg, #fa709a, #fee140)',
+        'linear-gradient(135deg, #a18cd1, #fbc2eb)',
+        'linear-gradient(135deg, #fccb90, #d57eeb)',
+        'linear-gradient(135deg, #ff9a9e, #fecfef)',
+        'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
+        'linear-gradient(135deg, #fd7943, #fd4343)',
+        'linear-gradient(135deg, #56ab2f, #a8e063)',
+        'linear-gradient(135deg, #f7971e, #ffd200)',
+    ];
 
     const grid = document.getElementById('moduleGrid');
     grid.innerHTML = "";
 
-    Object.keys(data).forEach(m => {
+    let moduleKeys = Object.keys(data);
+    if (moduleSort === 'asc') moduleKeys = moduleKeys.slice().sort((a, b) => a.localeCompare(b));
+    else if (moduleSort === 'desc') moduleKeys = moduleKeys.slice().sort((a, b) => b.localeCompare(a));
+
+    moduleKeys.forEach((m, idx) => {
 
         const card = document.createElement('div');
         card.className = "module-card";
         card.dataset.module = m;
 
         const subCount = Object.keys(data[m]).length;
-        const totalItems =
-        Object.values(data[m])
-        .reduce((sum, arr) => sum + arr.length, 0);
+        const totalItems = Object.values(data[m]).reduce((sum, arr) => sum + arr.length, 0);
+        const gradient = MODULE_GRADIENTS[idx % MODULE_GRADIENTS.length];
+        const icon = getTitleIcon(m);
 
-        card.innerHTML =
-        `<h3>${m}</h3>
-        <p style="font-size:12px; color:var(--accent); font-weight:normal; margin-bottom:6px;">
-        ${subCount} Submodules, ${totalItems} Items
-        </p>
+        card.innerHTML = `
+        <div class="module-card-banner" style="background: ${gradient};">
+            <div class="module-card-icon">${icon}</div>
+            <div class="module-card-initial">${m}</div>
+        </div>
+        <div class="module-card-body">
+            <div class="module-card-meta">
+                <span class="module-card-badge">📂 ${subCount} submodules</span>
+                <span class="module-card-badge">📝 ${totalItems} items</span>
+            </div>
+        </div>
         `;
 
         card.onclick = () => openModule(m);
-
         grid.appendChild(card);
     });
 
@@ -4148,35 +4479,48 @@ function initModuleSortable(){
 
     function renderSubmodules() {
 
-    const grid =
-    document.getElementById('submoduleGrid');
+    const SUBMODULE_GRADIENTS = [
+        'linear-gradient(135deg, #667eea, #764ba2)',
+        'linear-gradient(135deg, #f093fb, #f5576c)',
+        'linear-gradient(135deg, #4facfe, #00f2fe)',
+        'linear-gradient(135deg, #43e97b, #38f9d7)',
+        'linear-gradient(135deg, #fa709a, #fee140)',
+        'linear-gradient(135deg, #a18cd1, #fbc2eb)',
+        'linear-gradient(135deg, #fccb90, #d57eeb)',
+        'linear-gradient(135deg, #ff9a9e, #fecfef)',
+        'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
+        'linear-gradient(135deg, #fd7943, #fd4343)',
+        'linear-gradient(135deg, #56ab2f, #a8e063)',
+        'linear-gradient(135deg, #f7971e, #ffd200)',
+    ];
 
+    const grid = document.getElementById('submoduleGrid');
     grid.innerHTML = "";
 
-    if (!currentModule ||
-        !data[currentModule]) return;
+    if (!currentModule || !data[currentModule]) return;
 
-    Object.keys(data[currentModule])
-    .forEach(s => {
+    Object.keys(data[currentModule]).forEach((s, idx) => {
 
-        const card =
-        document.createElement('div');
-
+        const card = document.createElement('div');
         card.className = "module-card";
         card.dataset.submodule = s;
 
-        card.innerHTML =
-        `<h3>${s}</h3>
-        <p style="font-size:12px;
-        color:var(--accent);
-        font-weight:normal;">
-        ${data[currentModule][s].length}
-        Items
-        </p>`;
+        const itemCount = data[currentModule][s].length;
+        const gradient = SUBMODULE_GRADIENTS[idx % SUBMODULE_GRADIENTS.length];
+        const icon = getTitleIcon(s);
 
-        card.onclick = () =>
-        openSubmodule(s);
+        card.innerHTML = `
+        <div class="module-card-banner" style="background: ${gradient};">
+            <div class="module-card-icon">${icon}</div>
+            <div class="module-card-initial">${s}</div>
+        </div>
+        <div class="module-card-body">
+            <div class="module-card-meta">
+                <span class="module-card-badge">📝 ${itemCount} items</span>
+            </div>
+        </div>`;
 
+        card.onclick = () => openSubmodule(s);
         grid.appendChild(card);
     });
 
@@ -4312,34 +4656,14 @@ function toggleAllGroups() {
     }
 
 }
-	function toggleScroll() {
-
+	function scrollUp() {
 		const area = document.querySelector('.content-area');
-		const btn = document.getElementById('scrollToggleBtn');
+		if (area) area.scrollTo({ top: 0, behavior: 'smooth' });
+	}
 
-		// If near top → go bottom
-		if (area.scrollTop < area.scrollHeight / 2) {
-
-			area.scrollTo({
-				top: area.scrollHeight,
-				behavior: 'smooth'
-			});
-
-			btn.innerText = "↑";
-
-		}
-
-		// If near bottom → go top
-		else {
-
-			area.scrollTo({
-				top: 0,
-				behavior: 'smooth'
-			});
-
-			btn.innerText = "↓";
-
-		}
+	function scrollDown() {
+		const area = document.querySelector('.content-area');
+		if (area) area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
 	}
 	function addPDFHeader(pdf,pageWidth){
 
@@ -5708,6 +6032,8 @@ function renderStreakWidget() {
     const best = streakData.best || 0;
     document.getElementById('streakCount').textContent = streak;
     document.getElementById('streakBest').textContent = `Best: ${best} day${best !== 1 ? 's' : ''}`;
+    const tooltipCount = document.getElementById('streakTooltipCount');
+    if (tooltipCount) tooltipCount.textContent = `${streak} day streak`;
 
     // Build last 7 days dots
     const dots = document.getElementById('streakDots');
@@ -5725,9 +6051,14 @@ function renderStreakWidget() {
         dots.appendChild(dot);
     }
 
-    // Hide widget if 0 streak and no history
-    document.getElementById('streakWidget').style.display =
-        (streak > 0 || streakData.dates.length > 0) ? 'flex' : 'none';
+    // Show/hide widget
+    const widget = document.getElementById('streakWidget');
+    widget.style.display = (streak > 0 || streakData.dates.length > 0) ? 'flex' : 'none';
+
+    // Hover tooltip logic
+    const tooltip = document.getElementById('streakTooltip');
+    widget.onmouseenter = () => tooltip.style.display = 'block';
+    widget.onmouseleave = () => tooltip.style.display = 'none';
 }
 
 // =============================================
@@ -5805,6 +6136,13 @@ function renderProgressModal() {
         list.appendChild(row);
     });
 }
+
+	// Welcome splash
+	const splash = document.getElementById('welcomeSplash');
+	setTimeout(() => {
+		splash.classList.add('hide');
+		setTimeout(() => splash.style.display = 'none', 650);
+	}, 1800);
 
 	showDashboard();
 	// Stagger card animations on dashboard render
