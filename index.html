@@ -161,7 +161,6 @@ blockquote{
     display: none;
     backdrop-filter: blur(4px);
     line-height: 1.5;
-    font-weight: bold;
 }
 #qotdBanner .qotd-actions {
     display: flex;
@@ -239,7 +238,6 @@ blockquote{
     width: 100%;
     max-height: 200px;
     overflow-y: auto;
-    font-weight: bold;
 }
 .flashcard-hint {
     font-size: 0.6875em;
@@ -322,17 +320,15 @@ blockquote{
 }
 .interview-q-text { font-size: 0.9375em; font-weight: 600; color: var(--question-color); }
 .interview-q-answer {
+    display: none;
+    margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid var(--border);
     font-size: 0.8125em;
     opacity: 0.8;
     max-height: 150px;
     overflow-y: auto;
-    font-weight: bold;
 }
-
-/* Bold all answers */
-.answer-body, .module-answer { font-weight: bold; }
 
 /* Weak Topics */
 #weakTopicsModal {
