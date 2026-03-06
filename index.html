@@ -53,9 +53,10 @@
     color:#2563eb;
     margin-top:20px;
 }
-pre code{
-    font-family:'Fira Code';
-    font-size:12px;
+pre, code, pre code, pre[class*="language-"], code[class*="language-"] {
+    font-family: 'Fira Code', 'Source Code Pro', monospace !important;
+    font-size: 0.9rem !important;
+    line-height: 1.6 !important;
 }
 blockquote{
     border-left:4px solid #6366f1;
@@ -87,11 +88,11 @@ blockquote{
 }
 .custom-dialog h4 {
     margin: 0 0 6px 0;
-    font-size: 16px;
+    font-size: 1.0em;
     font-weight: 700;
 }
 .custom-dialog p {
-    font-size: 13px;
+    font-size: 0.8125em;
     opacity: 0.6;
     margin: 0 0 16px 0;
     line-height: 1.5;
@@ -103,7 +104,7 @@ blockquote{
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
-    font-size: 15px;
+    font-size: 0.9375em;
     margin-bottom: 16px;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -133,11 +134,11 @@ blockquote{
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 48px;
+    font-size: 3.0em;
     opacity: 0.15;
 }
 #qotdBanner .qotd-label {
-    font-size: 10px;
+    font-size: 0.625em;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -145,13 +146,13 @@ blockquote{
     margin-bottom: 6px;
 }
 #qotdBanner .qotd-question {
-    font-size: 15px;
+    font-size: 0.9375em;
     font-weight: 600;
     margin-bottom: 10px;
     line-height: 1.4;
 }
 #qotdBanner .qotd-answer {
-    font-size: 13px;
+    font-size: 0.8125em;
     background: rgba(255,255,255,0.15);
     border-radius: 8px;
     padding: 10px 14px;
@@ -172,7 +173,7 @@ blockquote{
     padding: 5px 12px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 0.75em;
     font-weight: 600;
     transition: background 0.2s;
 }
@@ -218,7 +219,7 @@ blockquote{
 }
 .flashcard-card:hover { border-color: var(--primary); transform: scale(1.01); }
 .flashcard-question {
-    font-size: 18px;
+    font-size: 1.125em;
     font-weight: 600;
     color: var(--text);
     line-height: 1.5;
@@ -228,7 +229,7 @@ blockquote{
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--border);
-    font-size: 14px;
+    font-size: 0.875em;
     color: var(--text);
     opacity: 0.85;
     text-align: left;
@@ -237,7 +238,7 @@ blockquote{
     overflow-y: auto;
 }
 .flashcard-hint {
-    font-size: 11px;
+    font-size: 0.6875em;
     opacity: 0.4;
     margin-top: 14px;
     display: flex;
@@ -246,7 +247,7 @@ blockquote{
 }
 .flashcard-progress {
     text-align: center;
-    font-size: 12px;
+    font-size: 0.75em;
     opacity: 0.5;
     margin-bottom: 14px;
 }
@@ -258,7 +259,7 @@ blockquote{
     align-items: center;
 }
 .flashcard-source {
-    font-size: 10px;
+    font-size: 0.625em;
     opacity: 0.4;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -288,7 +289,7 @@ blockquote{
     margin: auto;
 }
 .interview-timer {
-    font-size: 36px;
+    font-size: 2.25em;
     font-weight: 800;
     color: var(--primary);
     text-align: center;
@@ -308,20 +309,20 @@ blockquote{
 }
 .interview-q-card.revealed { border-color: var(--primary); }
 .interview-q-num {
-    font-size: 10px;
+    font-size: 0.625em;
     font-weight: 800;
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 6px;
 }
-.interview-q-text { font-size: 15px; font-weight: 600; color: var(--text); }
+.interview-q-text { font-size: 0.9375em; font-weight: 600; color: var(--text); }
 .interview-q-answer {
     display: none;
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid var(--border);
-    font-size: 13px;
+    font-size: 0.8125em;
     opacity: 0.8;
     max-height: 150px;
     overflow-y: auto;
@@ -370,8 +371,8 @@ blockquote{
     border-radius: 10px;
     transition: width 0.6s ease;
 }
-.weak-topic-name { font-size: 13px; font-weight: 600; min-width: 130px; }
-.weak-count { font-size: 11px; opacity: 0.5; min-width: 40px; text-align: right; }
+.weak-topic-name { font-size: 0.8125em; font-weight: 600; min-width: 130px; }
+.weak-count { font-size: 0.6875em; opacity: 0.5; min-width: 40px; text-align: right; }
 
 .streak-widget {
     display: flex;
@@ -380,7 +381,7 @@ blockquote{
     animation: fadeInUp 0.3s ease both;
 }
 .streak-fire {
-    font-size: 16px;
+    font-size: 1.0em;
     line-height: 1;
     filter: drop-shadow(0 2px 4px rgba(245,158,11,0.4));
     animation: fireWiggle 1.8s ease-in-out infinite;
@@ -391,12 +392,12 @@ blockquote{
 }
 .streak-info { display: flex; align-items: center; gap: 4px; }
 .streak-count {
-    font-size: 14px;
+    font-size: 0.875em;
     font-weight: 800;
     color: #f59e0b;
     line-height: 1;
 }
-.streak-label { font-size: 11px; opacity: 0.5; }
+.streak-label { font-size: 0.6875em; opacity: 0.5; }
 .streak-best { display: none; }
 .streak-dots {
     display: flex;
@@ -411,7 +412,7 @@ blockquote{
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 7px;
+    font-size: 0.4375em;
     font-weight: 700;
     border: 1.5px solid var(--border);
     color: var(--text);
@@ -446,7 +447,7 @@ blockquote{
     transition: width 0.6s ease;
 }
 .module-progress-label {
-    font-size: 11px;
+    font-size: 0.6875em;
     margin-top: 8px;
     display: flex;
     align-items: center;
@@ -458,7 +459,7 @@ blockquote{
     display: inline-block;
     padding: 2px 8px;
     border-radius: 20px;
-    font-size: 10px;
+    font-size: 0.625em;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -471,7 +472,7 @@ blockquote{
 .mastery-btn {
     padding: 2px 9px;
     border-radius: 20px;
-    font-size: 10px;
+    font-size: 0.625em;
     font-weight: 700;
     cursor: pointer;
     border: 1px solid var(--border);
@@ -517,7 +518,7 @@ blockquote{
 .progress-module-row:last-child { border-bottom: none; margin-bottom: 0; }
 .progress-module-name {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 0.875em;
     margin-bottom: 8px;
     display: flex;
     align-items: center;
@@ -539,7 +540,7 @@ blockquote{
 .progress-stats {
     display: flex;
     gap: 10px;
-    font-size: 11px;
+    font-size: 0.6875em;
     opacity: 0.6;
     flex-wrap: wrap;
 }
@@ -557,7 +558,7 @@ blockquote{
     border: 1px solid var(--border);
     background: var(--card);
     color: var(--text);
-    font-size: 13px;
+    font-size: 0.8125em;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -576,7 +577,7 @@ blockquote{
 }
 
 .pdf-wrapper h1{
-    font-size:24px;
+    font-size: 1.5em;
     margin-bottom:10px;
 }
 
@@ -653,14 +654,14 @@ blockquote{
 .pdf-export .token.number{color:#005cc5 !important;}
 .pdf-text{
     font-family:Helvetica;
-    font-size:10px;
+    font-size: 0.625em;
     line-height:1.5;
     color:#000;
 }
 
-.pdf-text h1{font-size:20px;}
-.pdf-text h2{font-size:16px;color:#2563eb;}
-.pdf-text h3{font-size:14px;}
+.pdf-text h1{font-size: 1.25em;}
+.pdf-text h2{font-size: 1.0em;color:#2563eb;}
+.pdf-text h3{font-size: 0.875em;}
 
 .pdf-text table{
     width:100%;
@@ -690,7 +691,7 @@ blockquote{
     display:block;
     width:520px;
     font-family:Helvetica;
-    font-size:10px;
+    font-size: 0.625em;
     line-height:1.5;
     color:#000;
 }
@@ -736,12 +737,12 @@ display:table-cell !important;
 }
 
 .pdf-print h1{
-    font-size:20px;
+    font-size: 1.25em;
     margin-bottom:10px;
 }
 
 .pdf-print h2{
-    font-size:14px;
+    font-size: 0.875em;
     color:#2563eb;
     margin-top:20px;
 }
@@ -849,11 +850,15 @@ display:table-cell !important;
 		.collapse-icon {
 			cursor: pointer;
 			margin-right: 5px;
-			font-size: 12px;
+			font-size: 0.75em;
 			user-select: none;
 		}
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.3s; }
+
+        /* ── Fluid base font: scales from 14px (360px screen) → 18px (2560px screen) ── */
+        html { font-size: clamp(14px, 0.55vw + 12px, 20px); }
+
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.3s; font-size: 1rem; }
 
         header { 
             display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; 
@@ -918,7 +923,7 @@ display:table-cell !important;
         #moduleWorkspace { flex: 1; display: flex; overflow: hidden; position: relative; }
 
         .sidebar { 
-            width: 300px; background: var(--sidebar); border-right: 1px solid var(--border); 
+            width: clamp(260px, 20vw, 360px); background: var(--sidebar); border-right: 1px solid var(--border); 
             display: flex; flex-direction: column; padding: 1rem; overflow-y: auto;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; z-index: 200;
         }
@@ -937,7 +942,7 @@ display:table-cell !important;
             font-size: 0.75rem; font-weight: 800; color: var(--accent); 
             text-transform: uppercase; letter-spacing: 1px; flex: 1; pointer-events: none;
         }
-        .drag-handle { cursor: grab; opacity: 0.3; margin-right: 8px; font-size: 12px; }
+        .drag-handle { cursor: grab; opacity: 0.3; margin-right: 8px; font-size: 0.75em; }
         .drag-handle:hover { opacity: 1; }
         .sortable-ghost { opacity: 0.4; background: var(--primary); }
         .sortable-drag { cursor: grabbing; }
@@ -950,7 +955,7 @@ display:table-cell !important;
 
         .nav-btn {
             width: 100%; padding: 8px 12px; border: none; background: none; text-align: left; 
-            cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.9rem; margin-bottom: 2px;
+            cursor: pointer; border-radius: 6px; color: var(--text); font-size: 0.9em; margin-bottom: 2px;
             display: flex; gap: 8px; align-items: center;
             transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
         }
@@ -965,7 +970,7 @@ display:table-cell !important;
         .content-area { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; position: relative; scroll-behavior: smooth; }
         .section-separator {
             margin: 30px 0 15px 0; padding-bottom: 8px; border-bottom: 2px solid var(--border);
-            color: var(--primary); font-size: 1.2rem; font-weight: 800; text-transform: uppercase;
+            color: var(--primary); font-size: 1.1em; font-weight: 800; text-transform: uppercase;
             letter-spacing: 1px; display: flex; align-items: center; gap: 10px;
         }
 		/* Container to hold input and clear button */
@@ -1008,12 +1013,12 @@ display:table-cell !important;
 			padding-right: 45px; 
 		}
 
-        .markdown-body { background-color: transparent !important; color: var(--text) !important; font-size: 16px; }
+        .markdown-body { background-color: transparent !important; color: var(--text) !important; font-size: 1rem; }
         .markdown-body table { background-color: var(--card) !important; color: var(--text) !important; margin-bottom: 16px; border-collapse: collapse; }
         .markdown-body table tr { background-color: var(--card) !important; border-top: 1px solid var(--border); }
         .markdown-body table tr:nth-child(2n) { background-color: var(--bg) !important; }
         .markdown-body table th, .markdown-body table td { border: 1px solid var(--border); padding: 6px 13px; }
-        code[class*="language-"], pre[class*="language-"] { font-family: 'Fira Code', monospace !important; font-size: 13px !important; }
+        code[class*="language-"], pre[class*="language-"] { font-family: 'Fira Code', monospace !important; font-size: 0.9rem !important; }
 
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); z-index: 150; }
@@ -1026,7 +1031,7 @@ display:table-cell !important;
             .preview-box { display: none; }
         }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(200px, 18vw, 300px), 1fr)); gap: 15px; margin-top: 20px; }
         .module-card {
             background: var(--card);
             padding: 0;
@@ -1061,7 +1066,7 @@ display:table-cell !important;
             background: rgba(0,0,0,0.08);
         }
         .module-card-icon {
-            font-size: 28px;
+            font-size: 1.75em;
             z-index: 1;
             line-height: 1;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
@@ -1071,11 +1076,11 @@ display:table-cell !important;
             justify-content: center;
         }
         .module-card-icon i {
-            font-size: 28px;
+            font-size: 1.75em;
             color: rgba(255,255,255,0.95);
         }
         .module-card-initial {
-            font-size: 13px;
+            font-size: 0.8125em;
             font-weight: 800;
             color: rgba(255,255,255,0.95);
             text-shadow: 0 2px 8px rgba(0,0,0,0.25);
@@ -1095,7 +1100,7 @@ display:table-cell !important;
             gap: 6px;
         }
         .module-card-body h3 {
-            font-size: 15px;
+            font-size: 0.95em;
             font-weight: 700;
             color: var(--text);
             margin: 0;
@@ -1109,7 +1114,7 @@ display:table-cell !important;
             flex-wrap: wrap;
         }
         .module-card-badge {
-            font-size: 11px;
+            font-size: 0.72em;
             font-weight: 600;
             padding: 2px 8px;
             border-radius: 20px;
@@ -1121,7 +1126,7 @@ display:table-cell !important;
         .card { background: var(--card); padding: 1.2rem; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border); }
         .editor-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; height: 100%; }
         .form-box, .preview-box { background: var(--card); padding: 1rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-        textarea, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        textarea, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
         textarea:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); outline: none; }
         .btn { padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: var(--primary); color: white; transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease; }
         .btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
@@ -1149,7 +1154,7 @@ display:table-cell !important;
 			border: none;
 			background: var(--card);
 			color: var(--text);
-			font-size: 16px;
+			font-size: 1.0em;
 			cursor: pointer;
 			box-shadow: 0 4px 14px rgba(0,0,0,0.18);
 			border: 1px solid var(--border);
@@ -1176,11 +1181,13 @@ display:table-cell !important;
 /* Remove GitHub markdown inline code bg INSIDE code blocks */
 .markdown-body pre code{
     background: transparent !important;
+    font-size: 0.9rem !important;
 }
 
 /* Remove token background */
 .markdown-body pre code span{
     background: transparent !important;
+    font-size: inherit !important;
 }
 
 /* Especially operators & punctuation */
@@ -1220,7 +1227,7 @@ display:table-cell !important;
 .fullscreen-editor textarea{
 
     height:80vh !important;
-    font-size:16px;
+    font-size: 1.0em;
 }
 
 .fullscreen-preview{
@@ -1348,7 +1355,7 @@ background:var(--card);
 border-radius:16px;
 padding:20px;
 width:100%;
-max-width:420px;
+max-width:min(420px, 94vw);
 display:flex;
 flex-direction:column;
 gap:12px;
@@ -1386,6 +1393,215 @@ from{transform:translateY(100%);}
 to{transform:translateY(0);}
 }
 
+/* =============================================
+   COMPREHENSIVE MOBILE RESPONSIVE STYLES
+   ============================================= */
+
+/* --- Dashboard & Submodule padding on small screens --- */
+@media (max-width: 480px) {
+    #dashboardView, #submoduleView {
+        padding: 1rem;
+    }
+    .content-area {
+        padding: 1rem;
+    }
+    #videoView {
+        padding: 1rem !important;
+    }
+}
+
+/* --- Module grid: 2 cols on tablet, 1 col on phone --- */
+@media (max-width: 600px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+}
+@media (max-width: 380px) {
+    .grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* --- Dashboard header sort buttons & create module btn --- */
+@media (max-width: 600px) {
+    #dashboardView h1 { font-size: 1.2rem; }
+    #dashboardView > div:first-child {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* --- Dashboard menu dropdown: full width on mobile --- */
+@media (max-width: 480px) {
+    #dashboardMenu {
+        min-width: calc(100vw - 32px) !important;
+        right: 0 !important;
+        left: auto !important;
+    }
+}
+
+/* --- Submodule view header & toolbar --- */
+@media (max-width: 600px) {
+    #submoduleView > div:first-child {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .practice-toolbar {
+        gap: 6px;
+    }
+    .practice-btn {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+}
+
+/* --- Cards inside submodule --- */
+@media (max-width: 480px) {
+    .card { padding: 0.9rem; }
+    .icon-btn svg { width: 13px; height: 13px; }
+}
+
+/* --- Flashcard modal --- */
+@media (max-width: 600px) {
+    .flashcard-box {
+        padding: 16px;
+        border-radius: 14px;
+    }
+    .flashcard-card { padding: 18px; min-height: 160px; }
+    .flashcard-question { font-size: 1rem; }
+    #flashcardModal { padding: 12px; }
+}
+
+/* --- Interview modal --- */
+@media (max-width: 600px) {
+    .interview-box {
+        padding: 16px;
+        border-radius: 14px;
+    }
+    #interviewModal { padding: 12px; }
+    .interview-timer { font-size: 1.8rem; }
+    #ivModuleSelect, #ivCountSelect, #ivTimeSelect {
+        width: 100% !important;
+    }
+    #interviewSetup > div { flex-direction: column; }
+}
+
+/* --- Weak topics modal --- */
+@media (max-width: 600px) {
+    .weak-topics-box { padding: 16px; border-radius: 14px; }
+    #weakTopicsModal { padding: 12px; }
+    .weak-topic-name { min-width: 90px; font-size: 0.75rem; }
+}
+
+/* --- Progress modal --- */
+@media (max-width: 600px) {
+    .progress-box { padding: 16px; border-radius: 14px; }
+    #progressModal { padding: 12px; }
+    #progressSummary { flex-wrap: wrap; }
+    #progressSummary > div { min-width: calc(50% - 8px) !important; }
+}
+
+/* --- Custom dialog --- */
+@media (max-width: 480px) {
+    .custom-dialog { padding: 18px; border-radius: 12px; }
+    #customDialogOverlay { padding: 12px; }
+}
+
+/* --- Add Book / Add Video modals --- */
+@media (max-width: 480px) {
+    #addBookModal > div {
+        width: 92vw !important;
+        padding: 18px !important;
+    }
+    .video-modal-content {
+        width: 92vw !important;
+        padding: 16px !important;
+    }
+}
+
+/* --- PDF progress box --- */
+@media (max-width: 480px) {
+    #pdfProgressBox { width: 88vw !important; }
+}
+
+/* --- Resume popup --- */
+@media (max-width: 480px) {
+    #resumePopup > div {
+        width: 90vw !important;
+        padding: 18px !important;
+    }
+}
+
+/* --- QOTD banner --- */
+@media (max-width: 480px) {
+    #qotdBanner { padding: 14px 16px; }
+    #qotdBanner::before { display: none; }
+    .qotd-actions { gap: 6px; }
+    .qotd-btn { font-size: 0.7rem; padding: 4px 10px; }
+}
+
+/* --- Streak widget: hide dots on very small screens --- */
+@media (max-width: 380px) {
+    .streak-dots { display: none; }
+    #streakWidget { padding: 4px 8px; }
+}
+
+/* --- Editor: single column on mobile --- */
+@media (max-width: 600px) {
+    .editor-container { grid-template-columns: 1fr !important; }
+    .preview-box { display: none !important; }
+}
+
+/* --- Scroll buttons: smaller on mobile --- */
+@media (max-width: 480px) {
+    .scroll-btn-group { right: 12px; bottom: 16px; }
+    .scroll-btn { width: 34px; height: 34px; font-size: 0.85rem; }
+}
+
+/* --- Sidebar on mobile: full overlay --- */
+@media (max-width: 480px) {
+    .sidebar { width: 85vw !important; }
+}
+
+/* --- Submodule module-card banner smaller on mobile --- */
+@media (max-width: 480px) {
+    .module-card-banner { height: 80px; }
+    .module-card-body { padding: 12px 14px 14px; }
+}
+
+/* --- Header height tight on mobile --- */
+@media (max-width: 480px) {
+    header { padding: 8px 10px; height: 52px; }
+}
+
+/* --- Search inputs full width --- */
+@media (max-width: 480px) {
+    .search-container { margin-bottom: 16px; }
+    #globalSearch, #search { font-size: 0.95rem; padding: 10px 14px; }
+}
+
+/* --- Tables inside markdown: allow scroll --- */
+@media (max-width: 600px) {
+    .markdown-body table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* --- Select dropdowns in interview/flashcard modals: full width --- */
+@media (max-width: 480px) {
+    #fcModuleSelect, #fcSubSelect {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+    #flashcardModal > .flashcard-box > div:nth-child(2) {
+        flex-direction: column;
+    }
+}
+
 .menu-item {
     width: 100%;
     padding: 9px 16px;
@@ -1394,7 +1610,7 @@ to{transform:translateY(0);}
     text-align: left;
     cursor: pointer;
     color: var(--text);
-    font-size: 13px;
+    font-size: 0.8125em;
     font-weight: 500;
     display: flex;
     align-items: center;
@@ -1412,7 +1628,7 @@ to{transform:translateY(0);}
 
 .menu-section-label {
     padding: 8px 16px 4px;
-    font-size: 10px;
+    font-size: 0.625em;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -1455,7 +1671,7 @@ to{transform:translateY(0);}
     background-clip: text;
 }
 .splash-tagline {
-    font-size: 14px;
+    font-size: 0.875em;
     color: rgba(255,255,255,0.4);
     font-weight: 500;
     letter-spacing: 2px;
@@ -1569,10 +1785,10 @@ to{transform:translateY(0);}
             white-space:nowrap;
         ">
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                <span style="font-size:20px;">🔥</span>
+                <span style="font-size: 1.25em;">🔥</span>
                 <div>
-                    <div style="font-size:16px; font-weight:800; color:#f59e0b;" id="streakTooltipCount">0 day streak</div>
-                    <div style="font-size:11px; opacity:0.5;" id="streakBest">Best: 0 days</div>
+                    <div style="font-size: 1.0em; font-weight:800; color:#f59e0b;" id="streakTooltipCount">0 day streak</div>
+                    <div style="font-size: 0.6875em; opacity:0.5;" id="streakBest">Best: 0 days</div>
                 </div>
             </div>
             <div id="streakDots" class="streak-dots" style="justify-content:center;"></div>
@@ -1598,7 +1814,7 @@ to{transform:translateY(0);}
         background:var(--card);
         border:1px solid var(--border);
         border-radius:14px;
-        min-width:210px;
+        min-width:min(320px, 90vw);
         box-shadow:0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
         z-index:10000;
         overflow:hidden;
@@ -1675,7 +1891,7 @@ to{transform:translateY(0);}
 		box-shadow:0 0 10px rgba(0,0,0,0.2);
 		z-index:9999;
 		display:none;
-		width:300px;
+		width:min(300px, 88vw);
 		text-align:center;
 	">
 
@@ -1703,7 +1919,7 @@ to{transform:translateY(0);}
     <div id="pdfProgressText"
     style="
     margin-top:8px;
-    font-size:12px;
+    font-size: 0.75em;
     color:var(--text);
     ">
     0%
@@ -1718,7 +1934,7 @@ color:white;
 border:none;
 border-radius:6px;
 cursor:pointer;
-font-size:12px;
+font-size: 0.75em;
 ">
 Cancel Export
 </button>
@@ -1729,9 +1945,9 @@ Cancel Export
     <h1>Dashboard</h1>
     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <div style="display:flex; align-items:center; background:var(--bg); border:1px solid var(--border); border-radius:10px; overflow:hidden;">
-            <button id="sortBtn-default" onclick="setModuleSort('default')" style="padding:6px 12px; border:none; background:var(--primary); color:white; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.15s;">Default</button>
-            <button id="sortBtn-asc" onclick="setModuleSort('asc')" style="padding:6px 12px; border:none; background:none; color:var(--text); font-size:12px; font-weight:600; cursor:pointer; transition:background 0.15s;">A → Z</button>
-            <button id="sortBtn-desc" onclick="setModuleSort('desc')" style="padding:6px 12px; border:none; background:none; color:var(--text); font-size:12px; font-weight:600; cursor:pointer; transition:background 0.15s;">Z → A</button>
+            <button id="sortBtn-default" onclick="setModuleSort('default')" style="padding:6px 12px; border:none; background:var(--primary); color:white; font-size: 0.75em; font-weight:600; cursor:pointer; transition:background 0.15s;">Default</button>
+            <button id="sortBtn-asc" onclick="setModuleSort('asc')" style="padding:6px 12px; border:none; background:none; color:var(--text); font-size: 0.75em; font-weight:600; cursor:pointer; transition:background 0.15s;">A → Z</button>
+            <button id="sortBtn-desc" onclick="setModuleSort('desc')" style="padding:6px 12px; border:none; background:none; color:var(--text); font-size: 0.75em; font-weight:600; cursor:pointer; transition:background 0.15s;">Z → A</button>
         </div>
         <button class="btn edit-action" onclick="addModule()">+ Create Module</button>
     </div>
@@ -1767,7 +1983,7 @@ Cancel Export
 		right:60px;
 		top:50%;
 		transform:translateY(-50%);
-		font-size:11px;
+		font-size: 0.6875em;
 		background:var(--card);
 		padding:2px 6px;
 		border-radius:4px;
@@ -1876,7 +2092,7 @@ border:none;
 padding:8px 16px;
 border-radius:6px;
 cursor:pointer;
-font-size:14px;
+font-size: 0.875em;
 ">
 ← Back to E-Books
 </button>
@@ -1904,7 +2120,7 @@ font-size:14px;
 				←
 			</button>
             <div>
-                <div style="font-size:11px; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Module</div>
+                <div style="font-size: 0.6875em; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Module</div>
                 <h1 id="currentModuleTitle" style="margin:0; font-size:1.4rem;">Module</h1>
             </div>
         </div>
@@ -1919,7 +2135,7 @@ font-size:14px;
                 color:var(--danger);
                 padding:6px 12px;
                 border-radius:8px;
-                font-size:12px;
+                font-size: 0.75em;
                 font-weight:600;
                 cursor:pointer;
                 transition: background 0.15s, color 0.15s;"
@@ -1945,7 +2161,7 @@ font-size:14px;
 			right:60px;
 			top:50%;
 			transform:translateY(-50%);
-			font-size:11px;
+			font-size: 0.6875em;
 			background:var(--card);
 			padding:2px 6px;
 			border-radius:4px;
@@ -1981,7 +2197,7 @@ font-size:14px;
         
         <button class="btn btn-outline"
             id="toggleAllBtn"
-            style="width:100%; font-size:12px; padding:5px;"
+            style="width:100%; font-size: 0.75em; padding:5px;"
             onclick="toggleAllGroups()">
             ⏬ Collapse All
         </button>
@@ -2009,7 +2225,7 @@ font-size:14px;
 			←
 		</button>
         <div>
-            <div style="font-size:11px; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Submodule</div>
+            <div style="font-size: 0.6875em; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Submodule</div>
             <h2 id="currentSubmoduleTitle"
                 style="color:var(--primary); margin:0; line-height:1;">
                 Submodule
@@ -2026,7 +2242,7 @@ font-size:14px;
             color:var(--danger);
             padding:6px 12px;
             border-radius:8px;
-            font-size:12px;
+            font-size: 0.75em;
             font-weight:600;
             cursor:pointer;
             transition: background 0.15s, color 0.15s;"
@@ -2037,12 +2253,12 @@ font-size:14px;
 
         <button class="btn btn-outline edit-action"
             onclick="exportSubmodulePDF()"
-            style="font-size:11px;">
+            style="font-size: 0.6875em;">
             📄 <span>Export PDF</span>
         </button>
 		<button class="btn edit-action"
 		onclick="exportSubmoduleTextPDF()"
-		style="font-size:11px;">
+		style="font-size: 0.6875em;">
 		📑 <span>Copyable PDF</span>
 		</button>
 
@@ -2063,7 +2279,7 @@ font-size:14px;
 					right:60px;
 					top:50%;
 					transform:translateY(-50%);
-					font-size:11px;
+					font-size: 0.6875em;
 					background:var(--card);
 					padding:2px 6px;
 					border-radius:4px;
@@ -2091,7 +2307,7 @@ font-size:14px;
                     <div style="display:flex; justify-content:space-between; align-items:center;">
 						<h3>
 						Editor 
-						<small style="font-weight: normal; opacity: 0.6; font-size: 10px;">
+						<small style="font-weight: normal; opacity: 0.6; font-size: 0.625em;">
 						(Ctrl+S to save)
 						</small>
 						</h3>
@@ -2638,7 +2854,7 @@ background:rgba(0,0,0,0.3);
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:32px;
+font-size: 2.0em;
 color:white;
 ">
 ▶
@@ -2646,7 +2862,7 @@ color:white;
 
 </div>
 
-<h3 style="font-size:14px;margin:0;">
+<h3 style="font-size: 0.875em;margin:0;">
 ${highlightText(v.title,term)}
 </h3>
 
@@ -2910,7 +3126,7 @@ object-fit:cover;
 ">
 </div>
 
-<h3 style="font-size:14px; margin:0;">
+<h3 style="font-size: 0.875em; margin:0;">
 📘 ${highlightText(book.title,term)}
 </h3>
 
@@ -3609,7 +3825,7 @@ function openSubmodule(name) {
                 // ADD THIS LINE: Shows full text on hover
                 b.title = item.q; 
                 
-                b.innerHTML = `<span style="opacity:0.5; font-size:10px;">::</span> <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.q}</span>`;
+                b.innerHTML = `<span style="opacity:0.5; font-size: 0.625em;">::</span> <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.q}</span>`;
                 b.onclick = (e) => { 
                     if(e.target.classList.contains('nav-btn') || e.target.parentElement.classList.contains('nav-btn')) {
                         scrollToQuestion(item.id); 
@@ -3721,7 +3937,7 @@ function openSubmodule(name) {
 				trackView(item.id);
 				card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <span style="color:var(--accent); font-size:12px; font-weight:700;">${highlightText(item.subtopic || 'General', term)}</span>
+                        <span style="color:var(--accent); font-size: 0.75em; font-weight:700;">${highlightText(item.subtopic || 'General', term)}</span>
                         <div style="display:flex; gap:6px; align-items:center;">
 							<button class="icon-btn edit-action"
 								title="Edit Entry"
@@ -4102,7 +4318,7 @@ if(sub){
 
     for (const [keywords, icon] of brandIcons) {
       if (keywords.some(k => t.includes(k)))
-        return `<i class="fi fi-brands-${icon}" style="font-size:28px;"></i>`;
+        return `<i class="fi fi-brands-${icon}" style="font-size: 1.75em;"></i>`;
     }
 
     // Emoji fallbacks
@@ -4298,7 +4514,7 @@ function initModuleSortable(){
                 
 
                 div.innerHTML = `
-						<div style="font-size:10px;
+						<div style="font-size: 0.625em;
 						text-transform:uppercase;
 						color:var(--accent);
 						margin-bottom:8px;">
@@ -4309,7 +4525,7 @@ function initModuleSortable(){
 						${highlightText(match.item.q, term)}
 						</h3>
 
-						<div style="font-size:11px;
+						<div style="font-size: 0.6875em;
 						opacity:0.6;
 						margin-bottom:10px;">
 						${match.item.subtopic || 'General'}
@@ -4417,7 +4633,7 @@ function initModuleSortable(){
         div.style.borderLeft = "4px solid var(--primary)";
 
         div.innerHTML = `
-            <div style="font-size:10px;
+            <div style="font-size: 0.625em;
             text-transform:uppercase;
             color:var(--accent);
             margin-bottom:8px;">
@@ -4428,7 +4644,7 @@ function initModuleSortable(){
             ${highlightText(match.item.q, term)}
             </h3>
 
-            <div style="font-size:11px;
+            <div style="font-size: 0.6875em;
             opacity:0.6;
             margin-bottom:10px;">
             ${match.item.subtopic || 'General'}
@@ -4888,13 +5104,13 @@ let cancelPDFExport = false;
 			div.style.marginBottom = "20px";
 
 			div.innerHTML = `
-			<div style="color:#6b7280; font-size:11px; font-weight:700; margin-bottom:6px;">
+			<div style="color:#6b7280; font-size: 0.6875em; font-weight:700; margin-bottom:6px;">
 				${item.subtopic || 'General'}
 			</div>
-			<h2 class="pdf-question-title" style="margin-top:0; margin-bottom:10px; color:#2563eb; font-size:16px; font-weight:700; line-height:1.4; word-wrap:break-word;">
+			<h2 class="pdf-question-title" style="margin-top:0; margin-bottom:10px; color:#2563eb; font-size: 1.0em; font-weight:700; line-height:1.4; word-wrap:break-word;">
 				${item.q}
 			</h2>
-			<div class="markdown-body" style="color:#000; font-size:13px; line-height:1.6; word-wrap:break-word;">
+			<div class="markdown-body" style="color:#000; font-size: 0.8125em; line-height:1.6; word-wrap:break-word;">
 				${marked.parse(item.a)}
 			</div>
 			`;
@@ -5501,7 +5717,7 @@ function showResumePopup(){
 
     <small style="
     opacity:0.5;
-    font-size:11px;
+    font-size: 0.6875em;
     ">
     Last read ${timeAgo}
     </small>
@@ -5850,7 +6066,7 @@ function startInterview() {
             <div class="interview-q-num">Q${i + 1} · ${entry._mod} › ${entry._sub}</div>
             <div class="interview-q-text">${entry.q}</div>
             <div class="interview-q-answer markdown-body" id="iv-ans-${i}">${marked.parse(entry.a)}</div>
-            <button onclick="toggleIvAnswer(${i})" style="margin-top:10px; background:none; border:1px solid var(--border); color:var(--text); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:12px; transition:background 0.15s;">👁 Show Answer</button>
+            <button onclick="toggleIvAnswer(${i})" style="margin-top:10px; background:none; border:1px solid var(--border); color:var(--text); padding:4px 10px; border-radius:6px; cursor:pointer; font-size: 0.75em; transition:background 0.15s;">👁 Show Answer</button>
         `;
         list.appendChild(card);
         trackView(entry.id);
@@ -6085,20 +6301,20 @@ function renderProgressModal() {
     // Summary cards
     document.getElementById('progressSummary').innerHTML = `
         <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
-            <div style="font-size:22px; font-weight:800; color:#22c55e;">${mastered}</div>
-            <div style="font-size:11px; opacity:0.6; margin-top:2px;">Mastered</div>
+            <div style="font-size: 1.375em; font-weight:800; color:#22c55e;">${mastered}</div>
+            <div style="font-size: 0.6875em; opacity:0.6; margin-top:2px;">Mastered</div>
         </div>
         <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
-            <div style="font-size:22px; font-weight:800; color:#3b82f6;">${learning}</div>
-            <div style="font-size:11px; opacity:0.6; margin-top:2px;">Learning</div>
+            <div style="font-size: 1.375em; font-weight:800; color:#3b82f6;">${learning}</div>
+            <div style="font-size: 0.6875em; opacity:0.6; margin-top:2px;">Learning</div>
         </div>
         <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
-            <div style="font-size:22px; font-weight:800; color:var(--text);">${newCount}</div>
-            <div style="font-size:11px; opacity:0.6; margin-top:2px;">Not Started</div>
+            <div style="font-size: 1.375em; font-weight:800; color:var(--text);">${newCount}</div>
+            <div style="font-size: 0.6875em; opacity:0.6; margin-top:2px;">Not Started</div>
         </div>
         <div style="flex:1; min-width:100px; background: linear-gradient(135deg,var(--primary),var(--accent)); border-radius:12px; padding:12px 16px; text-align:center;">
-            <div style="font-size:22px; font-weight:800; color:white;">${pct}%</div>
-            <div style="font-size:11px; color:rgba(255,255,255,0.75); margin-top:2px;">Overall</div>
+            <div style="font-size: 1.375em; font-weight:800; color:white;">${pct}%</div>
+            <div style="font-size: 0.6875em; color:rgba(255,255,255,0.75); margin-top:2px;">Overall</div>
         </div>
     `;
 
@@ -6120,7 +6336,7 @@ function renderProgressModal() {
         row.innerHTML = `
             <div class="progress-module-name">
                 <span>${mod}</span>
-                <span style="font-size:12px; color:var(--primary); font-weight:800;">${mPct}%</span>
+                <span style="font-size: 0.75em; color:var(--primary); font-weight:800;">${mPct}%</span>
             </div>
             <div class="progress-bar-track">
                 <div class="progress-bar-fill" style="width:${mPct}%"></div>
@@ -6240,7 +6456,7 @@ align-items:center;
 background:var(--card);
 padding:25px;
 border-radius:12px;
-width:350px;
+width:min(350px, 92vw);
 border:1px solid var(--border);
 display:flex;
 flex-direction:column;
@@ -6353,7 +6569,7 @@ border:none;
 padding:8px 16px;
 border-radius:6px;
 cursor:pointer;
-font-size:14px;
+font-size: 0.875em;
 ">
 ← Back
 </button>
@@ -6416,7 +6632,7 @@ border:1px solid var(--border);
 padding:10px 16px;
 border-radius:8px;
 box-shadow:0 4px 15px rgba(0,0,0,0.2);
-font-size:13px;
+font-size: 0.8125em;
 z-index:99999;
 opacity:0;
 transform:translateY(20px);
@@ -6452,7 +6668,7 @@ color:var(--text);
 padding:25px;
 border-radius:14px;
 border:1px solid var(--border);
-width:320px;
+width:min(320px, 90vw);
 text-align:center;
 box-shadow:0 5px 20px rgba(0,0,0,0.3);
 animation:fadeIn 0.25s ease;
@@ -6461,7 +6677,7 @@ animation:fadeIn 0.25s ease;
 <h3 style="margin-bottom:10px;">📖 Continue Reading?</h3>
 
 <p id="resumePopupText"
-style="font-size:13px; opacity:0.7; margin-bottom:15px;">
+style="font-size: 0.8125em; opacity:0.7; margin-bottom:15px;">
 You were reading last time
 </p>
 
@@ -6519,7 +6735,7 @@ Resume
         <button class="btn btn-outline" onclick="closeInterviewMode()" style="padding:4px 10px;">✕</button>
     </div>
     <div id="interviewSetup">
-        <p style="opacity:0.7; margin-bottom:16px; font-size:14px;">Pick a module and start a mock interview with random questions and a timer.</p>
+        <p style="opacity:0.7; margin-bottom:16px; font-size: 0.875em;">Pick a module and start a mock interview with random questions and a timer.</p>
         <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
             <select id="ivModuleSelect" style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
                 <option value="__all__">All Modules</option>
@@ -6542,11 +6758,11 @@ Resume
     <div id="interviewSession" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <div>
-                <div style="font-size:11px; opacity:0.5; text-transform:uppercase; letter-spacing:1px;">Time Remaining</div>
+                <div style="font-size: 0.6875em; opacity:0.5; text-transform:uppercase; letter-spacing:1px;">Time Remaining</div>
                 <div class="interview-timer" id="ivTimer">10:00</div>
             </div>
             <div style="text-align:right;">
-                <button class="btn btn-outline" style="font-size:12px;" onclick="revealAllAnswers()">👁 Reveal All</button>
+                <button class="btn btn-outline" style="font-size: 0.75em;" onclick="revealAllAnswers()">👁 Reveal All</button>
             </div>
         </div>
         <div id="ivQuestionList"></div>
@@ -6565,10 +6781,10 @@ Resume
         <h3 style="margin:0;">📊 Weak Topic Detection</h3>
         <button class="btn btn-outline" onclick="closeWeakTopics()" style="padding:4px 10px;">✕</button>
     </div>
-    <p style="opacity:0.6; font-size:13px; margin-bottom:16px;">Topics ranked by how rarely their entries have been viewed.</p>
+    <p style="opacity:0.6; font-size: 0.8125em; margin-bottom:16px;">Topics ranked by how rarely their entries have been viewed.</p>
     <div id="weakTopicsList"></div>
     <div style="margin-top:16px; display:flex; gap:8px;">
-        <button class="btn btn-outline" style="flex:1; font-size:12px;" onclick="resetViewCounts()">🗑 Reset Tracking</button>
+        <button class="btn btn-outline" style="flex:1; font-size: 0.75em;" onclick="resetViewCounts()">🗑 Reset Tracking</button>
         <button class="btn btn-outline" onclick="closeWeakTopics()" style="padding:6px 16px;">Close</button>
     </div>
 </div>
