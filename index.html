@@ -33,6 +33,7 @@
             --primary: #2563eb; --border: #cbd5e1; --accent: #6366f1; --danger: #ef4444;
             --md-bg: #ffffff;
 			--highlight: #facc15;
+            --question-color: #0d9488;
         }
         .dark {
             --bg: #0d1117; 
@@ -40,6 +41,7 @@
             --primary: #2f81f7; --border: #30363d;
             --md-bg: #0d1117;
 			--highlight: #f59e0b;
+            --question-color: #2dd4bf;
         }
 		.highlighted {
             background-color: var(--highlight);
@@ -50,7 +52,7 @@
             display: inline-block;
         }
 		h2{
-    color:#2563eb;
+    color: var(--question-color);
     margin-top:20px;
 }
 pre, code, pre code, pre[class*="language-"], code[class*="language-"] {
@@ -159,6 +161,7 @@ blockquote{
     display: none;
     backdrop-filter: blur(4px);
     line-height: 1.5;
+    font-weight: bold;
 }
 #qotdBanner .qotd-actions {
     display: flex;
@@ -221,7 +224,7 @@ blockquote{
 .flashcard-question {
     font-size: 1.125em;
     font-weight: 600;
-    color: var(--text);
+    color: var(--question-color);
     line-height: 1.5;
 }
 .flashcard-answer {
@@ -236,6 +239,7 @@ blockquote{
     width: 100%;
     max-height: 200px;
     overflow-y: auto;
+    font-weight: bold;
 }
 .flashcard-hint {
     font-size: 0.6875em;
@@ -316,17 +320,19 @@ blockquote{
     letter-spacing: 1px;
     margin-bottom: 6px;
 }
-.interview-q-text { font-size: 0.9375em; font-weight: 600; color: var(--text); }
+.interview-q-text { font-size: 0.9375em; font-weight: 600; color: var(--question-color); }
 .interview-q-answer {
-    display: none;
-    margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid var(--border);
     font-size: 0.8125em;
     opacity: 0.8;
     max-height: 150px;
     overflow-y: auto;
+    font-weight: bold;
 }
+
+/* Bold all answers */
+.answer-body, .module-answer { font-weight: bold; }
 
 /* Weak Topics */
 #weakTopicsModal {
