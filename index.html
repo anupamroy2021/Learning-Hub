@@ -2302,7 +2302,7 @@ font-size: 0.875em;
                 <div class="search-wrapper" style="position:relative;">
 
 					<input id="search"
-					placeholder="🔍 Search entries..."
+					placeholder="🔍 Search entries...  ( Press / to focus )"
 					oninput="renderQuestions()"
 					style="padding-right:95px;">
 
@@ -3910,6 +3910,18 @@ function openSubmodule(name) {
 
     function scrollToQuestion(id) {
         showListView();
+
+        // ⭐ FIX: If search is active, clear it first so all entries are rendered
+        const searchInput = document.getElementById('search');
+        if (searchInput && searchInput.value.trim() !== '') {
+            searchInput.value = '';
+            const clearBtn = document.getElementById('subClearBtn');
+            if (clearBtn) clearBtn.style.display = 'none';
+            currentMatchIndex = -1;
+            searchMatches = [];
+            renderQuestions();
+        }
+
         setTimeout(() => {
             const el = document.getElementById("q-" + id);
             if (el) {
@@ -6509,6 +6521,47 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target === overlay) closeCustomDialog();
     });
 });
+
+// =============================================
+// KEYBOARD SHORTCUT: Press '/' to focus search
+// =============================================
+document.addEventListener('keydown', function(e) {
+    const tag = document.activeElement.tagName;
+    const isTyping = (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable);
+
+    if (e.key === '/' && !isTyping) {
+        const workspace = document.getElementById('moduleWorkspace');
+        if (workspace && workspace.style.display !== 'none') {
+            e.preventDefault();
+            const searchInput = document.getElementById('search');
+            if (searchInput) {
+                const area = document.querySelector('.content-area');
+                if (area) area.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => { searchInput.focus(); searchInput.select(); }, 150);
+                showSearchFocusToast();
+            }
+        }
+        return;
+    }
+
+    if (e.key === 'Escape' && document.activeElement === document.getElementById('search')) {
+        document.getElementById('search').blur();
+    }
+});
+
+function showSearchFocusToast() {
+    let toast = document.getElementById('searchFocusToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'searchFocusToast';
+        toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--primary);color:white;padding:6px 14px;border-radius:20px;font-size:0.75em;font-weight:600;z-index:99999;opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;white-space:nowrap;';
+        toast.textContent = '🔍 Search focused  —  Esc to dismiss';
+        document.body.appendChild(toast);
+    }
+    requestAnimationFrame(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)'; });
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(-8px)'; }, 2000);
+}
 </script>
 <!-- ================= ADD BOOK MODAL ================= -->
 
