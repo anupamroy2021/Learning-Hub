@@ -180,6 +180,34 @@ blockquote{
     transition: background 0.2s;
 }
 #qotdBanner .qotd-btn:hover { background: rgba(255,255,255,0.35); }
+#qotdBanner .qotd-path {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7em;
+    opacity: 0.75;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+#qotdBanner .qotd-path .path-segment {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 5px;
+    padding: 2px 9px;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+#qotdBanner .qotd-path .path-segment:hover {
+    background: rgba(255,255,255,0.3);
+    opacity: 1;
+}
+#qotdBanner .qotd-path .path-arrow {
+    opacity: 0.5;
+    font-size: 0.9em;
+}
 
 /* Flashcard Mode */
 #flashcardModal {
@@ -1957,7 +1985,10 @@ Cancel Export
 
     <!-- QOTD Banner -->
     <div id="qotdBanner" style="display:none;">
-        <div class="qotd-label">⚡ Question of the Day</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+            <div class="qotd-label" style="margin-bottom:0;">⚡ Question of the Day</div>
+            <div class="qotd-path" id="qotdPath"></div>
+        </div>
         <div class="qotd-question" id="qotdText">Loading...</div>
         <div class="qotd-answer markdown-body" id="qotdAnswer"></div>
         <div class="qotd-actions">
@@ -5875,6 +5906,7 @@ function initQotd() {
     document.getElementById('qotdAnswer').innerHTML = marked.parse(entry.a);
     document.getElementById('qotdAnswer').style.display = 'none';
     document.getElementById('qotdBanner').style.display = 'block';
+    renderQotdPath(entry);
 }
 
 function toggleQotdAnswer() {
@@ -5899,6 +5931,46 @@ function refreshQotd() {
     document.getElementById('qotdAnswer').innerHTML = marked.parse(entry.a);
     document.getElementById('qotdAnswer').style.display = 'none';
     document.querySelector('#qotdBanner .qotd-btn').textContent = '👁 Reveal Answer';
+    renderQotdPath(entry);
+}
+
+function renderQotdPath(entry) {
+    const pathEl = document.getElementById('qotdPath');
+    if (!pathEl || !entry) return;
+    const mod = entry._mod || '';
+    const sub = entry._sub || '';
+    if (!mod && !sub) { pathEl.innerHTML = ''; return; }
+    pathEl.innerHTML =
+        `<span class="path-segment" title="Go to module" onclick="goToQotdModule()">${mod}</span>` +
+        (sub ? `<span class="path-arrow">›</span><span class="path-segment" title="Go to submodule" onclick="goToQotdSubmodule()">${sub}</span>` : '');
+}
+
+function goToQotdModule() {
+    if (!qotdEntry || !qotdEntry._mod) return;
+    document.getElementById('qotdBanner').style.display = 'none';
+    openModule(qotdEntry._mod);
+}
+
+function goToQotdSubmodule() {
+    if (!qotdEntry || !qotdEntry._mod || !qotdEntry._sub) return;
+    document.getElementById('qotdBanner').style.display = 'none';
+    openModule(qotdEntry._mod);
+    openSubmodule(qotdEntry._sub);
+    // Scroll to the exact question after render
+    setTimeout(() => {
+        const entryId = qotdEntry.id;
+        const el = document.getElementById(`q-${entryId}`);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.transition = 'box-shadow 0.4s, outline 0.4s';
+            el.style.outline = '2px solid rgba(255,255,255,0.5)';
+            el.style.boxShadow = '0 0 0 5px rgba(99,102,241,0.4)';
+            setTimeout(() => {
+                el.style.outline = '';
+                el.style.boxShadow = '';
+            }, 2200);
+        }
+    }, 300);
 }
 
 // =============================================
