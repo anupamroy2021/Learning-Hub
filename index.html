@@ -3801,6 +3801,14 @@ function openSubmodule(name) {
 			area.addEventListener('scroll', updateScrollUI);
 			area.addEventListener('wheel', updateScrollUI);
 			area.addEventListener('touchmove', updateScrollUI);
+			// Sync sidebar scroll proportionally with content area
+area.addEventListener('scroll', () => {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar || sidebar.classList.contains('collapsed')) return;
+    const contentPct = area.scrollTop / (area.scrollHeight - area.clientHeight);
+    const sidebarMax = sidebar.scrollHeight - sidebar.clientHeight;
+    sidebar.scrollTop = contentPct * sidebarMax;
+});
 			updateScrollUI();
 		}
 
@@ -4917,14 +4925,18 @@ function toggleAllGroups() {
 
 }
 	function scrollUp() {
-		const area = document.querySelector('.content-area');
-		if (area) area.scrollTo({ top: 0, behavior: 'smooth' });
-	}
+    const area = document.querySelector('.content-area');
+    const sidebar = document.getElementById('sidebar');
+    if (area) area.scrollTo({ top: 0, behavior: 'smooth' });
+    if (sidebar) sidebar.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-	function scrollDown() {
-		const area = document.querySelector('.content-area');
-		if (area) area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
-	}
+function scrollDown() {
+    const area = document.querySelector('.content-area');
+    const sidebar = document.getElementById('sidebar');
+    if (area) area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
+    if (sidebar) sidebar.scrollTo({ top: sidebar.scrollHeight, behavior: 'smooth' });
+}
 	function addPDFHeader(pdf,pageWidth){
 
 		pdf.setFont("Helvetica","bold");
@@ -6932,3 +6944,4 @@ Resume
 
 </body>
 </html>
+
