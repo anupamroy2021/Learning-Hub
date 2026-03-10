@@ -1865,6 +1865,28 @@ to{transform:translateY(0);}
 @keyframes splashBarFill {
     to { width: 100%; }
 }
+
+		/* Smooth transition for all cards */
+.content-area .card {
+    transition: transform 0.25s ease, 
+                box-shadow 0.25s ease, 
+                opacity 0.25s ease;
+}
+
+/* When hovering the container, dim other cards */
+.content-area:hover .card {
+    opacity: 0.55;
+    transform: scale(0.97);
+}
+
+/* Highlight the hovered card */
+.content-area .card:hover {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 
+        0 12px 35px rgba(0,0,0,0.18),
+        0 0 0 2px rgba(0,123,255,0.15);
+}
     </style>
 </head>
 <body class="dark">
@@ -7140,4 +7162,5 @@ Resume
 
 </body>
 </html>
+
 
