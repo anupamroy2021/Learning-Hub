@@ -209,12 +209,16 @@ blockquote{
     font-size: 0.9em;
 }
 
-/* Flashcard Mode */
+/* =============================================
+   FLASHCARD MODE — FLIP CARD (LARGE)
+   ============================================= */
 #flashcardModal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.80);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     z-index: 10002;
     align-items: center;
     justify-content: center;
@@ -222,78 +226,218 @@ blockquote{
 }
 .flashcard-box {
     background: var(--card);
-    border-radius: 20px;
-    padding: 30px;
+    border-radius: 26px;
+    padding: 36px 44px 40px;
     width: 100%;
-    max-width: 600px;
+    max-width: 960px;
     border: 1px solid var(--border);
     animation: fadeInUp 0.3s ease;
     position: relative;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.35);
 }
-.flashcard-card {
-    background: var(--bg);
-    border-radius: 14px;
-    padding: 28px;
-    min-height: 200px;
+
+/* ---- Flip scene ---- */
+.flashcard-scene {
+    width: 100%;
+    height: 420px;
+    perspective: 1400px;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+.flashcard-scene:hover .flashcard-inner:not(.is-flipped) {
+    transform: rotateY(5deg) scale(1.005);
+}
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    transform-style: preserve-3d;
+}
+.flashcard-inner.is-flipped {
+    transform: rotateY(180deg);
+}
+
+/* Front & back shared */
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    border: 2px solid var(--border);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    cursor: pointer;
-    border: 2px solid var(--border);
-    transition: border-color 0.2s, transform 0.15s;
-    perspective: 1000px;
-    position: relative;
+    padding: 44px 52px;
     overflow: hidden;
 }
-.flashcard-card:hover { border-color: var(--primary); transform: scale(1.01); }
-.flashcard-question {
-    font-size: 1.125em;
-    font-weight: 600;
-    color: var(--question-color);
-    line-height: 1.5;
+
+/* Front */
+.flashcard-front {
+    background: var(--bg);
+    text-align: center;
 }
-.flashcard-answer {
-    display: none;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-    font-size: 0.875em;
-    color: var(--text);
-    opacity: 0.85;
+.flashcard-front::before {
+    content: 'QUESTION';
+    position: absolute;
+    top: 16px; left: 22px;
+    font-size: 0.5625em;
+    font-weight: 900;
+    letter-spacing: 2.5px;
+    color: var(--primary);
+    opacity: 0.45;
+}
+
+/* Back */
+.flashcard-back {
+    background: var(--bg);
+    border-color: var(--primary);
+    transform: rotateY(180deg);
+    align-items: flex-start;
+    justify-content: flex-start;
     text-align: left;
-    width: 100%;
-    max-height: 200px;
+    padding-top: 52px;
     overflow-y: auto;
 }
+.flashcard-back::before {
+    content: 'ANSWER';
+    position: absolute;
+    top: 16px; left: 22px;
+    font-size: 0.5625em;
+    font-weight: 900;
+    letter-spacing: 2.5px;
+    color: var(--accent);
+    opacity: 0.55;
+}
+.flashcard-back::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle at top right, rgba(99,102,241,0.1), transparent 65%);
+    border-radius: 0 20px 0 0;
+    pointer-events: none;
+}
+.dark .flashcard-back {
+    background: linear-gradient(145deg, #161b22, #1b2236);
+}
+
+/* Question text */
+.flashcard-question {
+    font-size: 1.45em;
+    font-weight: 700;
+    color: var(--question-color);
+    line-height: 1.55;
+    width: 100%;
+    text-align: center;
+}
+
+/* Answer text */
+.flashcard-answer {
+    font-size: 0.9375em;
+    color: var(--text);
+    line-height: 1.72;
+    width: 100%;
+    text-align: left;
+    opacity: 0.92;
+}
+
+/* Hint pulse */
 .flashcard-hint {
-    font-size: 0.6875em;
-    opacity: 0.4;
-    margin-top: 14px;
+    font-size: 0.75em;
+    opacity: 0;
+    margin-top: 22px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
+    color: var(--text);
+    animation: hintPulse 2.8s ease-in-out infinite;
 }
-.flashcard-progress {
+@keyframes hintPulse {
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50%       { opacity: 0.65; transform: translateY(-3px); }
+}
+
+/* Source label */
+.flashcard-source {
+    font-size: 0.625em;
+    opacity: 0.38;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    width: 100%;
     text-align: center;
-    font-size: 0.75em;
-    opacity: 0.5;
-    margin-bottom: 14px;
 }
+.flashcard-back .flashcard-source {
+    text-align: left;
+    color: var(--accent);
+    opacity: 0.5;
+}
+
+/* Progress */
+.flashcard-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.8125em;
+    opacity: 0.55;
+    margin-bottom: 20px;
+}
+.flashcard-progress-bar-wrap {
+    flex: 1;
+    max-width: 260px;
+    height: 5px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.flashcard-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 10px;
+    transition: width 0.45s ease;
+}
+
+/* Status tag */
+.flashcard-status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.6875em;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+.flashcard-status-tag.question-side {
+    background: rgba(37,99,235,0.12);
+    color: var(--primary);
+    border: 1px solid rgba(37,99,235,0.2);
+}
+.flashcard-status-tag.answer-side {
+    background: rgba(99,102,241,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(99,102,241,0.22);
+}
+
 .flashcard-nav {
     display: flex;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 22px;
     justify-content: space-between;
     align-items: center;
 }
-.flashcard-source {
-    font-size: 0.625em;
-    opacity: 0.4;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+
+@media (max-width: 680px) {
+    .flashcard-box { padding: 22px 18px 28px; border-radius: 18px; }
+    .flashcard-scene { height: 300px; }
+    .flashcard-front, .flashcard-back { padding: 32px 24px; }
+    .flashcard-question { font-size: 1.15em; }
+    .flashcard-answer { font-size: 0.875em; }
 }
 
 /* Interview Practice */
@@ -1494,16 +1638,6 @@ to{transform:translateY(0);}
 }
 
 /* --- Flashcard modal --- */
-@media (max-width: 600px) {
-    .flashcard-box {
-        padding: 16px;
-        border-radius: 14px;
-    }
-    .flashcard-card { padding: 18px; min-height: 160px; }
-    .flashcard-question { font-size: 1rem; }
-    #flashcardModal { padding: 12px; }
-}
-
 /* --- Interview modal --- */
 @media (max-width: 600px) {
     .interview-box {
@@ -6047,21 +6181,40 @@ function loadFlashcardDeck() {
 function renderFlashcard() {
     const total = fcDeck.length;
     document.getElementById('fcTotal').textContent = total;
+
+    // Reset flip instantly
+    const inner = document.getElementById('flashcardInner');
+    if (inner) { inner.style.transition = 'none'; inner.classList.remove('is-flipped'); }
+    setTimeout(() => { if (inner) inner.style.transition = ''; }, 30);
+
+    // Reset status tag
+    const tag = document.getElementById('fcStatusTag');
+    if (tag) { tag.textContent = 'Question'; tag.className = 'flashcard-status-tag question-side'; }
+
     if (total === 0) {
         document.getElementById('fcQuestion').textContent = 'No entries found.';
-        document.getElementById('fcAnswer').style.display = 'none';
+        if (document.getElementById('fcAnswer')) document.getElementById('fcAnswer').innerHTML = '';
         document.getElementById('fcSource').textContent = '';
+        if (document.getElementById('fcSourceBack')) document.getElementById('fcSourceBack').textContent = '';
         document.getElementById('fcCurrent').textContent = '0';
-        document.getElementById('fcHint').style.display = 'none';
+        document.getElementById('fcHint').style.display = 'flex';
+        const bar = document.getElementById('fcProgressBar');
+        if (bar) bar.style.width = '0%';
         return;
     }
+
     const entry = fcDeck[fcIndex];
+    const sourceTxt = `${entry._mod} › ${entry._sub}`;
     document.getElementById('fcCurrent').textContent = fcIndex + 1;
     document.getElementById('fcQuestion').textContent = entry.q;
     document.getElementById('fcAnswer').innerHTML = marked.parse(entry.a);
-    document.getElementById('fcAnswer').style.display = 'none';
-    document.getElementById('fcSource').textContent = `${entry._mod} › ${entry._sub}`;
+    document.getElementById('fcSource').textContent = sourceTxt;
+    if (document.getElementById('fcSourceBack')) document.getElementById('fcSourceBack').textContent = sourceTxt;
     document.getElementById('fcHint').style.display = 'flex';
+
+    const bar = document.getElementById('fcProgressBar');
+    if (bar) bar.style.width = Math.round(((fcIndex + 1) / total) * 100) + '%';
+
     fcRevealed = false;
     trackView(entry.id);
     Prism.highlightAll();
@@ -6069,10 +6222,19 @@ function renderFlashcard() {
 
 function revealFlashcard() {
     if (fcDeck.length === 0) return;
+    const inner = document.getElementById('flashcardInner');
+    const tag = document.getElementById('fcStatusTag');
     fcRevealed = !fcRevealed;
-    document.getElementById('fcAnswer').style.display = fcRevealed ? 'block' : 'none';
-    document.getElementById('fcHint').style.display = fcRevealed ? 'none' : 'flex';
-    Prism.highlightAll();
+    if (fcRevealed) {
+        inner.classList.add('is-flipped');
+        document.getElementById('fcHint').style.display = 'none';
+        if (tag) { tag.textContent = 'Answer'; tag.className = 'flashcard-status-tag answer-side'; }
+        setTimeout(() => Prism.highlightAll(), 350);
+    } else {
+        inner.classList.remove('is-flipped');
+        document.getElementById('fcHint').style.display = 'flex';
+        if (tag) { tag.textContent = 'Question'; tag.className = 'flashcard-status-tag question-side'; }
+    }
 }
 
 function nextFlashcard() {
@@ -6837,32 +6999,66 @@ Resume
 </div>
 </div>
 <!-- ================= FLASHCARD MODAL ================= -->
-<div id="flashcardModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10002; align-items:center; justify-content:center; padding:20px;">
+<div id="flashcardModal" style="display:none; position:fixed; inset:0; z-index:10002; align-items:center; justify-content:center; padding:20px;">
 <div class="flashcard-box">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h3 style="margin:0;">🃏 Flashcard Mode</h3>
-        <button class="btn btn-outline" onclick="closeFlashcardMode()" style="padding:4px 10px;">✕</button>
+
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <h3 style="margin:0; font-size:1.15em; font-weight:800;">🃏 Flashcard Mode</h3>
+            <span class="flashcard-status-tag question-side" id="fcStatusTag">Question</span>
+        </div>
+        <button class="btn btn-outline" onclick="closeFlashcardMode()" style="padding:6px 12px; font-size:0.875em;">✕</button>
     </div>
+
+    <!-- Filters -->
     <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
-        <select id="fcModuleSelect" style="flex:1; min-width:120px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);" onchange="loadFlashcardDeck()">
+        <select id="fcModuleSelect" style="flex:1; min-width:130px; padding:9px 12px; border-radius:9px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:0.875em; font-family:inherit;" onchange="loadFlashcardDeck()">
             <option value="__all__">All Modules</option>
         </select>
-        <select id="fcSubSelect" style="flex:1; min-width:120px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);" onchange="loadFlashcardDeck()">
+        <select id="fcSubSelect" style="flex:1; min-width:130px; padding:9px 12px; border-radius:9px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:0.875em; font-family:inherit;" onchange="loadFlashcardDeck()">
             <option value="__all__">All Submodules</option>
         </select>
     </div>
-    <div class="flashcard-progress"><span id="fcCurrent">1</span> / <span id="fcTotal">0</span></div>
-    <div class="flashcard-card" id="flashcardFace" onclick="revealFlashcard()">
-        <div class="flashcard-source" id="fcSource"></div>
-        <div class="flashcard-question" id="fcQuestion">No entries found.</div>
-        <div class="flashcard-answer markdown-body" id="fcAnswer"></div>
-        <div class="flashcard-hint" id="fcHint">👆 Tap to reveal answer</div>
+
+    <!-- Progress -->
+    <div class="flashcard-progress">
+        <span id="fcCurrent">1</span>
+        <div class="flashcard-progress-bar-wrap">
+            <div class="flashcard-progress-bar" id="fcProgressBar" style="width:0%"></div>
+        </div>
+        <span id="fcTotal">0</span>
     </div>
+
+    <!-- Flip card -->
+    <div class="flashcard-scene" id="flashcardScene" onclick="revealFlashcard()">
+        <div class="flashcard-inner" id="flashcardInner">
+
+            <!-- FRONT: Question -->
+            <div class="flashcard-front">
+                <div class="flashcard-source" id="fcSource"></div>
+                <div class="flashcard-question" id="fcQuestion">No entries found.</div>
+                <div class="flashcard-hint" id="fcHint">
+                    <span style="font-size:1.4em;">👆</span> Tap to flip &amp; reveal answer
+                </div>
+            </div>
+
+            <!-- BACK: Answer -->
+            <div class="flashcard-back">
+                <div class="flashcard-source" id="fcSourceBack"></div>
+                <div class="flashcard-answer markdown-body" id="fcAnswer"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Nav -->
     <div class="flashcard-nav">
-        <button class="btn btn-outline" onclick="prevFlashcard()">← Prev</button>
-        <button class="btn btn-outline" onclick="shuffleFlashcards()" title="Shuffle">🔀</button>
-        <button class="btn" onclick="nextFlashcard()">Next →</button>
+        <button class="btn btn-outline" onclick="prevFlashcard()" style="padding:10px 20px;">← Prev</button>
+        <button class="btn btn-outline" onclick="shuffleFlashcards()" style="padding:10px 16px;">🔀 Shuffle</button>
+        <button class="btn" onclick="nextFlashcard()" style="padding:10px 20px;">Next →</button>
     </div>
+
 </div>
 </div>
 
