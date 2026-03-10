@@ -7475,14 +7475,14 @@ async function pullFromCloud() {
 
 // ---- Auto-pull on load ----
 window.addEventListener('DOMContentLoaded', function() {
-    // Load sync settings into modal fields if they exist
     const autoRaw = localStorage.getItem(SYNC_AUTO_KEY);
-    const auto = autoRaw === null ? true : autoRaw === 'true'; // default ON
+    const auto = autoRaw === null ? true : autoRaw === 'true';
     if (auto) {
         const token  = localStorage.getItem(SYNC_TOKEN_KEY);
         const gistId = localStorage.getItem(SYNC_GIST_KEY);
-        if (token && gistId) {
-            // Small delay so the app finishes initializing first
+        const alreadyPulled = sessionStorage.getItem('sync_pulled_this_session');
+        if (token && gistId && !alreadyPulled) {
+            sessionStorage.setItem('sync_pulled_this_session', 'true');
             setTimeout(async () => {
                 showReadModeToast('☁️ Auto-syncing from cloud...');
                 await pullFromCloud();
