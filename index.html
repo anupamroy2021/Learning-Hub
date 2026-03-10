@@ -7213,6 +7213,7 @@ Resume
 
     <div style="display:flex; gap:8px; margin-top:20px; flex-wrap:wrap;">
         <button class="btn btn-outline" style="flex:1; min-width:100px;" onclick="closeSyncModal()">Cancel</button>
+        <button class="btn btn-outline" style="flex:1; min-width:100px;" onclick="pullFromCloud()">⬇️ Pull Now</button>
         <button class="btn" style="flex:2; min-width:120px;" onclick="saveSyncSettings(); closeSyncModal(); showReadModeToast('✅ Sync settings saved!')">💾 Save Settings</button>
     </div>
 
@@ -7313,7 +7314,9 @@ function hideSyncStatus() {
 
 // ---- Core push/pull ----
 async function pushToCloud(silent = false) {
-    if (!silent) saveSyncSettings();
+    if (!silent && document.getElementById('syncModal').style.display === 'flex') {
+        saveSyncSettings();
+    }
     const token = localStorage.getItem(SYNC_TOKEN_KEY);
     if (!token) {
         if (!silent) { showSyncStatus('❌ No GitHub token found. Open ☁️ Sync Settings and enter your token first.', 'error'); openSyncModal(); }
@@ -7394,7 +7397,10 @@ async function pushToCloud(silent = false) {
 }
 
 async function pullFromCloud() {
-    saveSyncSettings();
+    // Only save settings if the modal is actually open
+    if (document.getElementById('syncModal').style.display === 'flex') {
+        saveSyncSettings();
+    }
     const token  = localStorage.getItem(SYNC_TOKEN_KEY);
     const gistId = localStorage.getItem(SYNC_GIST_KEY);
 
