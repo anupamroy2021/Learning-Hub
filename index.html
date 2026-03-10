@@ -1866,7 +1866,7 @@ to{transform:translateY(0);}
     to { width: 100%; }
 }
 
-		/* Smooth transition for all cards */
+/* Smooth transition for all cards */
 .content-area .card {
     transition: transform 0.25s ease, 
                 box-shadow 0.25s ease, 
@@ -1882,11 +1882,12 @@ to{transform:translateY(0);}
 /* Highlight the hovered card */
 .content-area .card:hover {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1.01);
     box-shadow: 
         0 12px 35px rgba(0,0,0,0.18),
         0 0 0 2px rgba(0,123,255,0.15);
 }
+
     </style>
 </head>
 <body class="dark">
@@ -2054,6 +2055,14 @@ to{transform:translateY(0);}
         </button>
         <button class="menu-item" onclick="exportData()">
             📤 Export
+        </button>
+
+        <hr style="border:none; border-top:1px solid var(--border); margin:6px 0;">
+
+        <!-- Sync -->
+        <div class="menu-section-label">Cloud Sync</div>
+        <button class="menu-item" onclick="openSyncModal(); document.getElementById('dashboardMenu').style.display='none'">
+            ☁️ Sync Settings
         </button>
 
     </div>
@@ -2559,7 +2568,22 @@ font-size: 0.875em;
 	let moduleSortable = null;
     let submoduleSortable = null;
     let lastReadingState = JSON.parse(localStorage.getItem("learninghub_last_state")) || null;
-    const save = () => { localStorage.setItem("devmaster_db_v7", JSON.stringify(data)); };
+    const save = () => {
+        localStorage.setItem("devmaster_db_v7", JSON.stringify(data));
+        scheduleAutoSync();
+    };
+
+    // Auto-sync: debounced push so rapid saves don't spam the API
+    let autoSyncTimer = null;
+    function scheduleAutoSync() {
+        if (autoSyncTimer) clearTimeout(autoSyncTimer);
+        autoSyncTimer = setTimeout(async () => {
+            const token  = localStorage.getItem('learninghub_sync_token');
+            const gistId = localStorage.getItem('learninghub_sync_gist_id');
+            if (!token || !gistId) return; // not configured yet, skip silently
+            await pushToCloud(true); // silent mode
+        }, 3000); // waits 3s after last change before pushing
+    }
 	
 	function wrapSelection(textarea, before, after = before) {
 
@@ -7147,6 +7171,54 @@ Resume
 </div>
 </div>
 
+<!-- ================= SYNC MODAL ================= -->
+<div id="syncModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10003; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px);">
+<div style="background:var(--card); border-radius:20px; padding:28px; width:100%; max-width:480px; border:1px solid var(--border); animation:fadeInUp 0.3s ease; box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <h3 style="margin:0; display:flex; align-items:center; gap:8px;">☁️ Cloud Sync</h3>
+        <button class="btn btn-outline" onclick="closeSyncModal()" style="padding:4px 10px;">✕</button>
+    </div>
+    <p style="font-size:0.8em; opacity:0.55; margin:0 0 20px 0; line-height:1.5;">Uses a private GitHub Gist to sync your data across devices. Your token is stored only in this browser.</p>
+
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+            <label style="font-size:0.75em; font-weight:700; opacity:0.6; display:block; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px;">GitHub Personal Access Token</label>
+            <div style="display:flex; gap:8px;">
+                <input id="syncTokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                    style="flex:1; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:0.875em; font-family:inherit;">
+                <button class="btn btn-outline" onclick="toggleSyncTokenVisibility()" id="syncTokenEyeBtn" style="padding:8px 12px; font-size:0.875em;" title="Show/hide token">👁</button>
+            </div>
+            <div style="font-size:0.7em; opacity:0.45; margin-top:5px;">
+                Go to <b>github.com → Settings → Developer settings → Personal access tokens → Tokens (classic)</b><br>
+                Create a token with only the <b>gist</b> scope checked.
+            </div>
+        </div>
+
+        <div>
+            <label style="font-size:0.75em; font-weight:700; opacity:0.6; display:block; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px;">Gist ID <span style="opacity:0.5; font-weight:400;">(auto-filled after first push)</span></label>
+            <input id="syncGistIdInput" type="text" placeholder="Leave empty to create a new Gist on first push"
+                style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:0.875em; font-family:inherit; box-sizing:border-box;">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; padding:12px; background:var(--bg); border-radius:10px; border:1px solid var(--border);">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.875em; user-select:none; flex:1;">
+                <input type="checkbox" id="syncAutoOnLoad" checked style="width:16px; height:16px; accent-color:var(--primary); cursor:pointer;">
+                <span>Auto-pull on app load</span>
+            </label>
+        </div>
+
+        <div id="syncStatus" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.8125em; line-height:1.5;"></div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:20px; flex-wrap:wrap;">
+        <button class="btn btn-outline" style="flex:1; min-width:100px;" onclick="closeSyncModal()">Cancel</button>
+        <button class="btn" style="flex:2; min-width:120px;" onclick="saveSyncSettings(); closeSyncModal(); showReadModeToast('✅ Sync settings saved!')">💾 Save Settings</button>
+    </div>
+
+
+</div>
+</div>
+
 <!-- ================= CUSTOM DIALOG ================= -->
 <div id="customDialogOverlay">
     <div class="custom-dialog" id="customDialogBox">
@@ -7160,7 +7232,267 @@ Resume
     </div>
 </div>
 
+<script>
+// ============================================================
+//  CLOUD SYNC  —  GitHub Gist backend
+//  All sensitive data stays in localStorage, never in the HTML
+// ============================================================
+
+const SYNC_TOKEN_KEY   = 'learninghub_sync_token';
+const SYNC_GIST_KEY    = 'learninghub_sync_gist_id';
+const SYNC_AUTO_KEY    = 'learninghub_sync_auto';
+const SYNC_LAST_KEY    = 'learninghub_sync_last';
+const GIST_FILENAME    = 'learninghub_data.json';
+
+// ---- Modal helpers ----
+function openSyncModal() {
+    const modal = document.getElementById('syncModal');
+    modal.style.display = 'flex';
+    // Populate fields from localStorage
+    const token  = localStorage.getItem(SYNC_TOKEN_KEY) || '';
+    const gistId = localStorage.getItem(SYNC_GIST_KEY)  || '';
+    const auto   = localStorage.getItem(SYNC_AUTO_KEY) !== 'false'; // default ON
+    document.getElementById('syncTokenInput').value   = token;
+    document.getElementById('syncGistIdInput').value  = gistId;
+    document.getElementById('syncAutoOnLoad').checked = auto;
+    hideSyncStatus();
+    // Show last sync time if available
+    const last = localStorage.getItem(SYNC_LAST_KEY);
+    if (last) {
+        showSyncStatus('ℹ️ Last synced: ' + new Date(parseInt(last)).toLocaleString(), 'info');
+    }
+}
+
+function closeSyncModal() {
+    document.getElementById('syncModal').style.display = 'none';
+}
+
+function saveSyncSettings() {
+    const token  = document.getElementById('syncTokenInput').value.trim();
+    const gistId = document.getElementById('syncGistIdInput').value.trim();
+    const auto   = document.getElementById('syncAutoOnLoad').checked;
+    if (token)  localStorage.setItem(SYNC_TOKEN_KEY, token);
+    if (gistId) localStorage.setItem(SYNC_GIST_KEY, gistId);
+    localStorage.setItem(SYNC_AUTO_KEY, auto ? 'true' : 'false');
+}
+
+function toggleSyncTokenVisibility() {
+    const inp = document.getElementById('syncTokenInput');
+    const btn = document.getElementById('syncTokenEyeBtn');
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        inp.type = 'password';
+        btn.textContent = '👁';
+    }
+}
+
+function showSyncStatus(msg, type) {
+    const el = document.getElementById('syncStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    const colors = {
+        info:    { bg: 'rgba(37,99,235,0.1)',   border: 'rgba(37,99,235,0.3)',   color: 'var(--primary)' },
+        success: { bg: 'rgba(34,197,94,0.1)',   border: 'rgba(34,197,94,0.3)',   color: '#22c55e' },
+        error:   { bg: 'rgba(239,68,68,0.1)',   border: 'rgba(239,68,68,0.3)',   color: '#ef4444' },
+        loading: { bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.3)',  color: '#f59e0b' },
+    };
+    const c = colors[type] || colors.info;
+    el.style.background   = c.bg;
+    el.style.border       = '1px solid ' + c.border;
+    el.style.color        = c.color;
+    el.innerHTML = msg;
+}
+
+function hideSyncStatus() {
+    const el = document.getElementById('syncStatus');
+    if (el) el.style.display = 'none';
+}
+
+// ---- Core push/pull ----
+async function pushToCloud(silent = false) {
+    if (!silent) saveSyncSettings();
+    const token = localStorage.getItem(SYNC_TOKEN_KEY);
+    if (!token) {
+        if (!silent) { showSyncStatus('❌ No GitHub token found. Open ☁️ Sync Settings and enter your token first.', 'error'); openSyncModal(); }
+        return;
+    }
+
+    if (!silent) showSyncStatus('⏳ Pushing data to cloud...', 'loading');
+
+    const payload = JSON.stringify({
+        learning_data : data,
+        ebook_data    : ebooks,
+        video_data    : videos,
+        last_state    : JSON.parse(localStorage.getItem('learninghub_last_state') || 'null'),
+        pushed_at     : new Date().toISOString()
+    }, null, 2);
+
+    const gistId = localStorage.getItem(SYNC_GIST_KEY);
+
+    try {
+        let response, result;
+        if (gistId) {
+            // Update existing gist
+            response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': 'token ' + token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify({
+                    description: 'Learning Hub Sync Data',
+                    files: { [GIST_FILENAME]: { content: payload } }
+                })
+            });
+        } else {
+            // Create new gist
+            response = await fetch('https://api.github.com/gists', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'token ' + token,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify({
+                    description: 'Learning Hub Sync Data',
+                    public: false,
+                    files: { [GIST_FILENAME]: { content: payload } }
+                })
+            });
+        }
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || `HTTP ${response.status}`);
+        }
+
+        result = await response.json();
+
+        // Auto-save Gist ID on first create
+        if (!gistId) {
+            localStorage.setItem(SYNC_GIST_KEY, result.id);
+            const inp = document.getElementById('syncGistIdInput');
+            if (inp) inp.value = result.id;
+        }
+
+        localStorage.setItem(SYNC_LAST_KEY, Date.now().toString());
+        if (!silent) {
+            showSyncStatus('✅ Push successful! Data synced to cloud at ' + new Date().toLocaleTimeString(), 'success');
+            showReadModeToast('☁️ Pushed to cloud!');
+        } else {
+            showReadModeToast('☁️ Auto-synced!');
+        }
+
+    } catch (e) {
+        if (!silent) showSyncStatus('❌ Push failed: ' + e.message + '<br><small>Check your token and network connection.</small>', 'error');
+        console.error('Sync push error:', e);
+    }
+}
+
+async function pullFromCloud() {
+    saveSyncSettings();
+    const token  = localStorage.getItem(SYNC_TOKEN_KEY);
+    const gistId = localStorage.getItem(SYNC_GIST_KEY);
+
+    if (!token) {
+        showSyncStatus('❌ No GitHub token found. Open ☁️ Sync Settings first.', 'error');
+        openSyncModal();
+        return;
+    }
+    if (!gistId) {
+        showSyncStatus('❌ No Gist ID found. Push your data first from another device.', 'error');
+        openSyncModal();
+        return;
+    }
+
+    showSyncStatus('⏳ Pulling data from cloud...', 'loading');
+
+    try {
+        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+            headers: {
+                'Authorization': 'token ' + token,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || `HTTP ${response.status}`);
+        }
+
+        const result  = await response.json();
+        const fileObj = result.files[GIST_FILENAME];
+        if (!fileObj) throw new Error('Sync file not found in Gist.');
+
+        // Fetch raw content (may be truncated in API response)
+        let raw = fileObj.content;
+        if (fileObj.truncated) {
+            const rawRes = await fetch(fileObj.raw_url);
+            raw = await rawRes.text();
+        }
+
+        const parsed = JSON.parse(raw);
+
+        // Apply data
+        if (parsed.learning_data) {
+            data   = parsed.learning_data;
+            localStorage.setItem('devmaster_db_v7', JSON.stringify(data));
+        }
+        if (parsed.ebook_data) {
+            ebooks = parsed.ebook_data;
+            localStorage.setItem('ebooks_db', JSON.stringify(ebooks));
+        }
+        if (parsed.video_data) {
+            videos = parsed.video_data;
+            localStorage.setItem('videos_db', JSON.stringify(videos));
+        }
+        if (parsed.last_state) {
+            localStorage.setItem('learninghub_last_state', JSON.stringify(parsed.last_state));
+        }
+
+        localStorage.setItem(SYNC_LAST_KEY, Date.now().toString());
+
+        // Refresh UI
+        renderDashboard();
+        if (typeof renderEbooks === 'function') renderEbooks();
+
+        const pushedAt = parsed.pushed_at ? new Date(parsed.pushed_at).toLocaleString() : 'unknown';
+        showSyncStatus(`✅ Pull successful! Data from cloud (pushed at ${pushedAt})`, 'success');
+        showReadModeToast('☁️ Pulled from cloud!');
+
+    } catch (e) {
+        showSyncStatus('❌ Pull failed: ' + e.message + '<br><small>Check your Gist ID and token.</small>', 'error');
+        console.error('Sync pull error:', e);
+    }
+}
+
+// ---- Auto-pull on load ----
+window.addEventListener('DOMContentLoaded', function() {
+    // Load sync settings into modal fields if they exist
+    const autoRaw = localStorage.getItem(SYNC_AUTO_KEY);
+    const auto = autoRaw === null ? true : autoRaw === 'true'; // default ON
+    if (auto) {
+        const token  = localStorage.getItem(SYNC_TOKEN_KEY);
+        const gistId = localStorage.getItem(SYNC_GIST_KEY);
+        if (token && gistId) {
+            // Small delay so the app finishes initializing first
+            setTimeout(async () => {
+                showReadModeToast('☁️ Auto-syncing from cloud...');
+                await pullFromCloud();
+            }, 2000);
+        }
+    }
+});
+
+// Close sync modal on backdrop click
+document.getElementById('syncModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSyncModal();
+});
+</script>
+
 </body>
 </html>
-
 
