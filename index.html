@@ -3813,30 +3813,6 @@ window.addEventListener("DOMContentLoaded", function(){
             reader.readAsText(e.target.files[0]);
         };
     }
-setTimeout(()=>{
-
-    // Don't show resume popup if auto-sync will pull and reload anyway
-    const autoRaw = localStorage.getItem(SYNC_AUTO_KEY);
-    const auto = autoRaw === null ? true : autoRaw === 'true';
-    const token  = localStorage.getItem(SYNC_TOKEN_KEY);
-    const gistId = localStorage.getItem(SYNC_GIST_KEY);
-    const alreadyPulled = sessionStorage.getItem('sync_pulled_this_session');
-
-    // If sync is configured and hasn't pulled yet this session, skip — 
-    // the resume popup will show after reload when alreadyPulled is set
-    if (auto && token && gistId && !alreadyPulled) return;
-
-    const savedState = localStorage.getItem("learninghub_last_state");
-
-    if(savedState){
-        const state = JSON.parse(savedState);
-        if(state.module && state.submodule){
-            showResumePopup();
-        }
-    }
-
-}, 4200);
-
 });
 	function showDashboard() {
 
@@ -7473,8 +7449,22 @@ async function pullFromCloud() {
 
         localStorage.setItem(SYNC_LAST_KEY, Date.now().toString());
 
-        // Show animated sync overlay then reload
-        showSyncOverlay(() => location.reload());
+        // Show animated overlay then re-render in place (no page reload)
+        showSyncOverlay(() => {
+            // Data is already in localStorage, just re-render everything
+            renderDashboard();
+            if (typeof renderEbooks === 'function') renderEbooks();
+            if (typeof renderVideos === 'function') renderVideos();
+
+            // Show resume popup if reading state exists
+            const savedState = localStorage.getItem("learninghub_last_state");
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                if (state.module && state.submodule) {
+                    setTimeout(() => showResumePopup(), 300);
+                }
+            }
+        });
 
     } catch (e) {
         showSyncStatus('❌ Pull failed: ' + e.message + '<br><small>Check your Gist ID and token.</small>', 'error');
@@ -7489,16 +7479,45 @@ window.addEventListener('DOMContentLoaded', function() {
     if (auto) {
         const token  = localStorage.getItem(SYNC_TOKEN_KEY);
         const gistId = localStorage.getItem(SYNC_GIST_KEY);
-        const alreadyPulled = sessionStorage.getItem('sync_pulled_this_session');
-        if (token && gistId && !alreadyPulled) {
-            sessionStorage.setItem('sync_pulled_this_session', 'true');
+        if (token && gistId) {
             setTimeout(async () => {
                 showReadModeToast('☁️ Auto-syncing from cloud...');
                 await pullFromCloud();
-            }, 4500);
+            }, 1500);
         }
     }
 });
+
+// ---- Background periodic sync (every 30 seconds) ----
+// Silently checks if cloud has newer data, pulls only if changed
+setInterval(async () => {
+    const token  = localStorage.getItem(SYNC_TOKEN_KEY);
+    const gistId = localStorage.getItem(SYNC_GIST_KEY);
+    if (!token || !gistId) return;
+
+    try {
+        // Fetch just the gist metadata to check updated_at
+        const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+            headers: {
+                'Authorization': 'token ' + token,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        if (!response.ok) return;
+
+        const result = await response.json();
+        const cloudUpdatedAt = new Date(result.updated_at).getTime();
+        const lastPulled = parseInt(localStorage.getItem(SYNC_LAST_KEY) || '0');
+
+        // Only pull if cloud is newer than our last sync
+        if (cloudUpdatedAt > lastPulled) {
+            showReadModeToast('☁️ New data found, syncing...');
+            await pullFromCloud();
+        }
+    } catch(e) {
+        // Silent fail — don't bother user
+    }
+}, 30000); // every 30 seconds
 
 // ---- Animated sync overlay ----
 function showSyncOverlay(onComplete) {
