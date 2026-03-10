@@ -2853,6 +2853,7 @@ function saveReadingState(entryId = null){
         "learninghub_last_state",
         JSON.stringify(state)
     );
+    scheduleAutoSync();
 }
 function toggleModuleDragLock(){
 
@@ -3809,18 +3810,23 @@ window.addEventListener("DOMContentLoaded", function(){
     }
 setTimeout(()=>{
 
-    const savedState =
-    localStorage.getItem("learninghub_last_state");
+    // Don't show resume popup if auto-sync will pull and reload anyway
+    const autoRaw = localStorage.getItem(SYNC_AUTO_KEY);
+    const auto = autoRaw === null ? true : autoRaw === 'true';
+    const token  = localStorage.getItem(SYNC_TOKEN_KEY);
+    const gistId = localStorage.getItem(SYNC_GIST_KEY);
+    const alreadyPulled = sessionStorage.getItem('sync_pulled_this_session');
+
+    // If sync is configured and hasn't pulled yet this session, skip — 
+    // the resume popup will show after reload when alreadyPulled is set
+    if (auto && token && gistId && !alreadyPulled) return;
+
+    const savedState = localStorage.getItem("learninghub_last_state");
 
     if(savedState){
-
         const state = JSON.parse(savedState);
-
-        // ⭐ Don't show popup if user was on dashboard only
         if(state.module && state.submodule){
-
             showResumePopup();
-
         }
     }
 
@@ -7462,10 +7468,8 @@ async function pullFromCloud() {
 
         localStorage.setItem(SYNC_LAST_KEY, Date.now().toString());
 
-        // Reload the page so all data renders fresh
-        const pushedAt = parsed.pushed_at ? new Date(parsed.pushed_at).toLocaleString() : 'unknown';
-        showReadModeToast('☁️ Pulled from cloud! Reloading...');
-        setTimeout(() => location.reload(), 1500);
+        // Show animated sync overlay then reload
+        showSyncOverlay(() => location.reload());
 
     } catch (e) {
         showSyncStatus('❌ Pull failed: ' + e.message + '<br><small>Check your Gist ID and token.</small>', 'error');
@@ -7486,12 +7490,114 @@ window.addEventListener('DOMContentLoaded', function() {
             setTimeout(async () => {
                 showReadModeToast('☁️ Auto-syncing from cloud...');
                 await pullFromCloud();
-            }, 2000);
+            }, 4500);
         }
     }
 });
 
-// Close sync modal on backdrop click
+// ---- Animated sync overlay ----
+function showSyncOverlay(onComplete) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'syncOverlay';
+    overlay.innerHTML = `
+        <div style="
+            position:fixed; inset:0;
+            background: #0d1117;
+            z-index:999999;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:28px;
+            animation: syncFadeIn 0.3s ease forwards;
+        ">
+            <!-- Icon -->
+            <div style="
+                font-size:3rem;
+                animation: syncPulse 1s ease-in-out infinite;
+            ">☁️</div>
+
+            <!-- Title -->
+            <div style="
+                font-size:1.1rem;
+                font-weight:800;
+                color:#e6edf3;
+                letter-spacing:1px;
+                text-align:center;
+            ">Syncing from cloud...</div>
+
+            <!-- Progress bar track -->
+            <div style="
+                width: min(320px, 80vw);
+                height: 5px;
+                background: #30363d;
+                border-radius: 10px;
+                overflow: hidden;
+            ">
+                <div id="syncProgressBar" style="
+                    height:100%;
+                    width:0%;
+                    background: linear-gradient(90deg, #2563eb, #6366f1);
+                    border-radius:10px;
+                    transition: width 0.2s ease;
+                "></div>
+            </div>
+
+            <!-- Steps -->
+            <div id="syncStepText" style="
+                font-size:0.75rem;
+                color:#8b949e;
+                letter-spacing:0.5px;
+                min-height:20px;
+                text-align:center;
+            ">Loading data...</div>
+        </div>
+    `;
+
+    // Inject keyframes
+    if (!document.getElementById('syncOverlayStyles')) {
+        const style = document.createElement('style');
+        style.id = 'syncOverlayStyles';
+        style.textContent = `
+            @keyframes syncFadeIn { from { opacity:0; } to { opacity:1; } }
+            @keyframes syncFadeOut { from { opacity:1; } to { opacity:0; } }
+            @keyframes syncPulse {
+                0%,100% { transform: scale(1) translateY(0); }
+                50%      { transform: scale(1.15) translateY(-4px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.body.appendChild(overlay);
+
+    const bar  = document.getElementById('syncProgressBar');
+    const step = document.getElementById('syncStepText');
+
+    const steps = [
+        { pct: 15,  text: '📦 Unpacking modules...' },
+        { pct: 35,  text: '📝 Loading questions...' },
+        { pct: 55,  text: '📚 Restoring e-books...' },
+        { pct: 72,  text: '🎥 Restoring videos...' },
+        { pct: 88,  text: '📍 Restoring reading position...' },
+        { pct: 100, text: '✅ Done! Loading app...' },
+    ];
+
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i >= steps.length) {
+            clearInterval(interval);
+            // Fade out then reload
+            overlay.firstElementChild.style.animation = 'syncFadeOut 0.4s ease forwards';
+            setTimeout(() => onComplete(), 450);
+            return;
+        }
+        bar.style.width  = steps[i].pct + '%';
+        step.textContent = steps[i].text;
+        i++;
+    }, 320);
+}
 document.getElementById('syncModal').addEventListener('click', function(e) {
     if (e.target === this) closeSyncModal();
 });
