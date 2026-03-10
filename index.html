@@ -7462,13 +7462,10 @@ async function pullFromCloud() {
 
         localStorage.setItem(SYNC_LAST_KEY, Date.now().toString());
 
-        // Refresh UI
-        renderDashboard();
-        if (typeof renderEbooks === 'function') renderEbooks();
-
+        // Reload the page so all data renders fresh
         const pushedAt = parsed.pushed_at ? new Date(parsed.pushed_at).toLocaleString() : 'unknown';
-        showSyncStatus(`✅ Pull successful! Data from cloud (pushed at ${pushedAt})`, 'success');
-        showReadModeToast('☁️ Pulled from cloud!');
+        showReadModeToast('☁️ Pulled from cloud! Reloading...');
+        setTimeout(() => location.reload(), 1500);
 
     } catch (e) {
         showSyncStatus('❌ Pull failed: ' + e.message + '<br><small>Check your Gist ID and token.</small>', 'error');
