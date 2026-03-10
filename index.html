@@ -7394,9 +7394,8 @@ async function pushToCloud(silent = false) {
         if (!silent) {
             showSyncStatus('✅ Push successful! Data synced to cloud at ' + new Date().toLocaleTimeString(), 'success');
             showReadModeToast('☁️ Pushed to cloud!');
-        } else {
-            showReadModeToast('☁️ Auto-synced to cloud ✅');
         }
+        // Silent auto-sync: no toast, runs in background without interrupting the user
 
     } catch (e) {
         if (!silent) showSyncStatus('❌ Push failed: ' + e.message + '<br><small>Check your token and network connection.</small>', 'error');
@@ -7502,7 +7501,6 @@ window.addEventListener('DOMContentLoaded', function() {
         const gistId = localStorage.getItem(SYNC_GIST_KEY);
         if (token && gistId) {
             setTimeout(async () => {
-                showReadModeToast('☁️ Auto-syncing from cloud...');
                 await pullFromCloud();
             }, 1500);
         }
@@ -7532,7 +7530,6 @@ setInterval(async () => {
 
         // Only pull if cloud is newer than our last sync
         if (cloudUpdatedAt > lastPulled) {
-            showReadModeToast('☁️ New data found, syncing...');
             await pullFromCloud();
         }
     } catch(e) {
@@ -7653,3 +7650,4 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
 
 </body>
 </html>
+
