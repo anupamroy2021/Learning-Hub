@@ -2978,6 +2978,7 @@ link:link   // ✅ store ORIGINAL link
 });
 
 localStorage.setItem("videos_db",JSON.stringify(videos));
+scheduleAutoSync();
 
 closeVideoModal();
 renderVideos();
@@ -3133,6 +3134,7 @@ localStorage.setItem(
 "videos_db",
 JSON.stringify(videos)
 );
+scheduleAutoSync();
 
 selectedVideos=new Set();
 isVideoDeleteMode=false;
@@ -3218,6 +3220,7 @@ function addBookPrompt(){
     });
 
     localStorage.setItem("ebooks_db",JSON.stringify(ebooks));
+    scheduleAutoSync();
 
     renderEbooks();
 }
@@ -3421,6 +3424,7 @@ function deleteSelectedBooks(){
         "ebooks_db",
         JSON.stringify(ebooks)
     );
+    scheduleAutoSync();
 
 selectedBooks = new Set();
     isDeleteMode = false;
@@ -3443,6 +3447,7 @@ function deleteBook(id, e){
             "ebooks_db",
             JSON.stringify(ebooks)
         );
+        scheduleAutoSync();
 
         renderEbooks();
     }
