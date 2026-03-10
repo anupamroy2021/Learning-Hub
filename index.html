@@ -2578,10 +2578,9 @@ font-size: 0.875em;
     function scheduleAutoSync() {
         if (autoSyncTimer) clearTimeout(autoSyncTimer);
         autoSyncTimer = setTimeout(async () => {
-            const token  = localStorage.getItem('learninghub_sync_token');
-            const gistId = localStorage.getItem('learninghub_sync_gist_id');
-            if (!token || !gistId) return; // not configured yet, skip silently
-            await pushToCloud(true); // silent mode
+            const token = localStorage.getItem('learninghub_sync_token');
+            if (!token) return; // no token = not configured, skip silently
+            await pushToCloud(true); // silent mode — will create gist if no ID yet
         }, 3000); // waits 3s after last change before pushing
     }
 	
@@ -7385,7 +7384,7 @@ async function pushToCloud(silent = false) {
             showSyncStatus('✅ Push successful! Data synced to cloud at ' + new Date().toLocaleTimeString(), 'success');
             showReadModeToast('☁️ Pushed to cloud!');
         } else {
-            showReadModeToast('☁️ Auto-synced!');
+            showReadModeToast('☁️ Auto-synced to cloud ✅');
         }
 
     } catch (e) {
