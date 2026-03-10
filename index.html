@@ -7007,7 +7007,28 @@ width:min(320px, 90vw);
 text-align:center;
 box-shadow:0 5px 20px rgba(0,0,0,0.3);
 animation:fadeIn 0.25s ease;
+position:relative;
 ">
+
+<!-- Close button -->
+<button onclick="document.getElementById('resumePopup').style.display='none'"
+style="
+position:absolute;
+top:10px;
+right:12px;
+background:none;
+border:none;
+font-size:1.1em;
+cursor:pointer;
+color:var(--text);
+opacity:0.4;
+line-height:1;
+padding:2px 6px;
+border-radius:4px;
+transition:opacity 0.2s;
+"
+onmouseover="this.style.opacity='1'"
+onmouseout="this.style.opacity='0.4'">✕</button>
 
 <h3 style="margin-bottom:10px;">📖 Continue Reading?</h3>
 
@@ -7612,9 +7633,12 @@ function showSyncOverlay(onComplete) {
     const interval = setInterval(() => {
         if (i >= steps.length) {
             clearInterval(interval);
-            // Fade out then reload
+            // Fade out then remove overlay completely before callback
             overlay.firstElementChild.style.animation = 'syncFadeOut 0.4s ease forwards';
-            setTimeout(() => onComplete(), 450);
+            setTimeout(() => {
+                overlay.remove();
+                onComplete();
+            }, 450);
             return;
         }
         bar.style.width  = steps[i].pct + '%';
