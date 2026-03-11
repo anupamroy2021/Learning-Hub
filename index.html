@@ -798,12 +798,10 @@ blockquote{
     /* Normalize icon-only action buttons to same square size (no display override) */
     .edit-action,
     .btn.edit-action,
-    .btn.btn-outline.edit-action,
-    .icon-btn.tts-btn {
-        padding: 0 !important;
-        width: 34px !important;
-        min-width: 34px !important;
-        height: 34px !important;
+    .btn.btn-outline.edit-action {
+        padding: 10px !important;
+        min-width: 40px !important;
+        height: 40px !important;
         align-items: center !important;
         justify-content: center !important;
         font-size: 1em !important;
@@ -811,8 +809,7 @@ blockquote{
     }
 
     /* Only apply flex layout when the button is actually visible */
-    .edit-action:not([style*="display: none"]):not([style*="display:none"]),
-    .icon-btn.tts-btn {
+    .edit-action:not([style*="display: none"]):not([style*="display:none"]) {
         display: inline-flex !important;
     }
 }
@@ -1003,31 +1000,25 @@ display:table-cell !important;
 			background: none;
 			border: 1px solid var(--border);
 			color: var(--text);
-			padding: 0;
-			width: 34px;
-			height: 34px;
-			min-width: 34px;
-			min-height: 34px;
-			border-radius: 7px;
+			padding: 4px 6px;
+			border-radius: 6px;
 			cursor: pointer;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			flex-shrink: 0;
 			transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 		}
 
 		.icon-btn svg {
-			width: 15px;
-			height: 15px;
-			flex-shrink: 0;
+			width: 14px;
+			height: 14px;
 		}
 
 		.icon-btn:hover {
 			background: var(--primary);
 			color: white;
 			border-color: var(--primary);
-			transform: scale(1.08);
+			transform: scale(1.1);
 		}
 
 		.delete-btn:hover {
@@ -1087,7 +1078,7 @@ display:table-cell !important;
 
         @media (max-width: 650px) {
             .btn span { display: none; }
-            .btn { padding: 0; min-width: 34px; height: 34px; display: flex; justify-content: center; align-items: center; }
+            .btn { padding: 10px; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
             #lockBtn b { display: none; }
             .logo span { display: none; }
             .header-actions-mobile {
@@ -1476,8 +1467,37 @@ display:table-cell !important;
     display: none !important;
 }
 
+/* Image alignment buttons */
+.img-align-btn.active { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
+
 /* Continue Reading tooltip on hover */
 #continueReadingBtn:hover #continueReadingTooltip { display:block !important; }
+
+/* Images inside answer cards */
+.answer-body img, .markdown-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin: 10px 0;
+    display: block;
+    cursor: zoom-in;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.answer-body img:hover, .markdown-body img:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+    transform: scale(1.01);
+}
+/* Image lightbox overlay */
+#imgLightbox {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85);
+    z-index:99999; align-items:center; justify-content:center; cursor:zoom-out;
+    animation: fadeIn 0.2s ease;
+}
+#imgLightbox img {
+    max-width:92vw; max-height:90vh; border-radius:10px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5); border:none;
+}
 
 /* TTS button speaking state */
 .tts-btn.speaking {
@@ -1813,13 +1833,6 @@ to{transform:translateY(0);}
 /* --- Cards inside submodule --- */
 @media (max-width: 480px) {
     .card { padding: 0.9rem; }
-    .icon-btn {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
-        min-height: 28px;
-        border-radius: 6px;
-    }
     .icon-btn svg { width: 13px; height: 13px; }
 }
 
@@ -2393,7 +2406,7 @@ Cancel Export
             <button id="sortBtn-asc" onclick="setModuleSort('asc')" style="padding:6px 12px; border:none; background:none; color:var(--text); font-size: 0.75em; font-weight:600; cursor:pointer; transition:background 0.15s;">A → Z</button>
             <button id="sortBtn-desc" onclick="setModuleSort('desc')" style="padding:6px 12px; border:none; background:none; color:var(--text); font-size: 0.75em; font-weight:600; cursor:pointer; transition:background 0.15s;">Z → A</button>
         </div>
-        <button class="btn edit-action" onclick="addModule()">+ <span>Create Module</span></button>
+        <button class="btn edit-action" onclick="addModule()">+ Create Module</button>
     </div>
     </div>
 
@@ -2574,10 +2587,11 @@ font-size: 0.875em;
 
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <button class="btn edit-action"
-                onclick="addSubmodule()">+ <span>Create Submodule</span></button>
+                onclick="addSubmodule()">+ Create Submodule</button>
 
             <button class="btn btn-outline edit-action"
-                onclick="renameCurrentModule()">
+                onclick="renameCurrentModule()"
+                style="font-size:0.8em;">
                 ✏️ <span class="btn-label">Rename</span>
             </button>
 
@@ -2688,14 +2702,16 @@ font-size: 0.875em;
     <!-- RIGHT SIDE (FIXED ORDER) -->
     <div style="display:flex; align-items:center; gap:8px;">
 
-        <button class="btn btn-outline edit-action"
+        <button class="btn btn-outline"
             onclick="openProgressModal()"
+            style="font-size:0.75em;"
             title="View Progress">
-            📊 <span class="btn-label">Progress</span>
+            📊
         </button>
 
         <button class="btn btn-outline edit-action"
-            onclick="renameCurrentSubmodule()">
+            onclick="renameCurrentSubmodule()"
+            style="font-size:0.75em;">
             ✏️ <span class="btn-label">Rename</span>
         </button>
 
@@ -2785,6 +2801,65 @@ font-size: 0.875em;
                     <input id="qInput" placeholder="Title">
                     <input id="tInput" list="subtopicList" placeholder="Sub-topic (Search or Type New)">
                     <datalist id="subtopicList"></datalist>
+
+                    <!-- Image insert toolbar -->
+                    <div style="display:flex; gap:6px; margin-bottom:4px; flex-wrap:wrap; align-items:center;">
+                        <button type="button" class="btn btn-outline" onclick="imgFromURL()"
+                            style="font-size:0.75em; padding:4px 10px; display:flex; align-items:center; gap:5px;">
+                            🔗 Insert Image URL
+                        </button>
+                        <span style="font-size:0.7em; opacity:0.45; align-self:center;">GitHub links auto-converted to raw</span>
+                    </div>
+
+                    <!-- Inline URL Panel -->
+                    <div id="imgUrlPanel" style="display:none; background:var(--bg); border:1px solid var(--border);
+                        border-radius:10px; padding:12px 14px; margin-bottom:8px;">
+                        <div style="font-size:0.78em; opacity:0.55; margin-bottom:6px;">
+                            Paste GitHub blob URL or any direct image URL
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <input id="imgUrlInput" type="text"
+                                placeholder="https://github.com/user/repo/blob/main/img.png"
+                                oninput="clearTimeout(this._t); this._t=setTimeout(imgUrlPreview,400)"
+                                onkeydown="if(event.key==='Enter')imgUrlInsert()"
+                                style="flex:1; padding:7px 10px; border-radius:8px; border:1px solid var(--border);
+                                       background:var(--card); color:var(--text); font-size:0.85em;" />
+                            <button class="btn" onclick="imgUrlInsert()"
+                                style="padding:6px 14px; font-size:0.85em; white-space:nowrap;">Insert</button>
+                            <button class="btn btn-outline" onclick="document.getElementById('imgUrlPanel').style.display='none'"
+                                style="padding:6px 10px; font-size:0.85em;">✕</button>
+                        </div>
+                        <div id="imgUrlPreview" style="display:none; margin-top:10px;"></div>
+
+                        <!-- Size & Alignment Controls (shown after preview loads) -->
+                        <div id="imgSizeControls" style="display:none; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);">
+                            <div style="display:flex; align-items:center; gap:6px; font-size:0.8em;">
+                                <span style="opacity:0.55;">W</span>
+                                <input id="imgSizeW" type="number" min="50" max="2000" placeholder="px"
+                                    oninput="imgSizeWChanged()"
+                                    style="width:64px; padding:4px 7px; border-radius:6px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:1em;"/>
+                                <span style="opacity:0.4;">×</span>
+                                <span style="opacity:0.55;">H</span>
+                                <input id="imgSizeH" type="number" min="50" max="2000" placeholder="auto"
+                                    style="width:64px; padding:4px 7px; border-radius:6px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:1em;"/>
+                                <span style="opacity:0.4; font-size:0.85em;">px</span>
+                            </div>
+                            <div style="display:flex; gap:4px;">
+                                <button class="img-align-btn active" data-align="left" onclick="imgSetAlign(this,'left')"
+                                    title="Align Left"
+                                    style="border:1px solid var(--border); background:var(--primary); color:white; border-radius:6px; padding:3px 8px; cursor:pointer; font-size:0.85em;">⬛ Left</button>
+                                <button class="img-align-btn" data-align="center" onclick="imgSetAlign(this,'center')"
+                                    title="Center"
+                                    style="border:1px solid var(--border); background:none; color:var(--text); border-radius:6px; padding:3px 8px; cursor:pointer; font-size:0.85em;">⬛ Center</button>
+                                <button class="img-align-btn" data-align="right" onclick="imgSetAlign(this,'right')"
+                                    title="Align Right"
+                                    style="border:1px solid var(--border); background:none; color:var(--text); border-radius:6px; padding:3px 8px; cursor:pointer; font-size:0.85em;">⬛ Right</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="imgFileChosen(this)">
+
                     <textarea id="aInput" placeholder="Markdown..." oninput="autoResize(this); updatePreview()" style="min-height:150px; resize:none;"></textarea>
                     <div style="display:flex; gap:10px;">
                         <button class="btn btn-outline" style="flex:1" onclick="showListView()">Cancel</button>
@@ -3043,6 +3118,20 @@ if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'f') {
 document.getElementById("aInput").addEventListener("paste", function(e){
 
     const textarea = this;
+
+    // ── Image paste from clipboard ──
+    const items = (e.clipboardData || window.clipboardData).items;
+    if (items) {
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                e.preventDefault();
+                const file = item.getAsFile();
+                imgInsertFile(file, textarea);
+                return;
+            }
+        }
+    }
+
     let pasted = (e.clipboardData || window.clipboardData).getData('text');
 
     if(!pasted.includes("\n")) return;
@@ -3094,6 +3183,25 @@ ${pasted}
     }
 
 });
+
+// ── Drag & drop images onto textarea ──
+(function() {
+    const ta = document.getElementById('aInput');
+    ta.addEventListener('dragover', e => { e.preventDefault(); ta.style.outline = '2px dashed var(--primary)'; });
+    ta.addEventListener('dragleave', () => { ta.style.outline = ''; });
+    ta.addEventListener('drop', e => {
+        e.preventDefault();
+        ta.style.outline = '';
+        const files = [...(e.dataTransfer.files || [])].filter(f => f.type.startsWith('image/'));
+        if (files.length) { files.forEach(f => imgInsertFile(f, ta)); return; }
+        // Also handle dropped URLs (e.g. drag image from browser)
+        const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+        if (url && /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(url)) {
+            const raw = imgUrlConvertGitHub(url.trim());
+            imgInsertMarkdown(`![image](${raw})`);
+        }
+    });
+})();
 function saveReadingState(entryId = null){
 
     if(!currentModule || !currentSubmodule) return;
@@ -3957,6 +4065,171 @@ function looksLikeJava(code){
 
     return matchCount >= 2;  // now DSA methods will pass
 }
+// ── Image insert helpers ──
+function imgInsertMarkdown(md) {
+    const ta = document.getElementById('aInput');
+    if (!ta) return;
+    const pos = ta.selectionStart;
+    ta.value = ta.value.slice(0, pos) + '\n' + md + '\n' + ta.value.slice(pos);
+    ta.selectionStart = ta.selectionEnd = pos + md.length + 2;
+    autoResize(ta);
+    updatePreview();
+    ta.focus();
+}
+
+function imgUrlConvertGitHub(url) {
+    // https://github.com/user/repo/blob/branch/path/img.png
+    // → https://raw.githubusercontent.com/user/repo/branch/path/img.png
+    const m = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/);
+    if (m) return `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}`;
+    return url;
+}
+
+function imgFromURL() {
+    const panel = document.getElementById('imgUrlPanel');
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) {
+        const inp = document.getElementById('imgUrlInput');
+        inp.value = '';
+        inp.dataset.resolved = '';
+        document.getElementById('imgUrlPreview').style.display = 'none';
+        document.getElementById('imgUrlPreview').innerHTML = '';
+        inp.focus();
+    }
+}
+
+function imgUploadTrigger() { document.getElementById('imgFileInput').click(); }
+function imgFileChosen(input) {
+    const file = input.files[0];
+    if (!file) return;
+    imgInsertFile(file, document.getElementById('aInput'));
+    input.value = '';
+}
+
+function imgFromURL() {
+    const panel = document.getElementById('imgUrlPanel');
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) {
+        document.getElementById('imgUrlInput').value = '';
+        document.getElementById('imgUrlInput').dataset.resolved = '';
+        document.getElementById('imgUrlPreview').style.display = 'none';
+        document.getElementById('imgUrlPreview').innerHTML = '';
+        document.getElementById('imgSizeControls').style.display = 'none';
+        document.getElementById('imgUrlInput').focus();
+        document.getElementById('imgbbKeyPanel').style.display = 'none';
+    }
+}
+
+function imgUrlConvertGitHub(url) {
+    const m = url.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/);
+    if (m) return `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}`;
+    return url;
+}
+
+async function imgUrlPreview() {
+    const input   = document.getElementById('imgUrlInput');
+    const preview = document.getElementById('imgUrlPreview');
+    let url = imgUrlConvertGitHub((input?.value || '').trim());
+    if (!url) { preview.style.display = 'none'; document.getElementById('imgSizeControls').style.display = 'none'; return; }
+    preview.style.display = 'block';
+    preview.innerHTML = `<div style="opacity:0.5;font-size:0.8em;">Loading preview…</div>`;
+    const img = new Image();
+    img.onload = () => {
+        input.dataset.resolved = url;
+        input.dataset.naturalW = img.naturalWidth;
+        input.dataset.naturalH = img.naturalHeight;
+        const defW = Math.min(img.naturalWidth || 700, 700);
+        document.getElementById('imgSizeW').value = defW;
+        document.getElementById('imgSizeH').value = img.naturalHeight ? Math.round(defW * img.naturalHeight / img.naturalWidth) : '';
+        document.getElementById('imgSizeControls').style.display = 'flex';
+        preview.innerHTML = `
+            <img src="${url}" style="max-width:100%;max-height:150px;border-radius:8px;border:1px solid var(--border);object-fit:contain;display:block;">
+            <div style="font-size:0.72em;opacity:0.45;margin-top:3px;">Natural: ${img.naturalWidth}×${img.naturalHeight}px</div>`;
+    };
+    img.onerror = () => {
+        preview.innerHTML = `<div style="color:var(--danger);font-size:0.8em;">⚠️ Cannot load — make sure the repo is public</div>`;
+        input.dataset.resolved = '';
+        document.getElementById('imgSizeControls').style.display = 'none';
+    };
+    img.src = url;
+}
+
+function imgSizeWChanged() {
+    const inp = document.getElementById('imgUrlInput');
+    const nw  = parseFloat(inp.dataset.naturalW), nh = parseFloat(inp.dataset.naturalH);
+    const w   = parseFloat(document.getElementById('imgSizeW').value);
+    if (nw && nh && w) document.getElementById('imgSizeH').value = Math.round(w * nh / nw);
+}
+
+function imgUrlInsert() {
+    const input = document.getElementById('imgUrlInput');
+    let url = (input?.dataset.resolved || input?.value || '').trim();
+    if (!url) { showReadModeToast('⚠️ Paste an image URL first'); return; }
+    url = imgUrlConvertGitHub(url);
+    const rawAlt   = url.split('/').pop().replace(/\.[^.]+$/, '').replace(/%20/g,' ') || 'image';
+    const w        = (document.getElementById('imgSizeW')?.value || '').trim();
+    const h        = (document.getElementById('imgSizeH')?.value || '').trim();
+    const align    = document.querySelector('.img-align-btn.active')?.dataset.align || '';
+    const sizePart  = w ? `|${w}${h ? 'x'+h : ''}` : '';
+    const alignPart = align && align !== 'left' ? `|${align}` : '';
+    imgInsertMarkdown(`![${rawAlt}${sizePart}${alignPart}](${url})`);
+    document.getElementById('imgUrlPanel').style.display = 'none';
+    document.getElementById('imgSizeControls').style.display = 'none';
+}
+
+// After upload/paste: insert with size from size controls if visible, else just raw
+function imgBuildMarkdown(alt, url) {
+    const w     = (document.getElementById('imgSizeW')?.value || '').trim();
+    const h     = (document.getElementById('imgSizeH')?.value || '').trim();
+    const align = document.querySelector('.img-align-btn.active')?.dataset.align || '';
+    const sp    = w ? `|${w}${h ? 'x'+h : ''}` : '';
+    const ap    = align && align !== 'left' ? `|${align}` : '';
+    return `![${alt}${sp}${ap}](${url})`;
+}
+
+// Toggle alignment buttons
+function imgSetAlign(btn, align) {
+    document.querySelectorAll('.img-align-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// Apply size & alignment from alt="name|400x300|center" when rendering
+function imgApplySizeFromAlt(img) {
+    const raw   = img.getAttribute('alt') || '';
+    const parts = raw.split('|');
+    if (parts.length < 2) return;
+    const sizePart  = parts.find(p => /^\d/.test(p.trim()));
+    const alignPart = parts.find(p => /^(center|right|left)$/i.test(p.trim()));
+    if (sizePart) {
+        const [w, h] = sizePart.trim().split('x');
+        if (w) { img.style.width = w + 'px'; img.style.maxWidth = '100%'; }
+        img.style.height = (h && h !== w) ? h + 'px' : 'auto';
+    }
+    if (alignPart) {
+        const a = alignPart.trim().toLowerCase();
+        img.style.display    = 'block';
+        img.style.marginLeft  = (a === 'center' || a === 'right') ? 'auto' : '0';
+        img.style.marginRight = (a === 'center' || a === 'left')  ? 'auto' : '0';
+    }
+    img.setAttribute('alt', parts[0].trim());
+}
+
+function attachImgZoom() {
+    document.querySelectorAll('.answer-body img').forEach(img => {
+        imgApplySizeFromAlt(img);
+        img.onclick = (e) => {
+            e.stopPropagation();
+            document.getElementById('imgLightboxImg').src = img.src;
+            document.getElementById('imgLightbox').style.display = 'flex';
+        };
+    });
+}
+
+
 function looksLikeDiagram(code){
 
     const diagramPatterns = [
@@ -4045,8 +4318,6 @@ function looksLikeDiagram(code){
     if (sw) sw.style.display = 'none';
 }
 window.addEventListener("DOMContentLoaded", function(){
-
-    const importInput = document.getElementById('importFile');
 
     if(importInput){
 
@@ -4518,6 +4789,7 @@ function openSubmodule(name) {
 		lucide.createIcons();
 		setTimeout(mapIndexWithScroll, 100);
 		updateMatchCounter();
+		attachImgZoom();
 
         // ── Auto-read: IntersectionObserver (30s dwell) ──
         attachReadTimers();
@@ -8512,6 +8784,11 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
         <h4 id="progressBreakdownTitle" style="margin:0 0 14px 0; font-size:0.875em; text-transform:uppercase; letter-spacing:1px; opacity:0.5;">By Module</h4>
         <div id="progressModuleList"></div>
     </div>
+</div>
+
+<!-- ================= IMAGE LIGHTBOX ================= -->
+<div id="imgLightbox" onclick="this.style.display='none'">
+    <img id="imgLightboxImg" src="" alt=""/>
 </div>
 
 <!-- ================= TTS PLAYER BAR ================= -->
