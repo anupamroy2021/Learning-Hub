@@ -5069,12 +5069,52 @@ if(sub){
             data[currentModule][currentSubmodule][idx] = { id: editId, q, subtopic: sub, a };
             targetId = editId;
         } else {
-            // Check for duplicate question
-            const duplicate = data[currentModule][currentSubmodule].find(i => i.q.trim().toLowerCase() === q.toLowerCase());
-            if (duplicate) {
+            // ── Fuzzy duplicate detection ──
+            // Uses Levenshtein similarity + Jaccard word-overlap, flags anything above 75%
+            function levenshtein(a, b) {
+                const m = a.length, n = b.length;
+                const dp = Array.from({length: m+1}, (_, i) => [i]);
+                for (let j = 0; j <= n; j++) dp[0][j] = j;
+                for (let i = 1; i <= m; i++)
+                    for (let j = 1; j <= n; j++)
+                        dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1]
+                            : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+                return dp[m][n];
+            }
+            function similarity(a, b) {
+                const na = a.toLowerCase().replace(/[^\w\s]/g,'').trim();
+                const nb = b.toLowerCase().replace(/[^\w\s]/g,'').trim();
+                if (!na || !nb) return 0;
+                // Levenshtein ratio
+                const maxLen = Math.max(na.length, nb.length);
+                const levScore = 1 - levenshtein(na, nb) / maxLen;
+                // Jaccard word overlap
+                const wa = new Set(na.split(/\s+/));
+                const wb = new Set(nb.split(/\s+/));
+                const intersection = [...wa].filter(w => wb.has(w)).length;
+                const union = new Set([...wa, ...wb]).size;
+                const jaccard = union ? intersection / union : 0;
+                // Weighted blend: 50% lev + 50% jaccard
+                return (levScore * 0.5) + (jaccard * 0.5);
+            }
+
+            const THRESHOLD = 0.75;
+            const similar = data[currentModule][currentSubmodule]
+                .map(i => ({ item: i, score: similarity(q, i.q) }))
+                .filter(x => x.score >= THRESHOLD)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3);
+
+            if (similar.length > 0) {
+                const listHtml = similar.map(x =>
+                    `<div style="margin-top:8px; padding:8px 10px; background:var(--bg); border-radius:8px; border:1px solid var(--border); font-size:0.8em;">
+                        <span style="color:var(--accent); font-weight:700; font-size:0.85em;">${Math.round(x.score*100)}% similar</span>
+                        <div style="margin-top:3px; opacity:0.85;">${x.item.q}</div>
+                    </div>`
+                ).join('');
                 openCustomConfirm({
-                    title: '⚠️ Duplicate Entry',
-                    message: `A question with this text already exists in "${currentSubmodule}". Save anyway?`,
+                    title: '⚠️ Similar Entry Found',
+                    message: `This looks similar to ${similar.length} existing entr${similar.length>1?'ies':'y'}:${listHtml}<div style="margin-top:10px; opacity:0.6; font-size:0.8em;">Save anyway?</div>`,
                     confirmText: 'Save Anyway',
                     danger: false,
                     onConfirm: () => {
@@ -5085,7 +5125,7 @@ if(sub){
                 });
                 return;
             }
-            // Creating a new entry
+            // No duplicates — create normally
             targetId = Date.now();
             data[currentModule][currentSubmodule].push({ id: targetId, q, subtopic: sub, a });
         }
@@ -7745,7 +7785,7 @@ function openCustomPrompt({ title, placeholder, confirmText, onConfirm }) {
 function openCustomConfirm({ title, message, confirmText, danger, onConfirm }) {
     document.getElementById('customDialogTitle').textContent = title;
     const msg = document.getElementById('customDialogMessage');
-    msg.textContent = message || '';
+    msg.innerHTML = message || '';
     msg.style.display = message ? 'block' : 'none';
     document.getElementById('customDialogInput').style.display = 'none';
     const btn = document.getElementById('customDialogConfirmBtn');
@@ -8185,7 +8225,7 @@ style="display:none"
 
         <div style="display:flex; align-items:center; gap:10px; padding:12px; background:var(--bg); border-radius:10px; border:1px solid var(--border);">
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.875em; user-select:none; flex:1;">
-                <input type="checkbox" id="syncAutoOnLoad" checked style="width:16px; height:16px; accent-color:var(--primary); cursor:pointer;">
+                <input type="checkbox" id="syncAutoOnLoad" style="width:16px; height:16px; accent-color:var(--primary); cursor:pointer;">
                 <span>Auto-pull on app load</span>
             </label>
         </div>
@@ -8235,7 +8275,7 @@ function openSyncModal() {
     // Populate fields from localStorage
     const token  = localStorage.getItem(SYNC_TOKEN_KEY) || '';
     const gistId = localStorage.getItem(SYNC_GIST_KEY)  || '';
-    const auto   = localStorage.getItem(SYNC_AUTO_KEY) !== 'false'; // default ON
+    const auto   = localStorage.getItem(SYNC_AUTO_KEY) === 'true'; // default OFF
     document.getElementById('syncTokenInput').value   = token;
     document.getElementById('syncGistIdInput').value  = gistId;
     document.getElementById('syncAutoOnLoad').checked = auto;
@@ -8495,7 +8535,7 @@ async function pullFromCloud(silent = false) {
 // ---- Auto-pull on load ----
 window.addEventListener('DOMContentLoaded', function() {
     const autoRaw = localStorage.getItem(SYNC_AUTO_KEY);
-    const auto = autoRaw === null ? true : autoRaw === 'true';
+    const auto = autoRaw === 'true'; // default false — user must opt in
     if (auto) {
         const token  = localStorage.getItem(SYNC_TOKEN_KEY);
         const gistId = localStorage.getItem(SYNC_GIST_KEY);
