@@ -2038,6 +2038,38 @@ to{transform:translateY(0);}
         0 0 0 2px rgba(0,123,255,0.15);
 }
 
+/* Auto-highlight: card currently in the reading zone */
+.content-area.has-focus .card {
+    opacity: 0.55;
+    transform: scale(0.97);
+}
+.content-area.has-focus .card.reading-focus {
+    opacity: 1;
+    transform: scale(1.01);
+    box-shadow: 
+        0 12px 35px rgba(0,0,0,0.18),
+        0 0 0 2px rgba(0,123,255,0.15);
+}
+/* Mouse hover always wins over auto-focus */
+.content-area.has-focus .card:hover {
+    opacity: 1;
+    transform: scale(1.01);
+}
+/* Book mode variants */
+body.book-mode .content-area.has-focus .card {
+    opacity: 0.55 !important;
+    transform: scale(0.99) !important;
+}
+body.book-mode .content-area.has-focus .card.reading-focus {
+    opacity: 1 !important;
+    transform: scale(1.005) !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.13), 0 0 0 2px rgba(0,123,255,0.12) !important;
+}
+body.book-mode .content-area.has-focus .card:hover {
+    opacity: 1 !important;
+    transform: scale(1.005) !important;
+}
+
     </style>
 </head>
 <body class="dark">
@@ -4112,6 +4144,7 @@ window.addEventListener("DOMContentLoaded", function(){
     recordStreakToday();
     renderStreakWidget();
     document.body.classList.remove('on-qa-page');
+    clearReadingFocus();
     document.getElementById('continueReadingBtn').style.display = 'none';
     showResumePopup();
 }
@@ -4148,6 +4181,7 @@ window.addEventListener("DOMContentLoaded", function(){
 		renderSubmodules();
 		document.getElementById('scrollBtnGroup').style.display = 'none';
 		document.body.classList.remove('on-qa-page');
+		clearReadingFocus();
 	}
 
 function openSubmodule(name) {
@@ -4226,6 +4260,14 @@ function openSubmodule(name) {
         document.getElementById('listView').style.display = 'block';
         document.getElementById('formView').style.display = 'none';
         document.body.classList.add('on-qa-page');
+    }
+
+    function clearReadingFocus() {
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea) {
+            contentArea.classList.remove('has-focus');
+            document.querySelectorAll('.card.reading-focus').forEach(c => c.classList.remove('reading-focus'));
+        }
     }
 
     function renderSidebarIndex() {
@@ -6324,14 +6366,12 @@ function startFreshReading(){
 		if (!cards.length || !contentArea) return;
 
 		// Find the card whose top edge is closest to 30% down the viewport
-		// (the "reading zone") — this ensures one card is always active
 		const targetY = window.innerHeight * 0.30;
 		let bestId = null;
 		let bestDist = Infinity;
 
 		cards.forEach(card => {
 			const rect = card.getBoundingClientRect();
-			// Card must be at least partially visible
 			if (rect.bottom < 60 || rect.top > window.innerHeight) return;
 			const dist = Math.abs(rect.top - targetY);
 			if (dist < bestDist) {
@@ -6342,19 +6382,23 @@ function startFreshReading(){
 
 		if (!bestId) return;
 
+		// Update sidebar active index
 		navBtns.forEach(btn => {
 			btn.classList.remove("active-index");
 			if (btn.dataset.id == bestId) {
 				btn.classList.add("active-index");
-				// Scroll the sidebar so the active item is centered
-				btn.scrollIntoView({
-					behavior: "smooth",
-					block: "center"
-				});
+				btn.scrollIntoView({ behavior: "smooth", block: "center" });
 			}
 		});
 
-		// ⭐ SAVE LAST POSITION AUTOMATICALLY
+		// Apply reading-focus highlight to the active card
+		contentArea.classList.add('has-focus');
+		cards.forEach(card => {
+			const cardId = card.id.replace("q-", "");
+			card.classList.toggle('reading-focus', cardId == bestId);
+		});
+
+		// Save last position
 		const activeBtn = document.querySelector('.nav-btn.active-index');
 		if (activeBtn) {
 			saveReadingState(activeBtn.dataset.id);
