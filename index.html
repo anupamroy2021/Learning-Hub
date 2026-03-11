@@ -1470,6 +1470,18 @@ display:table-cell !important;
 /* Continue Reading tooltip on hover */
 #continueReadingBtn:hover #continueReadingTooltip { display:block !important; }
 
+/* TTS button speaking state */
+.tts-btn.speaking {
+    background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+    color: white !important;
+    border-color: transparent !important;
+    animation: ttsPulse 1.2s ease-in-out infinite;
+}
+@keyframes ttsPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
+    50%       { box-shadow: 0 0 0 6px rgba(37,99,235,0); }
+}
+
 /* ================= BOOK MODE ================= */
 
 /* Make content-area a positioned block so we can use viewport-based centering */
@@ -2071,6 +2083,7 @@ body.book-mode .content-area.has-focus .card:hover {
 }
 
     </style>
+    <script src="https://js.puter.com/v2/"></script>
 </head>
 <body class="dark">
 <script>
@@ -4145,6 +4158,7 @@ window.addEventListener("DOMContentLoaded", function(){
     renderStreakWidget();
     document.body.classList.remove('on-qa-page');
     clearReadingFocus();
+    ttsStop();
     document.getElementById('continueReadingBtn').style.display = 'none';
     showResumePopup();
 }
@@ -4182,6 +4196,7 @@ window.addEventListener("DOMContentLoaded", function(){
 		document.getElementById('scrollBtnGroup').style.display = 'none';
 		document.body.classList.remove('on-qa-page');
 		clearReadingFocus();
+		ttsStop();
 	}
 
 function openSubmodule(name) {
@@ -4456,6 +4471,11 @@ function openSubmodule(name) {
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                         <span style="color:var(--accent); font-size: 0.75em; font-weight:700;">${highlightText(item.subtopic || 'General', term)}</span>
                         <div style="display:flex; gap:6px; align-items:center;">
+							<button class="icon-btn tts-btn"
+								title="Read Aloud"
+								onclick="speakCard(this, '${item.id}')">
+								<i data-lucide="volume-2"></i>
+							</button>
 							<button class="icon-btn edit-action"
 								title="Edit Entry"
 								onclick="openEditor('${item.id}')">
@@ -8284,6 +8304,181 @@ document.addEventListener('DOMContentLoaded', function() {
     else document.documentElement.style.setProperty('--book-width', bookWidth + 'px');
 })();
 
+// ================= TEXT TO SPEECH — Web Speech API (Free, No Limits) =================
+let ttsCurrentBtn = null;
+let ttsUtterance  = null;
+let ttsRate       = 1;
+let ttsPaused     = false;
+let ttsChunks     = [];
+let ttsChunkIdx   = 0;
+let ttsTotalLen   = 0;
+let ttsSpokenLen  = 0;
+
+// Best free voices — neural quality, built into Chrome/Edge/Safari
+const TTS_VOICE_PRIORITY = [
+    // Edge / Windows neural voices (best quality)
+    'Microsoft Aria Online (Natural) - English (United States)',
+    'Microsoft Jenny Online (Natural) - English (United States)',
+    'Microsoft Sonia Online (Natural) - English (United Kingdom)',
+    'Microsoft Libby Online (Natural) - English (United Kingdom)',
+    'Microsoft Natasha Online (Natural) - English (Australia)',
+    // Chrome neural voices
+    'Google US English',
+    'Google UK English Female',
+    'Google UK English Male',
+    // macOS / iOS voices
+    'Samantha', 'Karen', 'Moira', 'Tessa', 'Daniel',
+    // Android
+    'en-us-x-sfg#female_1-local', 'en-GB-language',
+];
+
+function ttsGetVoice() {
+    const voices = speechSynthesis.getVoices();
+    for (const name of TTS_VOICE_PRIORITY) {
+        const v = voices.find(v => v.name === name);
+        if (v) return v;
+    }
+    // Fallback: any online English voice first, then any English
+    return voices.find(v => v.localService === false && /en[-_]/i.test(v.lang))
+        || voices.find(v => /en[-_]/i.test(v.lang))
+        || voices[0] || null;
+}
+
+function cleanTextForSpeech(el) {
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll('pre, code').forEach(c => c.replaceWith(document.createTextNode(' [code block] ')));
+    clone.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(h => h.after(document.createTextNode('. ')));
+    clone.querySelectorAll('li').forEach(li => li.prepend(document.createTextNode('. ')));
+    return (clone.innerText || clone.textContent || '')
+        .replace(/\[code block\]\s*\[code block\]/g, '[code block]')
+        .replace(/\s+/g, ' ').replace(/\.\s*\./g, '.').trim();
+}
+
+// Chrome has a bug where long utterances cut off — split into sentences
+function chunkBySentence(text, max = 180) {
+    const sentences = text.match(/[^.!?]+[.!?]+["']?|[^.!?]+$/g) || [text];
+    const chunks = [];
+    let cur = '';
+    for (const s of sentences) {
+        if ((cur + s).length > max) { if (cur) chunks.push(cur.trim()); cur = s; }
+        else cur += s;
+    }
+    if (cur.trim()) chunks.push(cur.trim());
+    return chunks.filter(Boolean);
+}
+
+function speakCard(btn, itemId) {
+    if (ttsCurrentBtn === btn && speechSynthesis.speaking) { ttsPauseResume(); return; }
+    ttsStop(false);
+
+    const card = document.getElementById('q-' + itemId);
+    if (!card) return;
+    const questionText = (card.querySelector('h2') || {}).innerText?.trim() || '';
+    const answerEl = card.querySelector('.answer-body');
+    if (!answerEl) return;
+    const script = (questionText ? questionText + '. ' : '') + cleanTextForSpeech(answerEl);
+    if (!script.trim()) return;
+
+    ttsCurrentBtn = btn;
+    ttsPaused     = false;
+    ttsChunks     = chunkBySentence(script);
+    ttsChunkIdx   = 0;
+    ttsTotalLen   = script.length;
+    ttsSpokenLen  = 0;
+
+    btn.classList.add('speaking');
+    const bar = document.getElementById('ttsBar');
+    const title = document.getElementById('ttsBarTitle');
+    if (bar)   { bar.style.display = 'flex'; }
+    if (title) title.textContent = '🎓 ' + (questionText || 'Reading...');
+    document.getElementById('ttsPauseBtn').textContent = '⏸';
+    document.getElementById('ttsBarProgress').style.width = '0%';
+
+    const playChunk = () => {
+        if (ttsChunkIdx >= ttsChunks.length || ttsCurrentBtn !== btn) { ttsStop(true); return; }
+        const chunk = ttsChunks[ttsChunkIdx++];
+        const utt = new SpeechSynthesisUtterance(chunk);
+        ttsUtterance = utt;
+
+        const voice = ttsGetVoice();
+        if (voice) utt.voice = voice;
+        utt.rate   = ttsRate;
+        utt.pitch  = 1.0;
+        utt.volume = 1;
+
+        utt.onboundary = (e) => {
+            if (e.name !== 'word') return;
+            ttsSpokenLen += 1;
+            const done = ttsChunks.slice(0, ttsChunkIdx - 1).join(' ').length;
+            const pct = Math.min(99, ((done + e.charIndex) / ttsTotalLen) * 100);
+            const pb = document.getElementById('ttsBarProgress');
+            if (pb) pb.style.width = pct.toFixed(1) + '%';
+        };
+        utt.onend = () => { if (!ttsPaused) playChunk(); };
+        utt.onerror = (e) => { if (e.error !== 'interrupted') ttsStop(true); };
+
+        speechSynthesis.speak(utt);
+    };
+
+    // Voices may not be loaded yet on first call
+    if (speechSynthesis.getVoices().length) {
+        playChunk();
+    } else {
+        speechSynthesis.onvoiceschanged = () => { speechSynthesis.onvoiceschanged = null; playChunk(); };
+    }
+}
+
+function ttsPauseResume() {
+    const btn = document.getElementById('ttsPauseBtn');
+    if (speechSynthesis.paused) {
+        ttsPaused = false;
+        speechSynthesis.resume();
+        if (btn) btn.textContent = '⏸';
+        if (ttsCurrentBtn) ttsCurrentBtn.classList.add('speaking');
+    } else if (speechSynthesis.speaking) {
+        ttsPaused = true;
+        speechSynthesis.pause();
+        if (btn) btn.textContent = '▶';
+        if (ttsCurrentBtn) ttsCurrentBtn.classList.remove('speaking');
+    }
+}
+
+function ttsSpeed(rate) {
+    ttsRate = rate;
+    ['Slow','Normal','Fast'].forEach(s => {
+        const b = document.getElementById('ttsSpeed' + s);
+        if (!b) return;
+        const active = (s==='Slow'&&rate===0.8)||(s==='Normal'&&rate===1)||(s==='Fast'&&rate===1.25);
+        b.style.background  = active ? 'var(--primary)' : 'none';
+        b.style.color       = active ? 'white' : 'var(--text)';
+        b.style.borderColor = active ? 'var(--primary)' : 'var(--border)';
+    });
+    // Restart with new rate if speaking
+    if (ttsCurrentBtn && (speechSynthesis.speaking || speechSynthesis.paused)) {
+        const btn = ttsCurrentBtn;
+        const card = btn.closest('.card[id^="q-"]') || btn.closest('.card');
+        if (card) {
+            const id = card.id.replace('q-', '');
+            speechSynthesis.cancel();
+            setTimeout(() => speakCard(btn, id), 120);
+        }
+    }
+}
+
+function ttsStop(resetBar = true) {
+    ttsPaused = false;
+    speechSynthesis.cancel();
+    ttsUtterance = null;
+    ttsChunks = []; ttsChunkIdx = 0;
+    if (ttsCurrentBtn) { ttsCurrentBtn.classList.remove('speaking'); ttsCurrentBtn = null; }
+    if (resetBar) {
+        const bar = document.getElementById('ttsBar');
+        if (bar) bar.style.display = 'none';
+        const pb = document.getElementById('ttsBarProgress');
+        if (pb) pb.style.width = '0%';
+    }
+}
+
 document.getElementById('syncModal').addEventListener('click', function(e) {
     if (e.target === this) closeSyncModal();
 });
@@ -8306,7 +8501,40 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
     </div>
 </div>
 
-<!-- ================= BOOK MODE INDICATOR ================= -->
+<!-- ================= TTS PLAYER BAR ================= -->
+<div id="ttsBar" style="
+    display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--card); border:1px solid var(--border); border-radius:40px;
+    padding:10px 18px; gap:12px; align-items:center;
+    box-shadow:0 8px 32px rgba(0,0,0,0.22); z-index:9500;
+    font-size:0.8em; font-weight:600; color:var(--text);
+    min-width:260px; max-width:92vw;
+    animation: fadeInUp 0.25s ease;
+">
+    <button id="ttsPauseBtn" onclick="ttsPauseResume()"
+        style="background:var(--primary); border:none; color:white; border-radius:50%;
+               width:34px; height:34px; cursor:pointer; font-size:1em; flex-shrink:0;
+               display:flex; align-items:center; justify-content:center;">⏸</button>
+
+    <div style="flex:1; min-width:0;">
+        <div id="ttsBarTitle" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:0.85; margin-bottom:5px;"></div>
+        <div style="height:3px; background:var(--border); border-radius:10px; overflow:hidden;">
+            <div id="ttsBarProgress" style="height:100%; width:0%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:10px; transition:width 0.25s linear;"></div>
+        </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
+        <button onclick="ttsSpeed(0.8)"  id="ttsSpeedSlow"   style="border:1px solid var(--border); background:none; color:var(--text); border-radius:8px; padding:2px 7px; font-size:0.78em; cursor:pointer;">0.8×</button>
+        <button onclick="ttsSpeed(1)"    id="ttsSpeedNormal" style="border:1px solid var(--primary); background:var(--primary); color:white; border-radius:8px; padding:2px 7px; font-size:0.78em; cursor:pointer;">1×</button>
+        <button onclick="ttsSpeed(1.25)" id="ttsSpeedFast"   style="border:1px solid var(--border); background:none; color:var(--text); border-radius:8px; padding:2px 7px; font-size:0.78em; cursor:pointer;">1.25×</button>
+    </div>
+
+    <button onclick="ttsStop()"
+        style="background:none; border:1px solid var(--border); color:var(--text); border-radius:50%;
+               width:28px; height:28px; cursor:pointer; font-size:0.9em; flex-shrink:0;
+               display:flex; align-items:center; justify-content:center;">✕</button>
+</div>
+</body>
 <div id="bookModeIndicator">
     📚 Book Mode
     <div id="bookWidthPills">
