@@ -795,7 +795,7 @@ blockquote{
 @media (max-width: 600px) {
     .btn-label { display: none; }
 
-    /* Normalize icon-only action buttons to same square size (no display override) */
+    /* Normalize ALL action buttons to same square size */
     .edit-action,
     .btn.edit-action,
     .btn.btn-outline.edit-action {
@@ -806,11 +806,61 @@ blockquote{
         justify-content: center !important;
         font-size: 1em !important;
         line-height: 1 !important;
+        border-radius: 8px !important;
     }
 
-    /* Only apply flex layout when the button is actually visible */
-    .edit-action:not([style*="display: none"]):not([style*="display:none"]) {
+    /* Show edit actions ONLY when NOT in read mode */
+    body:not(.read-mode) .edit-action:not([style*="display: none"]):not([style*="display:none"]) {
         display: inline-flex !important;
+    }
+
+    /* Unify custom-styled danger delete buttons — only outside read mode */
+    body:not(.read-mode) button.edit-action[style*="border:1px solid var(--danger)"],
+    body:not(.read-mode) button.edit-action[style*="border: 1px solid var(--danger)"] {
+        padding: 10px !important;
+        min-width: 40px !important;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 1em !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden;
+    }
+
+    /* Submodule/module view toolbar: consistent row height — only outside read mode */
+    body:not(.read-mode) #submoduleView .btn,
+    body:not(.read-mode) #listView .btn,
+    body:not(.read-mode) #listView button.edit-action {
+        height: 40px !important;
+        min-width: 40px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Hide text spans inside danger delete buttons on mobile */
+    button.edit-action[style*="border:1px solid var(--danger)"] span,
+    button.edit-action[style*="border: 1px solid var(--danger)"] span {
+        display: none !important;
+    }
+
+    /* Enforce read-mode-hide on mobile too */
+    body.read-mode .read-mode-hide {
+        display: none !important;
+    }
+
+    /* icon-btn: slightly larger touch targets on mobile */
+    .icon-btn {
+        min-width: 38px !important;
+        height: 38px !important;
+        padding: 8px !important;
+    }
+
+    .icon-btn svg {
+        width: 17px !important;
+        height: 17px !important;
     }
 }
 
@@ -1000,18 +1050,20 @@ display:table-cell !important;
 			background: none;
 			border: 1px solid var(--border);
 			color: var(--text);
-			padding: 4px 6px;
+			padding: 7px 8px;
 			border-radius: 6px;
 			cursor: pointer;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			min-width: 34px;
+			height: 34px;
 			transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 		}
 
 		.icon-btn svg {
-			width: 14px;
-			height: 14px;
+			width: 16px;
+			height: 16px;
 		}
 
 		.icon-btn:hover {
@@ -1463,8 +1515,47 @@ display:table-cell !important;
 
 /* ================= READ MODE HIDE EDIT UI ================= */
 
+/* Hide ALL action buttons: edit, delete, speak, rename, export, new entry, lock, etc. */
 .read-mode .edit-action {
     display: none !important;
+}
+
+/* Hide header items that aren't back/menu (streak, book mode, continue reading, hamburger) */
+.read-mode .read-mode-hide {
+    display: none !important;
+}
+
+/* Hide only the search input wrapper, NOT the whole container (cards live inside it) */
+.read-mode .search-wrapper {
+    display: none !important;
+}
+
+/* Hide scroll-to-top/bottom buttons */
+.read-mode #scrollBtnGroup {
+    display: none !important;
+}
+
+/* ===== MOBILE READ MODE — force-hide overrides all mobile display:inline-flex rules ===== */
+@media (max-width: 600px) {
+    body.read-mode .edit-action,
+    body.read-mode .edit-action[style*="display"],
+    body.read-mode #submoduleView .btn.edit-action,
+    body.read-mode #listView .btn.edit-action,
+    body.read-mode #listView button.edit-action,
+    body.read-mode button.edit-action[style*="border:1px solid var(--danger)"],
+    body.read-mode button.edit-action[style*="border: 1px solid var(--danger)"] {
+        display: none !important;
+    }
+    body.read-mode .read-mode-hide,
+    body.read-mode .read-mode-hide[style*="display"] {
+        display: none !important;
+    }
+    body.read-mode .search-wrapper {
+        display: none !important;
+    }
+    body.read-mode #scrollBtnGroup {
+        display: none !important;
+    }
 }
 
 /* Image alignment buttons */
@@ -1473,20 +1564,58 @@ display:table-cell !important;
 /* Continue Reading tooltip on hover */
 #continueReadingBtn:hover #continueReadingTooltip { display:block !important; }
 
-/* Images inside answer cards */
+/* Images inside answer cards — fully responsive */
 .answer-body img, .markdown-body img {
-    max-width: 100%;
-    height: auto;
+    /* Override any hardcoded width/height HTML attributes */
+    max-width: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    /* Never overflow the card */
+    box-sizing: border-box;
     border-radius: 8px;
     border: 1px solid var(--border);
-    margin: 10px 0;
+    margin: 12px 0;
     display: block;
     cursor: zoom-in;
     transition: transform 0.2s, box-shadow 0.2s;
+    /* Fluid: never wider than the card, never too tall to read past */
+    max-height: 60vh;
+    object-fit: contain;
 }
 .answer-body img:hover, .markdown-body img:hover {
     box-shadow: 0 6px 24px rgba(0,0,0,0.18);
     transform: scale(1.01);
+}
+
+/* Tablet: slightly tighter max height */
+@media (max-width: 850px) {
+    .answer-body img, .markdown-body img {
+        max-height: 50vh;
+        border-radius: 6px;
+    }
+}
+
+/* Mobile: full-width, shorter max height, no hover scale */
+@media (max-width: 600px) {
+    .answer-body img, .markdown-body img {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 40vh;
+        border-radius: 6px;
+        margin: 8px 0;
+    }
+    .answer-body img:hover, .markdown-body img:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+    .answer-body img, .markdown-body img {
+        max-height: 32vh;
+        border-radius: 4px;
+    }
 }
 /* Image lightbox overlay */
 #imgLightbox {
@@ -1833,7 +1962,7 @@ to{transform:translateY(0);}
 /* --- Cards inside submodule --- */
 @media (max-width: 480px) {
     .card { padding: 0.9rem; }
-    .icon-btn svg { width: 13px; height: 13px; }
+    .icon-btn svg { width: 15px; height: 15px; }
 }
 
 /* --- Flashcard modal --- */
@@ -2165,7 +2294,7 @@ body.book-mode .content-area.has-focus .card:hover {
 <!-- RIGHT SIDE -->
 <div class="header-actions">
 
-    <button class="btn btn-outline"
+    <button class="btn btn-outline read-mode-hide"
     id="headerBookModeBtn"
     onclick="toggleBookMode()"
     style="display: none;"
@@ -2214,7 +2343,7 @@ body.book-mode .content-area.has-focus .card:hover {
     </button>
 
     <!-- Header Streak Widget (dashboard only) -->
-    <div id="streakWidget" class="streak-widget" style="display:none; background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:5px 10px; position:relative; cursor:default;">
+    <div id="streakWidget" class="streak-widget read-mode-hide" style="display:none; background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:5px 10px; position:relative; cursor:default;">
         <span class="streak-fire">🔥</span>
         <span class="streak-count" id="streakCount">0</span>
 
@@ -2702,7 +2831,7 @@ font-size: 0.875em;
     <!-- RIGHT SIDE (FIXED ORDER) -->
     <div style="display:flex; align-items:center; gap:8px;">
 
-        <button class="btn btn-outline"
+        <button class="btn btn-outline read-mode-hide"
             onclick="openProgressModal()"
             style="font-size:0.75em;"
             title="View Progress">
@@ -2894,7 +3023,9 @@ font-size: 0.875em;
 	let scrollAnim = null;
 	let isAllCollapsed = false;
 	let lastUsedSubtopic = "";
-	let isReadOnlyMode = false;
+	let isReadOnlyMode = window.innerWidth <= 600;
+	// Apply read mode immediately on mobile
+	if (isReadOnlyMode) document.body.classList.add('read-mode');
 	let searchMatches = [];
     let currentMatchIndex = -1;
 	let moduleSearchMatches = [];
@@ -4319,6 +4450,8 @@ function looksLikeDiagram(code){
 }
 window.addEventListener("DOMContentLoaded", function(){
 
+    const importInput = document.getElementById('importFile');
+
     if(importInput){
 
         importInput.onchange = function(e){
@@ -4501,6 +4634,12 @@ function openSubmodule(name) {
     document.getElementById('headerNewBtn').style.display = 'block';
     document.getElementById('lockBtn').style.display = 'block';
     document.getElementById('headerBookModeBtn').style.display = 'block';
+
+    // Always expand sidebar on desktop; on mobile leave it collapsed (user opens via hamburger)
+    const sb = document.getElementById('sidebar');
+    if (window.innerWidth > 850) {
+        sb.classList.remove('collapsed');
+    }
 
     showListView(); 
     renderSidebarIndex(); 
@@ -8653,8 +8792,9 @@ function chunkBySentence(text, max = 180) {
 }
 
 function speakCard(btn, itemId) {
-    if (ttsCurrentBtn === btn && speechSynthesis.speaking) { ttsPauseResume(); return; }
-    ttsStop(false);
+    // Toggle off if already speaking this card
+    if (ttsCurrentBtn === btn && speechSynthesis.speaking) { ttsStop(true); return; }
+    ttsStop(true);
 
     const card = document.getElementById('q-' + itemId);
     if (!card) return;
@@ -8672,12 +8812,6 @@ function speakCard(btn, itemId) {
     ttsSpokenLen  = 0;
 
     btn.classList.add('speaking');
-    const bar = document.getElementById('ttsBar');
-    const title = document.getElementById('ttsBarTitle');
-    if (bar)   { bar.style.display = 'flex'; }
-    if (title) title.textContent = '🎓 ' + (questionText || 'Reading...');
-    document.getElementById('ttsPauseBtn').textContent = '⏸';
-    document.getElementById('ttsBarProgress').style.width = '0%';
 
     const playChunk = () => {
         if (ttsChunkIdx >= ttsChunks.length || ttsCurrentBtn !== btn) { ttsStop(true); return; }
@@ -8691,14 +8825,6 @@ function speakCard(btn, itemId) {
         utt.pitch  = 1.0;
         utt.volume = 1;
 
-        utt.onboundary = (e) => {
-            if (e.name !== 'word') return;
-            ttsSpokenLen += 1;
-            const done = ttsChunks.slice(0, ttsChunkIdx - 1).join(' ').length;
-            const pct = Math.min(99, ((done + e.charIndex) / ttsTotalLen) * 100);
-            const pb = document.getElementById('ttsBarProgress');
-            if (pb) pb.style.width = pct.toFixed(1) + '%';
-        };
         utt.onend = () => { if (!ttsPaused) playChunk(); };
         utt.onerror = (e) => { if (e.error !== 'interrupted') ttsStop(true); };
 
@@ -8756,12 +8882,6 @@ function ttsStop(resetBar = true) {
     ttsUtterance = null;
     ttsChunks = []; ttsChunkIdx = 0;
     if (ttsCurrentBtn) { ttsCurrentBtn.classList.remove('speaking'); ttsCurrentBtn = null; }
-    if (resetBar) {
-        const bar = document.getElementById('ttsBar');
-        if (bar) bar.style.display = 'none';
-        const pb = document.getElementById('ttsBarProgress');
-        if (pb) pb.style.width = '0%';
-    }
 }
 
 document.getElementById('syncModal').addEventListener('click', function(e) {
@@ -8791,39 +8911,7 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
     <img id="imgLightboxImg" src="" alt=""/>
 </div>
 
-<!-- ================= TTS PLAYER BAR ================= -->
-<div id="ttsBar" style="
-    display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-    background:var(--card); border:1px solid var(--border); border-radius:40px;
-    padding:10px 18px; gap:12px; align-items:center;
-    box-shadow:0 8px 32px rgba(0,0,0,0.22); z-index:9500;
-    font-size:0.8em; font-weight:600; color:var(--text);
-    min-width:260px; max-width:92vw;
-    animation: fadeInUp 0.25s ease;
-">
-    <button id="ttsPauseBtn" onclick="ttsPauseResume()"
-        style="background:var(--primary); border:none; color:white; border-radius:50%;
-               width:34px; height:34px; cursor:pointer; font-size:1em; flex-shrink:0;
-               display:flex; align-items:center; justify-content:center;">⏸</button>
 
-    <div style="flex:1; min-width:0;">
-        <div id="ttsBarTitle" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:0.85; margin-bottom:5px;"></div>
-        <div style="height:3px; background:var(--border); border-radius:10px; overflow:hidden;">
-            <div id="ttsBarProgress" style="height:100%; width:0%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:10px; transition:width 0.25s linear;"></div>
-        </div>
-    </div>
-
-    <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
-        <button onclick="ttsSpeed(0.8)"  id="ttsSpeedSlow"   style="border:1px solid var(--border); background:none; color:var(--text); border-radius:8px; padding:2px 7px; font-size:0.78em; cursor:pointer;">0.8×</button>
-        <button onclick="ttsSpeed(1)"    id="ttsSpeedNormal" style="border:1px solid var(--primary); background:var(--primary); color:white; border-radius:8px; padding:2px 7px; font-size:0.78em; cursor:pointer;">1×</button>
-        <button onclick="ttsSpeed(1.25)" id="ttsSpeedFast"   style="border:1px solid var(--border); background:none; color:var(--text); border-radius:8px; padding:2px 7px; font-size:0.78em; cursor:pointer;">1.25×</button>
-    </div>
-
-    <button onclick="ttsStop()"
-        style="background:none; border:1px solid var(--border); color:var(--text); border-radius:50%;
-               width:28px; height:28px; cursor:pointer; font-size:0.9em; flex-shrink:0;
-               display:flex; align-items:center; justify-content:center;">✕</button>
-</div>
 </body>
 <div id="bookModeIndicator">
     📚 Book Mode
