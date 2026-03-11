@@ -6607,38 +6607,53 @@ function renderWeakTopics() {
         return;
     }
 
-    // Group by topic, sum view counts
+    // Group by subtopic, count read vs total using masteryData
     const topicStats = {};
     entries.forEach(entry => {
         const topic = entry.subtopic || 'General';
-        if (!topicStats[topic]) topicStats[topic] = { views: 0, count: 0 };
-        topicStats[topic].views += (viewCounts[entry.id] || 0);
-        topicStats[topic].count++;
+        if (!topicStats[topic]) topicStats[topic] = { total: 0, read: 0, mod: entry._mod, sub: entry._sub };
+        topicStats[topic].total++;
+        if (masteryData[entry.id]) topicStats[topic].read++;
     });
 
-    // Sort by average views ascending (least viewed = weakest)
+    // Sort by unread % descending — most unread = weakest
     const sorted = Object.entries(topicStats)
-        .map(([topic, stats]) => ({ topic, avg: stats.views / stats.count, ...stats }))
-        .sort((a, b) => a.avg - b.avg);
-
-    const maxAvg = Math.max(...sorted.map(s => s.avg), 1);
+        .map(([topic, s]) => ({
+            topic,
+            total: s.total,
+            read: s.read,
+            unread: s.total - s.read,
+            readPct: s.total ? Math.round((s.read / s.total) * 100) : 0,
+            mod: s.mod,
+            sub: s.sub
+        }))
+        .sort((a, b) => a.readPct - b.readPct); // lowest read% first = weakest
 
     const list = document.getElementById('weakTopicsList');
     list.innerHTML = '';
 
     sorted.forEach((stat, i) => {
-        const pct = Math.round((stat.avg / maxAvg) * 100);
-        const heat = pct < 20 ? '#ef4444' : pct < 50 ? '#f59e0b' : '#22c55e';
+        const heat  = stat.readPct < 20 ? '#ef4444' : stat.readPct < 60 ? '#f59e0b' : '#22c55e';
         const badge = i === 0 ? ' 🔴' : i === 1 ? ' 🟠' : i === 2 ? ' 🟡' : '';
 
         const row = document.createElement('div');
         row.className = 'weak-topic-row';
+        row.style.cssText = 'display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); flex-wrap:wrap;';
         row.innerHTML = `
-            <span class="weak-topic-name">${stat.topic}${badge}</span>
-            <div class="weak-bar-wrap">
-                <div class="weak-bar" style="width:${pct}%; background:${heat};"></div>
+            <div style="min-width:130px; flex:1;">
+                <div style="font-size:0.8125em; font-weight:600;">${stat.topic}${badge}</div>
+                <div style="font-size:0.6875em; opacity:0.45; margin-top:2px;">${stat.read} / ${stat.total} read</div>
             </div>
-            <span class="weak-count">${Math.round(stat.avg * 10) / 10} views</span>
+            <div class="weak-bar-wrap" style="flex:2; min-width:80px;">
+                <div class="weak-bar" style="width:${stat.readPct}%; background:${heat}; transition:width 0.6s ease;"></div>
+            </div>
+            <span style="font-size:0.75em; font-weight:700; min-width:38px; text-align:right; color:${heat};">${stat.readPct}%</span>
+            ${stat.unread > 0 && stat.sub ? `<button onclick="closeWeakTopics(); openModule('${stat.mod}'); openSubmodule('${stat.sub}');"
+                style="font-size:0.6875em; padding:4px 10px; border-radius:6px; border:1px solid var(--primary); color:var(--primary); background:none; cursor:pointer; white-space:nowrap; transition:background 0.15s;"
+                onmouseover="this.style.background='var(--primary)';this.style.color='white'"
+                onmouseout="this.style.background='none';this.style.color='var(--primary)'">
+                Study →
+            </button>` : ''}
         `;
         list.appendChild(row);
     });
@@ -6696,38 +6711,41 @@ function getMasteryLabel(entryId) {
 
 // =============================================
 // AUTO-READ TIMER (word-count based, IntersectionObserver)
+// Elapsed time is preserved across re-renders (search, edit, save)
 // =============================================
 let _readObserver = null;
-const _readTimers = {};      // entryId → { timeout, startedAt, dwellMs }
-const WPM = 200;             // average reading speed
-const MIN_READ_MS = 5000;    // minimum 5s even for very short entries
+const _readTimers  = {};   // entryId → { timeout, visibleSince }  (active timers)
+const _readElapsed = {};   // entryId → ms already spent reading    (survives re-renders)
+const _readTotal   = {};   // entryId → total ms needed             (cached word-count)
+const WPM = 200;
+const MIN_READ_MS = 5000;
 
 function _calcReadTime(card) {
-    const text = (card.querySelector('.answer-body') || card).innerText || '';
+    const text  = (card.querySelector('.answer-body') || card).innerText || '';
     const title = (card.querySelector('h2') || {}).innerText || '';
     const words = (text + ' ' + title).trim().split(/\s+/).filter(Boolean).length;
-    const ms = Math.max(MIN_READ_MS, Math.round((words / WPM) * 60 * 1000));
-    return ms;
+    return Math.max(MIN_READ_MS, Math.round((words / WPM) * 60 * 1000));
 }
 
 function attachReadTimers() {
-    if (_readObserver) { _readObserver.disconnect(); _readObserver = null; }
-    Object.values(_readTimers).forEach(t => clearTimeout(t.timeout));
-    Object.keys(_readTimers).forEach(k => delete _readTimers[k]);
+    // Pause all active timers and bank their elapsed time — DON'T wipe _readElapsed/_readTotal
+    if (_readObserver) _readObserver.disconnect();
+    _readObserver = null;
+    Object.keys(_readTimers).forEach(id => _pauseReadTimer(id));
 
     const scrollRoot = document.querySelector('.content-area') || null;
 
     _readObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            const card = entry.target;
+            const card    = entry.target;
             const entryId = card.dataset.entryId;
             if (!entryId) return;
-            if (masteryData[entryId]) { _stopReadTimer(entryId); return; }
+            if (masteryData[entryId]) { _pauseReadTimer(entryId); return; }
 
             if (entry.isIntersecting) {
                 _startReadTimer(entryId, card);
             } else {
-                _stopReadTimer(entryId);
+                _pauseReadTimer(entryId);
             }
         });
     }, { root: scrollRoot, threshold: 0.5 });
@@ -6738,19 +6756,32 @@ function attachReadTimers() {
 }
 
 function _startReadTimer(entryId, card) {
-    if (_readTimers[entryId]) return;
-    const dwellMs = _calcReadTime(card);
+    if (_readTimers[entryId]) return; // already running
+
+    // Cache total time needed once per entry
+    if (!_readTotal[entryId]) _readTotal[entryId] = _calcReadTime(card);
+    const elapsed   = _readElapsed[entryId] || 0;
+    const remaining = _readTotal[entryId] - elapsed;
+
+    if (remaining <= 0) { _markAsRead(entryId, card); return; }
+
+    const visibleSince = Date.now();
     const timeout = setTimeout(() => {
         delete _readTimers[entryId];
+        _readElapsed[entryId] = _readTotal[entryId]; // fully done
         _markAsRead(entryId, card);
-    }, dwellMs);
-    _readTimers[entryId] = { timeout, dwellMs };
+    }, remaining);
+
+    _readTimers[entryId] = { timeout, visibleSince };
 }
 
-function _stopReadTimer(entryId) {
+// Pause: bank how long the entry was visible this session, clear the timeout
+function _pauseReadTimer(entryId) {
     const t = _readTimers[entryId];
     if (!t) return;
     clearTimeout(t.timeout);
+    const spent = Date.now() - t.visibleSince;
+    _readElapsed[entryId] = (_readElapsed[entryId] || 0) + spent;
     delete _readTimers[entryId];
 }
 
@@ -7519,13 +7550,12 @@ Resume
 <div id="weakTopicsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10002; align-items:center; justify-content:center; padding:20px; overflow-y:auto;">
 <div class="weak-topics-box">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h3 style="margin:0;">📊 Weak Topic Detection</h3>
+        <h3 style="margin:0;">📊 Weak Topics</h3>
         <button class="btn btn-outline" onclick="closeWeakTopics()" style="padding:4px 10px;">✕</button>
     </div>
-    <p style="opacity:0.6; font-size: 0.8125em; margin-bottom:16px;">Topics ranked by how rarely their entries have been viewed.</p>
+    <p style="opacity:0.6; font-size: 0.8125em; margin-bottom:16px;">Topics ranked by % unread — least read entries appear first. Click <b>Study →</b> to go there directly.</p>
     <div id="weakTopicsList"></div>
-    <div style="margin-top:16px; display:flex; gap:8px;">
-        <button class="btn btn-outline" style="flex:1; font-size: 0.75em;" onclick="resetViewCounts()">🗑 Reset Tracking</button>
+    <div style="margin-top:16px; text-align:right;">
         <button class="btn btn-outline" onclick="closeWeakTopics()" style="padding:6px 16px;">Close</button>
     </div>
 </div>
