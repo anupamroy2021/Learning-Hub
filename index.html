@@ -1891,6 +1891,13 @@ to{transform:translateY(0);}
     </style>
 </head>
 <body class="dark">
+<script>
+// Restore theme before paint to avoid flash
+(function(){
+    const t = localStorage.getItem('lh_theme');
+    if (t === 'light') document.body.classList.remove('dark');
+})();
+</script>
 
 <!-- ===== WELCOME SPLASH ===== -->
 <div id="welcomeSplash">
@@ -2327,6 +2334,12 @@ font-size: 0.875em;
             <button class="btn edit-action"
                 onclick="addSubmodule()">+ Create Submodule</button>
 
+            <button class="btn btn-outline edit-action"
+                onclick="renameCurrentModule()"
+                style="font-size:0.8em;">
+                ✏️ Rename
+            </button>
+
             <button class="edit-action" onclick="deleteCurrentModule()"
                 style="background:none;
                 border:1px solid var(--danger);
@@ -2434,6 +2447,19 @@ font-size: 0.875em;
     <!-- RIGHT SIDE (FIXED ORDER) -->
     <div style="display:flex; align-items:center; gap:8px;">
 
+        <button class="btn btn-outline"
+            onclick="openProgressModal()"
+            style="font-size:0.75em;"
+            title="View Progress">
+            📊
+        </button>
+
+        <button class="btn btn-outline edit-action"
+            onclick="renameCurrentSubmodule()"
+            style="font-size:0.75em;">
+            ✏️ Rename
+        </button>
+
         <button class="edit-action" onclick="deleteCurrentSubmodule()"
             style="background:none;
             border:1px solid var(--danger);
@@ -2468,7 +2494,7 @@ font-size: 0.875em;
 
 					<input id="search"
 					placeholder="🔍 Search entries...  ( Press / to focus )"
-					oninput="renderQuestions()"
+					oninput="debouncedRenderQuestions()"
 					style="padding-right:95px;">
 
 					<span id="matchCounter"
@@ -2564,7 +2590,7 @@ font-size: 0.875em;
 	let isDeleteMode = false;
     let selectedBooks = new Set();
 	let isModuleLocked = true;
-	let moduleSort = 'default';
+	let moduleSort = localStorage.getItem('lh_module_sort') || 'default';
 	let moduleSortable = null;
     let submoduleSortable = null;
     let lastReadingState = JSON.parse(localStorage.getItem("learninghub_last_state")) || null;
@@ -2575,6 +2601,12 @@ font-size: 0.875em;
 
     // Auto-sync: debounced push so rapid saves don't spam the API
     let autoSyncTimer = null;
+    // Debounce helper for search inputs
+    let _searchDebounceTimer = null;
+    function debouncedRenderQuestions() {
+        clearTimeout(_searchDebounceTimer);
+        _searchDebounceTimer = setTimeout(() => renderQuestions(), 180);
+    }
     function scheduleAutoSync() {
         if (autoSyncTimer) clearTimeout(autoSyncTimer);
         autoSyncTimer = setTimeout(async () => {
@@ -3954,6 +3986,12 @@ function openSubmodule(name) {
 
 			document.getElementById('scrollBtnGroup').style.display = 'flex';
 
+			// Remove any previously attached listeners before adding new ones
+			if (area._scrollUIHandler) area.removeEventListener('scroll', area._scrollUIHandler);
+			if (area._scrollUIWheel) area.removeEventListener('wheel', area._scrollUIWheel);
+			if (area._scrollUITouch) area.removeEventListener('touchmove', area._scrollUITouch);
+			if (area._syncSidebarHandler) area.removeEventListener('scroll', area._syncSidebarHandler);
+
 			function updateScrollUI() {
 				if (scrollAnim) { cancelAnimationFrame(scrollAnim); scrollAnim = null; }
 				mapIndexWithScroll();
@@ -3966,17 +4004,22 @@ function openSubmodule(name) {
 				document.getElementById('scrollDownBtn').classList.toggle('active', scrollTop < maxScroll - 50);
 			}
 
-			area.addEventListener('scroll', updateScrollUI);
-			area.addEventListener('wheel', updateScrollUI);
-			area.addEventListener('touchmove', updateScrollUI);
+			area._scrollUIHandler = updateScrollUI;
+			area._scrollUIWheel = updateScrollUI;
+			area._scrollUITouch = updateScrollUI;
+			area.addEventListener('scroll', area._scrollUIHandler);
+			area.addEventListener('wheel', area._scrollUIWheel);
+			area.addEventListener('touchmove', area._scrollUITouch);
+
 			// Sync sidebar scroll proportionally with content area
-area.addEventListener('scroll', () => {
-    const sidebar = document.getElementById('sidebar');
-    if (!sidebar || sidebar.classList.contains('collapsed')) return;
-    const contentPct = area.scrollTop / (area.scrollHeight - area.clientHeight);
-    const sidebarMax = sidebar.scrollHeight - sidebar.clientHeight;
-    sidebar.scrollTop = contentPct * sidebarMax;
-});
+			area._syncSidebarHandler = () => {
+				const sidebar = document.getElementById('sidebar');
+				if (!sidebar || sidebar.classList.contains('collapsed')) return;
+				const contentPct = area.scrollTop / (area.scrollHeight - area.clientHeight);
+				const sidebarMax = sidebar.scrollHeight - sidebar.clientHeight;
+				sidebar.scrollTop = contentPct * sidebarMax;
+			};
+			area.addEventListener('scroll', area._syncSidebarHandler);
 			updateScrollUI();
 		}
 
@@ -4086,6 +4129,8 @@ area.addEventListener('scroll', () => {
 
     function scrollToQuestion(id) {
         showListView();
+        // Track view when user explicitly navigates to an entry
+        trackView(id);
 
         // ⭐ FIX: If search is active, clear it first so all entries are rendered
         const searchInput = document.getElementById('search');
@@ -4127,6 +4172,18 @@ area.addEventListener('scroll', () => {
             const searchStr = (item.q + (item.subtopic || "") + item.a).toLowerCase();
             return searchStr.includes(term);
         });
+
+        if (filteredItems.length === 0) {
+            const allCount = data[currentModule][currentSubmodule].length;
+            box.innerHTML = `
+                <div style="text-align:center; padding:60px 20px; opacity:0.55;">
+                    <div style="font-size:3rem; margin-bottom:16px;">${allCount === 0 ? '📝' : '🔍'}</div>
+                    <div style="font-size:1.1em; font-weight:700; margin-bottom:8px;">${allCount === 0 ? 'No entries yet' : 'No results found'}</div>
+                    <div style="font-size:0.85em; opacity:0.7;">${allCount === 0 ? 'Press <strong>+ New Entry</strong> to add your first note' : 'Try a different search term'}</div>
+                </div>`;
+            updateMatchCounter();
+            return;
+        }
         
         const grouped = {};
         const topicOrder = [];
@@ -4154,8 +4211,6 @@ area.addEventListener('scroll', () => {
 				if(term){
 					searchMatches.push(card.id);
 				}
-				// Track view for weak topic detection
-				trackView(item.id);
 				card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                         <span style="color:var(--accent); font-size: 0.75em; font-weight:700;">${highlightText(item.subtopic || 'General', term)}</span>
@@ -4313,7 +4368,10 @@ if(sub){
 }
         const a = document.getElementById('aInput').value.trim();
         
-        if (!q || !a) return alert("Required fields missing");
+        if (!q || !a) {
+            openCustomConfirm({ title: '⚠️ Missing Fields', message: 'Question and Answer fields are required.', confirmText: 'OK', danger: false, onConfirm: () => {} });
+            return;
+        }
 
         let targetId;
 
@@ -4323,6 +4381,22 @@ if(sub){
             data[currentModule][currentSubmodule][idx] = { id: editId, q, subtopic: sub, a };
             targetId = editId;
         } else {
+            // Check for duplicate question
+            const duplicate = data[currentModule][currentSubmodule].find(i => i.q.trim().toLowerCase() === q.toLowerCase());
+            if (duplicate) {
+                openCustomConfirm({
+                    title: '⚠️ Duplicate Entry',
+                    message: `A question with this text already exists in "${currentSubmodule}". Save anyway?`,
+                    confirmText: 'Save Anyway',
+                    danger: false,
+                    onConfirm: () => {
+                        const newId = Date.now();
+                        data[currentModule][currentSubmodule].push({ id: newId, q, subtopic: sub, a });
+                        save(); renderSidebarIndex(); renderQuestions(); showListView(); scrollToQuestion(newId);
+                    }
+                });
+                return;
+            }
             // Creating a new entry
             targetId = Date.now();
             data[currentModule][currentSubmodule].push({ id: targetId, q, subtopic: sub, a });
@@ -4403,6 +4477,54 @@ if(sub){
         });
     }
 
+    function renameCurrentModule() {
+        if(isReadOnlyMode){ showReadModeToast("Reading Mode Enabled"); return; }
+        openCustomPrompt({
+            title: '✏️ Rename Module',
+            placeholder: currentModule,
+            confirmText: 'Rename',
+            onConfirm: (newName) => {
+                newName = newName.trim();
+                if (!newName || newName === currentModule) return;
+                if (data[newName]) { showReadModeToast('A module with that name already exists!'); return; }
+                // Rebuild data preserving order
+                const newData = {};
+                Object.keys(data).forEach(k => {
+                    newData[k === currentModule ? newName : k] = data[k];
+                });
+                data = newData;
+                currentModule = newName;
+                document.getElementById('currentModuleTitle').textContent = newName;
+                save();
+                showReadModeToast('✅ Module renamed!');
+            }
+        });
+    }
+
+    function renameCurrentSubmodule() {
+        if(isReadOnlyMode){ showReadModeToast("Reading Mode Enabled"); return; }
+        openCustomPrompt({
+            title: '✏️ Rename Submodule',
+            placeholder: currentSubmodule,
+            confirmText: 'Rename',
+            onConfirm: (newName) => {
+                newName = newName.trim();
+                if (!newName || newName === currentSubmodule) return;
+                if (data[currentModule][newName]) { showReadModeToast('A submodule with that name already exists!'); return; }
+                const newSubs = {};
+                Object.keys(data[currentModule]).forEach(k => {
+                    newSubs[k === currentSubmodule ? newName : k] = data[currentModule][k];
+                });
+                data[currentModule] = newSubs;
+                currentSubmodule = newName;
+                document.getElementById('currentSubmoduleTitle').textContent = newName;
+                save();
+                renderSidebarIndex();
+                showReadModeToast('✅ Submodule renamed!');
+            }
+        });
+    }
+
     function updatePreview() { 
         document.getElementById('livePreview').innerHTML = marked.parse(document.getElementById('aInput').value); 
         Prism.highlightAll();
@@ -4411,6 +4533,7 @@ if(sub){
     function toggleTheme() { 
         const body = document.body;
         body.classList.toggle('dark'); 
+        localStorage.setItem('lh_theme', body.classList.contains('dark') ? 'dark' : 'light');
         const prismLink = document.getElementById('prism-theme');
         prismLink.href = body.classList.contains('dark') ? 
             "https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-one-dark.min.css" : 
@@ -4489,6 +4612,7 @@ if(sub){
 
   function setModuleSort(order) {
     moduleSort = order;
+    localStorage.setItem('lh_module_sort', order);
     ['default','asc','desc'].forEach(o => {
         const btn = document.getElementById('sortBtn-' + o);
         if (!btn) return;
@@ -4605,6 +4729,16 @@ if(sub){
     let moduleKeys = Object.keys(data);
     if (moduleSort === 'asc') moduleKeys = moduleKeys.slice().sort((a, b) => a.localeCompare(b));
     else if (moduleSort === 'desc') moduleKeys = moduleKeys.slice().sort((a, b) => b.localeCompare(a));
+
+    if (moduleKeys.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:80px 20px; opacity:0.5;">
+                <div style="font-size:3.5rem; margin-bottom:16px;">🧠</div>
+                <div style="font-size:1.2em; font-weight:800; margin-bottom:8px;">Your knowledge base is empty</div>
+                <div style="font-size:0.875em; opacity:0.7;">Click <strong>+ Create Module</strong> to start building your Learning Hub</div>
+            </div>`;
+        return;
+    }
 
     moduleKeys.forEach((m, idx) => {
 
@@ -4935,7 +5069,18 @@ function initModuleSortable(){
 
     if (!currentModule || !data[currentModule]) return;
 
-    Object.keys(data[currentModule]).forEach((s, idx) => {
+    const subKeys = Object.keys(data[currentModule]);
+    if (subKeys.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:60px 20px; opacity:0.55;">
+                <div style="font-size:3rem; margin-bottom:16px;">📂</div>
+                <div style="font-size:1.1em; font-weight:700; margin-bottom:8px;">No submodules yet</div>
+                <div style="font-size:0.85em; opacity:0.7;">Press <strong>+ Create Submodule</strong> to get started</div>
+            </div>`;
+        return;
+    }
+
+    subKeys.forEach((s, idx) => {
 
         const card = document.createElement('div');
         card.className = "module-card";
@@ -4945,6 +5090,10 @@ function initModuleSortable(){
         const gradient = SUBMODULE_GRADIENTS[idx % SUBMODULE_GRADIENTS.length];
         const icon = getTitleIcon(s);
 
+        const masteredCount = data[currentModule][s].filter(e => masteryData[e.id] === 'mastered').length;
+        const learningCount = data[currentModule][s].filter(e => masteryData[e.id] === 'learning').length;
+        const mastPct = itemCount ? Math.round((masteredCount / itemCount) * 100) : 0;
+
         card.innerHTML = `
         <div class="module-card-banner" style="background: ${gradient};">
             <div class="module-card-icon">${icon}</div>
@@ -4953,7 +5102,11 @@ function initModuleSortable(){
         <div class="module-card-body">
             <div class="module-card-meta">
                 <span class="module-card-badge">📝 ${itemCount} items</span>
+                ${mastPct > 0 ? `<span class="module-card-badge" style="color:#22c55e;">✅ ${mastPct}%</span>` : ''}
             </div>
+            ${itemCount > 0 ? `<div style="margin-top:8px; height:4px; background:var(--border); border-radius:4px; overflow:hidden;">
+                <div style="height:100%; width:${mastPct}%; background:linear-gradient(90deg,#22c55e,#16a34a); border-radius:4px; transition:width 0.5s;"></div>
+            </div>` : ''}
         </div>`;
 
         card.onclick = () => openSubmodule(s);
@@ -6114,7 +6267,21 @@ function toggleQotdAnswer() {
 function refreshQotd() {
     const entries = getAllEntries();
     if (entries.length === 0) return;
-    const entry = entries[Math.floor(Math.random() * entries.length)];
+
+    // Avoid repeating recently seen questions (track last seen IDs)
+    let seenIds = JSON.parse(localStorage.getItem('lh_qotd_seen') || '[]');
+    let unseen = entries.filter(e => !seenIds.includes(String(e.id)));
+    // If all entries have been seen, reset history
+    if (unseen.length === 0) {
+        seenIds = [];
+        unseen = entries;
+        localStorage.setItem('lh_qotd_seen', '[]');
+    }
+    const entry = unseen[Math.floor(Math.random() * unseen.length)];
+    seenIds.push(String(entry.id));
+    // Keep history capped at total entries to allow full cycle
+    localStorage.setItem('lh_qotd_seen', JSON.stringify(seenIds.slice(-entries.length)));
+
     localStorage.setItem('lh_qotd_id', String(entry.id));
     localStorage.setItem('lh_qotd_date', new Date().toDateString());
     qotdEntry = entry;
@@ -6654,6 +6821,22 @@ function renderProgressModal() {
 	}, 1800);
 
 	showDashboard();
+	// Restore sort button active state from saved preference
+	if (moduleSort !== 'default') {
+		['default','asc','desc'].forEach(o => {
+			const btn = document.getElementById('sortBtn-' + o);
+			if (!btn) return;
+			btn.style.background = (o === moduleSort) ? 'var(--primary)' : 'none';
+			btn.style.color = (o === moduleSort) ? 'white' : 'var(--text)';
+		});
+	}
+	// Apply saved Prism theme on load
+	(function(){
+		const prismLink = document.getElementById('prism-theme');
+		if (prismLink && !document.body.classList.contains('dark')) {
+			prismLink.href = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
+		}
+	})();
 	// Stagger card animations on dashboard render
 	function staggerCards(selector) {
 		document.querySelectorAll(selector).forEach((el, i) => {
@@ -7338,6 +7521,9 @@ async function pushToCloud(silent = false) {
         ebook_data    : ebooks,
         video_data    : videos,
         last_state    : JSON.parse(localStorage.getItem('learninghub_last_state') || 'null'),
+        mastery_data  : JSON.parse(localStorage.getItem('lh_mastery') || '{}'),
+        streak_data   : JSON.parse(localStorage.getItem('lh_streak') || '{"dates":[],"best":0}'),
+        view_counts   : JSON.parse(localStorage.getItem('lh_view_counts') || '{}'),
         pushed_at     : new Date().toISOString()
     }, null, 2);
 
@@ -7394,8 +7580,9 @@ async function pushToCloud(silent = false) {
         if (!silent) {
             showSyncStatus('✅ Push successful! Data synced to cloud at ' + new Date().toLocaleTimeString(), 'success');
             showReadModeToast('☁️ Pushed to cloud!');
+        } else {
+            showReadModeToast('☁️ Auto-synced to cloud ✅');
         }
-        // Silent auto-sync: no toast, runs in background without interrupting the user
 
     } catch (e) {
         if (!silent) showSyncStatus('❌ Push failed: ' + e.message + '<br><small>Check your token and network connection.</small>', 'error');
@@ -7466,6 +7653,18 @@ async function pullFromCloud() {
         if (parsed.last_state) {
             localStorage.setItem('learninghub_last_state', JSON.stringify(parsed.last_state));
         }
+        if (parsed.mastery_data) {
+            masteryData = parsed.mastery_data;
+            localStorage.setItem('lh_mastery', JSON.stringify(masteryData));
+        }
+        if (parsed.streak_data) {
+            streakData = parsed.streak_data;
+            localStorage.setItem('lh_streak', JSON.stringify(streakData));
+        }
+        if (parsed.view_counts) {
+            viewCounts = parsed.view_counts;
+            localStorage.setItem('lh_view_counts', JSON.stringify(viewCounts));
+        }
 
         localStorage.setItem(SYNC_LAST_KEY, Date.now().toString());
 
@@ -7501,6 +7700,7 @@ window.addEventListener('DOMContentLoaded', function() {
         const gistId = localStorage.getItem(SYNC_GIST_KEY);
         if (token && gistId) {
             setTimeout(async () => {
+                showReadModeToast('☁️ Auto-syncing from cloud...');
                 await pullFromCloud();
             }, 1500);
         }
@@ -7530,6 +7730,7 @@ setInterval(async () => {
 
         // Only pull if cloud is newer than our last sync
         if (cloudUpdatedAt > lastPulled) {
+            showReadModeToast('☁️ New data found, syncing...');
             await pullFromCloud();
         }
     } catch(e) {
