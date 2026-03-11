@@ -4207,6 +4207,8 @@ function openSubmodule(name) {
                 const card = document.createElement('div');
                 card.className = "card"; 
 				card.id = "q-" + item.id;
+                card.dataset.entryId = item.id;
+                card.style.position = 'relative';
 
 				if(term){
 					searchMatches.push(card.id);
@@ -4244,6 +4246,9 @@ function openSubmodule(name) {
 		lucide.createIcons();
 		setTimeout(mapIndexWithScroll, 100);
 		updateMatchCounter();
+
+        // ── Auto-read: IntersectionObserver (30s dwell) ──
+        attachReadTimers();
     }
 	function clearSubmoduleSearch(){
 
@@ -5092,7 +5097,8 @@ function initModuleSortable(){
 
         const masteredCount = data[currentModule][s].filter(e => masteryData[e.id] === 'mastered').length;
         const learningCount = data[currentModule][s].filter(e => masteryData[e.id] === 'learning').length;
-        const mastPct = itemCount ? Math.round((masteredCount / itemCount) * 100) : 0;
+        const readCount = masteredCount + learningCount;
+        const mastPct = itemCount ? Math.round((readCount / itemCount) * 100) : 0;
 
         card.innerHTML = `
         <div class="module-card-banner" style="background: ${gradient};">
@@ -5102,10 +5108,10 @@ function initModuleSortable(){
         <div class="module-card-body">
             <div class="module-card-meta">
                 <span class="module-card-badge">📝 ${itemCount} items</span>
-                ${mastPct > 0 ? `<span class="module-card-badge" style="color:#22c55e;">✅ ${mastPct}%</span>` : ''}
+                <span class="module-card-badge submodule-pct-badge" data-submodule-badge="${s}" style="color:#22c55e;${mastPct > 0 ? '' : 'display:none'}">👁 ${mastPct}%</span>
             </div>
             ${itemCount > 0 ? `<div style="margin-top:8px; height:4px; background:var(--border); border-radius:4px; overflow:hidden;">
-                <div style="height:100%; width:${mastPct}%; background:linear-gradient(90deg,#22c55e,#16a34a); border-radius:4px; transition:width 0.5s;"></div>
+                <div class="submodule-progress-bar" data-submodule-bar="${s}" style="height:100%; width:${mastPct}%; background:linear-gradient(90deg,#22c55e,#16a34a); border-radius:4px; transition:width 0.5s;"></div>
             </div>` : ''}
         </div>`;
 
@@ -6662,12 +6668,98 @@ function cycleMastery(entryId) {
     else                delete masteryData[entryId];
     saveMastery();
     renderQuestions();
-    // Refresh module cards if on dashboard
+    if (currentModule && currentSubmodule) updateSubmoduleCardProgress(currentSubmodule);
     if (document.getElementById('dashboardView').style.display !== 'none') renderDashboard();
+}
+
+// Live-update the progress bar & badge on a submodule card without re-rendering the whole grid
+function updateSubmoduleCardProgress(subName) {
+    if (!currentModule || !data[currentModule] || !data[currentModule][subName]) return;
+    const items = data[currentModule][subName];
+    const total = items.length;
+    const read  = items.filter(e => masteryData[e.id]).length; // learning + mastered = read
+    const pct   = total ? Math.round((read / total) * 100) : 0;
+
+    const bar   = document.querySelector(`.submodule-progress-bar[data-submodule-bar="${subName}"]`);
+    const badge = document.querySelector(`.submodule-pct-badge[data-submodule-badge="${subName}"]`);
+
+    if (bar)   bar.style.width = pct + '%';
+    if (badge) {
+        badge.textContent = `👁 ${pct}%`;
+        badge.style.display = pct > 0 ? '' : 'none';
+    }
 }
 
 function getMasteryLabel(entryId) {
     return masteryData[entryId] || 'new';
+}
+
+// =============================================
+// AUTO-READ TIMER (word-count based, IntersectionObserver)
+// =============================================
+let _readObserver = null;
+const _readTimers = {};      // entryId → { timeout, startedAt, dwellMs }
+const WPM = 200;             // average reading speed
+const MIN_READ_MS = 5000;    // minimum 5s even for very short entries
+
+function _calcReadTime(card) {
+    const text = (card.querySelector('.answer-body') || card).innerText || '';
+    const title = (card.querySelector('h2') || {}).innerText || '';
+    const words = (text + ' ' + title).trim().split(/\s+/).filter(Boolean).length;
+    const ms = Math.max(MIN_READ_MS, Math.round((words / WPM) * 60 * 1000));
+    return ms;
+}
+
+function attachReadTimers() {
+    if (_readObserver) { _readObserver.disconnect(); _readObserver = null; }
+    Object.values(_readTimers).forEach(t => clearTimeout(t.timeout));
+    Object.keys(_readTimers).forEach(k => delete _readTimers[k]);
+
+    const scrollRoot = document.querySelector('.content-area') || null;
+
+    _readObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const card = entry.target;
+            const entryId = card.dataset.entryId;
+            if (!entryId) return;
+            if (masteryData[entryId]) { _stopReadTimer(entryId); return; }
+
+            if (entry.isIntersecting) {
+                _startReadTimer(entryId, card);
+            } else {
+                _stopReadTimer(entryId);
+            }
+        });
+    }, { root: scrollRoot, threshold: 0.5 });
+
+    document.querySelectorAll('#questionsBox .card[data-entry-id]').forEach(card => {
+        _readObserver.observe(card);
+    });
+}
+
+function _startReadTimer(entryId, card) {
+    if (_readTimers[entryId]) return;
+    const dwellMs = _calcReadTime(card);
+    const timeout = setTimeout(() => {
+        delete _readTimers[entryId];
+        _markAsRead(entryId, card);
+    }, dwellMs);
+    _readTimers[entryId] = { timeout, dwellMs };
+}
+
+function _stopReadTimer(entryId) {
+    const t = _readTimers[entryId];
+    if (!t) return;
+    clearTimeout(t.timeout);
+    delete _readTimers[entryId];
+}
+
+function _markAsRead(entryId, card) {
+    if (masteryData[entryId]) return;
+    masteryData[entryId] = 'learning';
+    saveMastery();
+    if (currentModule && currentSubmodule) updateSubmoduleCardProgress(currentSubmodule);
+    if (_readObserver) _readObserver.unobserve(card);
 }
 
 // =============================================
@@ -6752,65 +6844,141 @@ function closeProgressModal() {
 }
 
 function renderProgressModal() {
-    const allEntries = getAllEntries();
-    const total = allEntries.length;
-    const mastered = allEntries.filter(e => masteryData[e.id] === 'mastered').length;
-    const learning = allEntries.filter(e => masteryData[e.id] === 'learning').length;
-    const newCount = total - mastered - learning;
-    const pct = total ? Math.round((mastered / total) * 100) : 0;
+    // --- Determine scope ---
+    const inSubmodule = currentModule && currentSubmodule;
+    const inModule    = currentModule && !currentSubmodule;
+
+    let scopeEntries, scopeLabel, breakdownTitle, breakdownRows = '';
+
+    if (inSubmodule) {
+        // Show only this submodule's entries
+        scopeEntries = (data[currentModule][currentSubmodule] || []);
+        scopeLabel   = `${currentModule}  ›  ${currentSubmodule}`;
+        breakdownTitle = null; // no extra breakdown needed
+    } else if (inModule) {
+        // Show all submodules of this module
+        scopeEntries = [];
+        Object.values(data[currentModule]).forEach(arr => scopeEntries.push(...arr));
+        scopeLabel = currentModule;
+        breakdownTitle = 'By Submodule';
+    } else {
+        // Dashboard: show everything
+        scopeEntries = getAllEntries();
+        scopeLabel   = 'All Modules';
+        breakdownTitle = 'By Module';
+    }
+
+    const total    = scopeEntries.length;
+    const read     = scopeEntries.filter(e => masteryData[e.id]).length;
+    const pct      = total ? Math.round((read / total) * 100) : 0;
+
+    // Title
+    document.querySelector('#progressModal .progress-box h3').innerHTML =
+        `📊 Progress <span style="font-size:0.6em; font-weight:500; opacity:0.55; margin-left:6px;">${scopeLabel}</span>`;
 
     // Summary cards
     document.getElementById('progressSummary').innerHTML = `
-        <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
-            <div style="font-size: 1.375em; font-weight:800; color:#22c55e;">${mastered}</div>
-            <div style="font-size: 0.6875em; opacity:0.6; margin-top:2px;">Mastered</div>
+        <div style="flex:1; min-width:120px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
+            <div style="font-size: 1.375em; font-weight:800; color:#22c55e;">${read}</div>
+            <div style="font-size: 0.6875em; opacity:0.6; margin-top:2px;">Read</div>
         </div>
-        <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
-            <div style="font-size: 1.375em; font-weight:800; color:#3b82f6;">${learning}</div>
-            <div style="font-size: 0.6875em; opacity:0.6; margin-top:2px;">Learning</div>
+        <div style="flex:1; min-width:120px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
+            <div style="font-size: 1.375em; font-weight:800; color:var(--text);">${total - read}</div>
+            <div style="font-size: 0.6875em; opacity:0.6; margin-top:2px;">Not Read</div>
         </div>
-        <div style="flex:1; min-width:100px; background:var(--bg); border-radius:12px; padding:12px 16px; border:1px solid var(--border); text-align:center;">
-            <div style="font-size: 1.375em; font-weight:800; color:var(--text);">${newCount}</div>
-            <div style="font-size: 0.6875em; opacity:0.6; margin-top:2px;">Not Started</div>
-        </div>
-        <div style="flex:1; min-width:100px; background: linear-gradient(135deg,var(--primary),var(--accent)); border-radius:12px; padding:12px 16px; text-align:center;">
+        <div style="flex:1; min-width:120px; background: linear-gradient(135deg,var(--primary),var(--accent)); border-radius:12px; padding:12px 16px; text-align:center;">
             <div style="font-size: 1.375em; font-weight:800; color:white;">${pct}%</div>
-            <div style="font-size: 0.6875em; color:rgba(255,255,255,0.75); margin-top:2px;">Overall</div>
+            <div style="font-size: 0.6875em; color:rgba(255,255,255,0.75); margin-top:2px;">Completed</div>
         </div>
     `;
 
-    // Per-module breakdown
+    // Breakdown list
     const list = document.getElementById('progressModuleList');
+    const titleEl = document.getElementById('progressBreakdownTitle');
     list.innerHTML = '';
-    Object.keys(data).forEach(mod => {
-        const modEntries = [];
-        Object.values(data[mod]).forEach(arr => modEntries.push(...arr));
-        if (!modEntries.length) return;
 
-        const mMastered = modEntries.filter(e => masteryData[e.id] === 'mastered').length;
-        const mLearning = modEntries.filter(e => masteryData[e.id] === 'learning').length;
-        const mTotal = modEntries.length;
-        const mPct = Math.round((mMastered / mTotal) * 100);
-
-        const row = document.createElement('div');
-        row.className = 'progress-module-row';
-        row.innerHTML = `
-            <div class="progress-module-name">
-                <span>${mod}</span>
-                <span style="font-size: 0.75em; color:var(--primary); font-weight:800;">${mPct}%</span>
-            </div>
-            <div class="progress-bar-track">
-                <div class="progress-bar-fill" style="width:${mPct}%"></div>
-            </div>
-            <div class="progress-stats">
-                <span>✅ ${mMastered} mastered</span>
-                <span>📘 ${mLearning} learning</span>
-                <span>⬜ ${mTotal - mMastered - mLearning} not started</span>
-                <span style="margin-left:auto;">${mTotal} total entries</span>
-            </div>
-        `;
-        list.appendChild(row);
-    });
+    if (inSubmodule) {
+        // Group by subtopic inside the submodule
+        if (titleEl) titleEl.textContent = 'By Subtopic';
+        const groups = {};
+        scopeEntries.forEach(e => {
+            const t = e.subtopic || 'General';
+            if (!groups[t]) groups[t] = [];
+            groups[t].push(e);
+        });
+        Object.entries(groups).forEach(([topic, items]) => {
+            const gRead  = items.filter(e => masteryData[e.id]).length;
+            const gTotal = items.length;
+            const gPct   = gTotal ? Math.round((gRead / gTotal) * 100) : 0;
+            const row = document.createElement('div');
+            row.className = 'progress-module-row';
+            row.innerHTML = `
+                <div class="progress-module-name">
+                    <span>${topic}</span>
+                    <span style="font-size: 0.75em; color:var(--primary); font-weight:800;">${gPct}%</span>
+                </div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" style="width:${gPct}%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span>👁 ${gRead} read</span>
+                    <span>⬜ ${gTotal - gRead} not read</span>
+                    <span style="margin-left:auto;">${gTotal} total</span>
+                </div>`;
+            list.appendChild(row);
+        });
+    } else if (inModule) {
+        if (titleEl) titleEl.textContent = 'By Submodule';
+        Object.keys(data[currentModule]).forEach(sub => {
+            const items  = data[currentModule][sub] || [];
+            if (!items.length) return;
+            const sRead  = items.filter(e => masteryData[e.id]).length;
+            const sTotal = items.length;
+            const sPct   = Math.round((sRead / sTotal) * 100);
+            const row = document.createElement('div');
+            row.className = 'progress-module-row';
+            row.innerHTML = `
+                <div class="progress-module-name">
+                    <span>${sub}</span>
+                    <span style="font-size: 0.75em; color:var(--primary); font-weight:800;">${sPct}%</span>
+                </div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" style="width:${sPct}%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span>👁 ${sRead} read</span>
+                    <span>⬜ ${sTotal - sRead} not read</span>
+                    <span style="margin-left:auto;">${sTotal} total entries</span>
+                </div>`;
+            list.appendChild(row);
+        });
+    } else {
+        if (titleEl) titleEl.textContent = 'By Module';
+        Object.keys(data).forEach(mod => {
+            const modEntries = [];
+            Object.values(data[mod]).forEach(arr => modEntries.push(...arr));
+            if (!modEntries.length) return;
+            const mRead  = modEntries.filter(e => masteryData[e.id]).length;
+            const mTotal = modEntries.length;
+            const mPct   = Math.round((mRead / mTotal) * 100);
+            const row = document.createElement('div');
+            row.className = 'progress-module-row';
+            row.innerHTML = `
+                <div class="progress-module-name">
+                    <span>${mod}</span>
+                    <span style="font-size: 0.75em; color:var(--primary); font-weight:800;">${mPct}%</span>
+                </div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" style="width:${mPct}%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span>👁 ${mRead} read</span>
+                    <span>⬜ ${mTotal - mRead} not read</span>
+                    <span style="margin-left:auto;">${mTotal} total entries</span>
+                </div>`;
+            list.appendChild(row);
+        });
+    }
 }
 
 	// Welcome splash
@@ -7590,7 +7758,7 @@ async function pushToCloud(silent = false) {
     }
 }
 
-async function pullFromCloud() {
+async function pullFromCloud(silent = false) {
     // Only save settings if the modal is actually open
     if (document.getElementById('syncModal').style.display === 'flex') {
         saveSyncSettings();
@@ -7669,8 +7837,7 @@ async function pullFromCloud() {
         localStorage.setItem(SYNC_LAST_KEY, Date.now().toString());
 
         // Show animated overlay then re-render in place (no page reload)
-        showSyncOverlay(() => {
-            // Data is already in localStorage, just re-render everything
+        const doRender = () => {
             renderDashboard();
             if (typeof renderEbooks === 'function') renderEbooks();
             if (typeof renderVideos === 'function') renderVideos();
@@ -7683,7 +7850,13 @@ async function pullFromCloud() {
                     setTimeout(() => showResumePopup(), 300);
                 }
             }
-        });
+        };
+
+        if (silent) {
+            doRender();
+        } else {
+            showSyncOverlay(doRender);
+        }
 
     } catch (e) {
         showSyncStatus('❌ Pull failed: ' + e.message + '<br><small>Check your Gist ID and token.</small>', 'error');
@@ -7728,15 +7901,14 @@ setInterval(async () => {
         const cloudUpdatedAt = new Date(result.updated_at).getTime();
         const lastPulled = parseInt(localStorage.getItem(SYNC_LAST_KEY) || '0');
 
-        // Only pull if cloud is newer than our last sync
+        // Only pull if cloud is newer than our last sync (silent — no toast)
         if (cloudUpdatedAt > lastPulled) {
-            showReadModeToast('☁️ New data found, syncing...');
-            await pullFromCloud();
+            await pullFromCloud(true);
         }
     } catch(e) {
         // Silent fail — don't bother user
     }
-}, 30000); // every 30 seconds
+}, 120000); // every 2 minutes
 
 // ---- Animated sync overlay ----
 function showSyncOverlay(onComplete) {
@@ -7849,6 +8021,22 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
 });
 </script>
 
+<!-- ================= PROGRESS MODAL ================= -->
+<div id="progressModal" onclick="if(event.target===this)closeProgressModal()">
+    <div class="progress-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0;">📊 Your Progress</h3>
+            <button onclick="closeProgressModal()" style="background:none; border:none; font-size:1.4em; cursor:pointer; color:var(--text); opacity:0.6; line-height:1;">✕</button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div id="progressSummary" style="display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap;"></div>
+
+        <!-- Per-Module Breakdown -->
+        <h4 id="progressBreakdownTitle" style="margin:0 0 14px 0; font-size:0.875em; text-transform:uppercase; letter-spacing:1px; opacity:0.5;">By Module</h4>
+        <div id="progressModuleList"></div>
+    </div>
+</div>
+
 </body>
 </html>
-
