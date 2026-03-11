@@ -791,6 +791,29 @@ blockquote{
     color:#555;
     margin:10px 0;
 }
+/* ===== MOBILE: Icon-only buttons ===== */
+@media (max-width: 600px) {
+    .btn-label { display: none; }
+
+    /* Normalize icon-only action buttons to same square size (no display override) */
+    .edit-action,
+    .btn.edit-action,
+    .btn.btn-outline.edit-action {
+        padding: 10px !important;
+        min-width: 40px !important;
+        height: 40px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1em !important;
+        line-height: 1 !important;
+    }
+
+    /* Only apply flex layout when the button is actually visible */
+    .edit-action:not([style*="display: none"]):not([style*="display:none"]) {
+        display: inline-flex !important;
+    }
+}
+
 /* ================= PDF FIX ================= */
 
 .pdf-export{
@@ -2337,7 +2360,7 @@ font-size: 0.875em;
             <button class="btn btn-outline edit-action"
                 onclick="renameCurrentModule()"
                 style="font-size:0.8em;">
-                ✏️ <span>Rename</span>
+                ✏️ <span class="btn-label">Rename</span>
             </button>
 
             <button class="edit-action" onclick="deleteCurrentModule()"
@@ -2352,7 +2375,7 @@ font-size: 0.875em;
                 transition: background 0.15s, color 0.15s;"
                 onmouseover="this.style.background='var(--danger)';this.style.color='white'"
                 onmouseout="this.style.background='none';this.style.color='var(--danger)'">
-                🗑 Delete Module
+                🗑 <span class="btn-label">Delete Module</span>
             </button>
         </div>
     </div>
@@ -2457,7 +2480,7 @@ font-size: 0.875em;
         <button class="btn btn-outline edit-action"
             onclick="renameCurrentSubmodule()"
             style="font-size:0.75em;">
-            ✏️ Rename
+            ✏️ <span class="btn-label">Rename</span>
         </button>
 
         <button class="edit-action" onclick="deleteCurrentSubmodule()"
@@ -2472,7 +2495,7 @@ font-size: 0.875em;
             transition: background 0.15s, color 0.15s;"
             onmouseover="this.style.background='var(--danger)';this.style.color='white'"
             onmouseout="this.style.background='none';this.style.color='var(--danger)'">
-            🗑 Delete Submodule
+            🗑 <span class="btn-label">Delete Submodule</span>
         </button>
 
         <button class="btn btn-outline edit-action"
@@ -8070,4 +8093,3 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
 
 </body>
 </html>
-
