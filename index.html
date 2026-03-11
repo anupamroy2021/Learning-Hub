@@ -8204,6 +8204,8 @@ let isBookMode = localStorage.getItem('lh_book_mode') === 'true';
 let bookWidth  = parseInt(localStorage.getItem('lh_book_width') || '1100');
 
 function toggleBookMode() {
+    if (window.innerWidth <= 850) return;
+
     // Remember which card is currently in view before layout changes
     const activeBtn = document.querySelector('.nav-btn.active-index');
     const activeId = activeBtn ? activeBtn.dataset.id : null;
@@ -8278,7 +8280,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Init on load
 (function initBookMode() {
-    if (isBookMode) applyBookMode();
+    if (isBookMode && window.innerWidth > 850) applyBookMode();
     else document.documentElement.style.setProperty('--book-width', bookWidth + 'px');
 })();
 
