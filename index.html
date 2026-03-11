@@ -812,8 +812,11 @@ blockquote{
     .edit-action:not([style*="display: none"]):not([style*="display:none"]) {
         display: inline-flex !important;
     }
+}
 
-    #headerBookModeBtn span { display: none; }
+/* Hide book mode button on tablet and smaller, override JS display:block */
+@media (max-width: 850px) {
+    #headerBookModeBtn { display: none !important; }
 }
 
 /* ================= PDF FIX ================= */
@@ -1464,6 +1467,9 @@ display:table-cell !important;
     display: none !important;
 }
 
+/* Continue Reading tooltip on hover */
+#continueReadingBtn:hover #continueReadingTooltip { display:block !important; }
+
 /* ================= BOOK MODE ================= */
 
 /* Make content-area a positioned block so we can use viewport-based centering */
@@ -1842,14 +1848,6 @@ to{transform:translateY(0);}
     #pdfProgressBox { width: 88vw !important; }
 }
 
-/* --- Resume popup --- */
-@media (max-width: 480px) {
-    #resumePopup > div {
-        width: 90vw !important;
-        padding: 18px !important;
-    }
-}
-
 /* --- QOTD banner --- */
 @media (max-width: 480px) {
     #qotdBanner { padding: 14px 16px; }
@@ -2118,6 +2116,29 @@ to{transform:translateY(0);}
     <b>+</b> <span>New Entry</span>
     </button>
 
+    <!-- Continue Reading Button (dashboard only) -->
+    <button id="continueReadingBtn"
+        onclick="resumeLastReading()"
+        style="display:none; align-items:center; gap:7px; padding:6px 14px; border-radius:20px;
+               background: linear-gradient(135deg, var(--primary), var(--accent));
+               color:white; border:none; cursor:pointer; font-size:0.8em; font-weight:700;
+               box-shadow: 0 3px 10px rgba(37,99,235,0.3); transition: transform 0.15s, box-shadow 0.15s;
+               white-space:nowrap; position:relative;"
+        onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 18px rgba(37,99,235,0.4)'"
+        onmouseout="this.style.transform=''; this.style.boxShadow='0 3px 10px rgba(37,99,235,0.3)'">
+        ▶ <span id="continueReadingLabel">Continue</span>
+        <!-- Tooltip -->
+        <div id="continueReadingTooltip" style="
+            display:none; position:absolute; top:calc(100% + 10px); right:0;
+            background:var(--card); border:1px solid var(--border); border-radius:12px;
+            padding:12px 16px; min-width:220px; max-width:280px;
+            box-shadow:0 8px 24px rgba(0,0,0,0.15); z-index:10001;
+            text-align:left; pointer-events:none;
+        ">
+            <div id="continueReadingTooltipText" style="font-size:0.85em; color:var(--text); line-height:1.5;"></div>
+        </div>
+    </button>
+
     <!-- Header Streak Widget (dashboard only) -->
     <div id="streakWidget" class="streak-widget" style="display:none; background:var(--bg); border:1px solid var(--border); border-radius:20px; padding:5px 10px; position:relative; cursor:default;">
         <span class="streak-fire">🔥</span>
@@ -2194,9 +2215,6 @@ to{transform:translateY(0);}
         </button>
         <button class="menu-item" onclick="openVideoPage()">
             🎥 Videos
-        </button>
-        <button class="menu-item" id="bookModeMenuItem" onclick="toggleBookMode(); event.stopPropagation();">
-            📚 Book Mode
         </button>
         <button class="menu-item" onclick="toggleModuleDragLock()">
             🧩 Rearrange Modules
@@ -3113,7 +3131,7 @@ function openEbookPage(){
    hideAllViews();
 document.getElementById('ebookView').style.display='block';
 
-    document.getElementById('dashboardControls').style.display='none'; document.getElementById('streakWidget').style.display='none';
+    document.getElementById('dashboardControls').style.display='none'; document.getElementById('streakWidget').style.display='none'; document.getElementById('continueReadingBtn').style.display='none';
 
     renderEbooks();
 }
@@ -3122,7 +3140,7 @@ function openVideoPage(){
     hideAllViews();
     document.getElementById('videoView').style.display='block';
 
-    document.getElementById('dashboardControls').style.display='none'; document.getElementById('streakWidget').style.display='none';
+    document.getElementById('dashboardControls').style.display='none'; document.getElementById('streakWidget').style.display='none'; document.getElementById('continueReadingBtn').style.display='none';
 
     renderVideos();
 }
@@ -4036,6 +4054,8 @@ window.addEventListener("DOMContentLoaded", function(){
     renderStreakWidget();
     document.getElementById('scrollBtnGroup').style.display = 'none';
     document.body.classList.remove('on-qa-page');
+    document.getElementById('continueReadingBtn').style.display = 'none';
+    showResumePopup();
 	setTimeout(initModuleSortable,100);
 }
 	function initSubmoduleSortable(){
@@ -4092,12 +4112,14 @@ window.addEventListener("DOMContentLoaded", function(){
     recordStreakToday();
     renderStreakWidget();
     document.body.classList.remove('on-qa-page');
+    document.getElementById('continueReadingBtn').style.display = 'none';
+    showResumePopup();
 }
 
     function openModule(name) {
 		currentModule = name;
 
-		document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none';
+		document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none'; document.getElementById('continueReadingBtn').style.display = 'none';
         document.getElementById("hamburger").style.display = "none";
 		document.getElementById('currentModuleTitle').textContent = name;
 		document.getElementById('dashboardView').style.display = 'none';
@@ -4110,7 +4132,7 @@ window.addEventListener("DOMContentLoaded", function(){
 
    function showSubmoduleView() {
 
-		document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none';
+		document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none'; document.getElementById('continueReadingBtn').style.display = 'none';
 
 		currentSubmodule = null;
 
@@ -4130,7 +4152,7 @@ window.addEventListener("DOMContentLoaded", function(){
 
 function openSubmodule(name) {
 
-    document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none';
+    document.getElementById('dashboardControls').style.display = 'none'; document.getElementById('streakWidget').style.display = 'none'; document.getElementById('continueReadingBtn').style.display = 'none';
     currentSubmodule = name;
 
     const submoduleSearch = document.getElementById('search');
@@ -6244,46 +6266,22 @@ function resumeLastReading(){
     },400);
 }
 function showResumePopup(){
+    const state = JSON.parse(localStorage.getItem("learninghub_last_state"));
+    if (!state) return;
 
-    const state =
-    JSON.parse(localStorage.getItem("learninghub_last_state"));
+    const btn = document.getElementById('continueReadingBtn');
+    if (!btn) return;
 
-    if(!state) return;
-
-    const text =
-    document.getElementById("resumePopupText");
-
-    let title =
-    state.question
-    ? state.question
-    : state.module + " › " + state.submodule;
-
-    let timeAgo =
-    state.time
-    ? getTimeAgo(state.time)
-    : "";
-
-    text.innerHTML = `
-    <b style="color:var(--primary); display:block; margin-bottom:4px;">
-    ${title}
-    </b>
-
-    <small style="opacity:0.6;">
-    ${state.module} › ${state.submodule}
-    </small>
-
-    <br>
-
-    <small style="
-    opacity:0.5;
-    font-size: 0.6875em;
-    ">
-    Last read ${timeAgo}
-    </small>
+    // Build tooltip content
+    const title = state.question ? state.question : state.module + ' › ' + state.submodule;
+    const timeAgo = state.time ? getTimeAgo(state.time) : '';
+    document.getElementById('continueReadingTooltipText').innerHTML = `
+        <b style="color:var(--primary); display:block; margin-bottom:4px; white-space:normal;">${title}</b>
+        <span style="opacity:0.6; font-size:0.9em;">${state.module} › ${state.submodule}</span>
+        ${timeAgo ? `<br><span style="opacity:0.45; font-size:0.85em;">Last read ${timeAgo}</span>` : ''}
     `;
 
-    document.getElementById("resumePopup")
-    .style.display = "flex";
+    btn.style.display = 'inline-flex';
 }
 function getTimeAgo(timestamp){
 
@@ -7542,76 +7540,6 @@ accept=".json"
 style="display:none"
 />
 
-<!-- ===== CONTINUE READING POPUP ===== -->
-<div id="resumePopup" style="
-position:fixed;
-top:0;
-left:0;
-width:100vw;
-height:100vh;
-background:rgba(0,0,0,0.6);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:99999;
-">
-
-<div style="
-background:var(--card);
-color:var(--text);
-padding:25px;
-border-radius:14px;
-border:1px solid var(--border);
-width:min(320px, 90vw);
-text-align:center;
-box-shadow:0 5px 20px rgba(0,0,0,0.3);
-animation:fadeIn 0.25s ease;
-position:relative;
-">
-
-<!-- Close button -->
-<button onclick="document.getElementById('resumePopup').style.display='none'"
-style="
-position:absolute;
-top:10px;
-right:12px;
-background:none;
-border:none;
-font-size:1.1em;
-cursor:pointer;
-color:var(--text);
-opacity:0.4;
-line-height:1;
-padding:2px 6px;
-border-radius:4px;
-transition:opacity 0.2s;
-"
-onmouseover="this.style.opacity='1'"
-onmouseout="this.style.opacity='0.4'">✕</button>
-
-<h3 style="margin-bottom:10px;">📖 Continue Reading?</h3>
-
-<p id="resumePopupText"
-style="font-size: 0.8125em; opacity:0.7; margin-bottom:15px;">
-You were reading last time
-</p>
-
-<div style="display:flex; gap:10px;">
-<button class="btn btn-outline"
-style="flex:1"
-onclick="startFreshReading()">
-Start Fresh
-</button>
-
-<button class="btn"
-style="flex:1"
-onclick="resumeLastReadingFromPopup()">
-Resume
-</button>
-</div>
-
-</div>
-</div>
 <!-- ================= FLASHCARD MODAL ================= -->
 <div id="flashcardModal" style="display:none; position:fixed; inset:0; z-index:10002; align-items:center; justify-content:center; padding:20px;">
 <div class="flashcard-box">
@@ -8256,9 +8184,6 @@ function applyBookMode() {
     document.body.classList.toggle('book-mode', isBookMode);
     document.documentElement.style.setProperty('--book-width', bookWidth + 'px');
     updateBookModeOffset();
-    // Menu item
-    const item = document.getElementById('bookModeMenuItem');
-    if (item) item.style.fontWeight = isBookMode ? '800' : '';
     // Header button
     const headerBtn = document.getElementById('headerBookModeBtn');
     if (headerBtn) {
