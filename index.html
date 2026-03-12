@@ -1724,6 +1724,11 @@ body.book-mode .search-container {
     animation: fadeInUp 0.3s ease;
     gap: 6px;
     align-items: center;
+    opacity: 0.25;              /* ← dim level (0 = invisible, 1 = full) */
+    transition: opacity 0.25s ease;
+}
+#bookModeIndicator:hover {
+    opacity: 1;                 /* ← full brightness on hover */
 }
 /* Only show indicator when book-mode is active AND we're on the Q&A page */
 body.book-mode.on-qa-page #bookModeIndicator {
@@ -8956,3 +8961,4 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
 
 </body>
 </html>
+
