@@ -1422,13 +1422,14 @@ display:table-cell !important;
 			pointer-events: none;
 		}
 		.scroll-btn.active {
-			opacity: 1;
+			opacity: 0.25;
 			pointer-events: all;
 			background: var(--primary);
 			color: white;
 			border-color: var(--primary);
 		}
 		.scroll-btn:hover {
+		    opacity: 1;
 			transform: scale(1.1);
 		}
 
@@ -8961,4 +8962,5 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
 
 </body>
 </html>
+
 
