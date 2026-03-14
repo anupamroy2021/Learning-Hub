@@ -612,13 +612,6 @@ blockquote{
 
 /* ===== PROGRESS TRACKING ===== */
 .module-card { position: relative; overflow: hidden; }
-
-.module-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.15), 0 0 0 2px var(--primary), 0 0 18px rgba(37,99,235,0.25);
-    border-color: var(--primary);
-}
-		
 .module-progress-bar {
     position: absolute;
     bottom: 0; left: 0;
@@ -1307,8 +1300,8 @@ display:table-cell !important;
         }
         .module-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 16px 40px rgba(0,0,0,0.15);
-            border-color: transparent;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.15), 0 0 0 2px var(--primary), 0 0 18px rgba(37,99,235,0.25);
+            border-color: var(--primary);
         }
         .module-card-banner {
             height: 110px;
@@ -8969,5 +8962,3 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
 
 </body>
 </html>
-
-
