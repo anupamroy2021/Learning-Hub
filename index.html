@@ -613,22 +613,10 @@ blockquote{
 /* ===== PROGRESS TRACKING ===== */
 .module-card { position: relative; overflow: hidden; }
 
-.module-card {
-    transition: all 0.25s ease;
-}
-
 .module-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    border: 2px solid var(--primary);
-    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.25);
-}
-
-.grid:hover .module-card {
-    opacity: 0.5;
-}
-
-.grid .module-card:hover {
-    opacity: 1;
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.15), 0 0 0 2px var(--primary), 0 0 18px rgba(37,99,235,0.25);
+    border-color: var(--primary);
 }
 		
 .module-progress-bar {
