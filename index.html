@@ -1183,6 +1183,39 @@ display:table-cell !important;
         }
         .sidebar.collapsed { width: 0; padding: 0; border: none; overflow: hidden; opacity: 0; pointer-events: none; }
 
+        /* ── Sidebar collapse toggle button ── */
+        #sidebarCollapseBtn {
+            position: absolute;
+            left: clamp(260px, 20vw, 360px);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 56px;
+            border-radius: 0 8px 8px 0;
+            background: var(--border);
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.13);
+            transition: background 0.2s, color 0.2s, left 0.3s cubic-bezier(0.4,0,0.2,1), width 0.2s;
+            font-size: 0.6rem;
+            opacity: 0.75;
+        }
+        #sidebarCollapseBtn:hover {
+            background: var(--primary);
+            color: white;
+            opacity: 1;
+            width: 22px;
+        }
+        /* When sidebar is collapsed, move button to left:0 */
+        #moduleWorkspace.sidebar-collapsed #sidebarCollapseBtn {
+            left: 0;
+        }
+
         /* Draggable Styles */
         .index-group { 
             margin-bottom: 15px; min-width: 240px; background: var(--bg); 
@@ -1285,6 +1318,7 @@ display:table-cell !important;
             .sidebar.active { transform: translateX(0); }
             .editor-container { grid-template-columns: 1fr; }
             .preview-box { display: none; }
+            #sidebarCollapseBtn { display: none !important; }
         }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(200px, 18vw, 300px), 1fr)); gap: 15px; margin-top: 20px; }
@@ -2814,6 +2848,7 @@ font-size: 0.875em;
 
 <div id="moduleWorkspace" style="display:none;">
     <aside class="sidebar collapsed" id="sidebar">
+
     <div style="margin-bottom:10px;">
         
         <button class="btn btn-outline"
@@ -2828,6 +2863,11 @@ font-size: 0.875em;
     <div id="indexList"></div>
 
 </aside>
+
+    <!-- Sidebar collapse/expand tab — lives outside sidebar so it persists when collapsed -->
+    <button id="sidebarCollapseBtn" onclick="toggleSidebar()" title="Collapse sidebar">
+        ◀
+    </button>
 
 </aside>
     
@@ -4415,10 +4455,15 @@ function looksLikeDiagram(code){
 
     const sb = document.getElementById('sidebar');
     const ov = document.getElementById('overlay');
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    const workspace = document.getElementById('moduleWorkspace');
 
     if (window.innerWidth > 850) {
 
         sb.classList.toggle('collapsed');
+        const isCollapsed = sb.classList.contains('collapsed');
+        if (collapseBtn) collapseBtn.textContent = isCollapsed ? '▶' : '◀';
+        if (workspace) workspace.classList.toggle('sidebar-collapsed', isCollapsed);
 
     } 
     else {
@@ -4665,6 +4710,10 @@ function openSubmodule(name) {
     const sb = document.getElementById('sidebar');
     if (window.innerWidth > 850) {
         sb.classList.remove('collapsed');
+        const collapseBtn = document.getElementById('sidebarCollapseBtn');
+        if (collapseBtn) collapseBtn.textContent = '◀';
+        const workspace = document.getElementById('moduleWorkspace');
+        if (workspace) workspace.classList.remove('sidebar-collapsed');
     }
 
     showListView(); 
