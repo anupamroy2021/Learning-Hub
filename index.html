@@ -8768,11 +8768,44 @@ function showSyncOverlay(onComplete) {
 let isBookMode = localStorage.getItem('lh_book_mode') === 'true';
 let bookWidth  = parseInt(localStorage.getItem('lh_book_width') || '1100');
 
+/* Returns the card element currently most centred in the viewport */
+function getCurrentlyReadingCard() {
+    // 1. Try the active nav button's id
+    const activeBtn = document.querySelector('.nav-btn.active-index');
+    if (activeBtn && activeBtn.dataset.id) {
+        const el = document.getElementById('q-' + activeBtn.dataset.id);
+        if (el) return el;
+    }
+    // 2. Fall back to the card whose centre is closest to the viewport centre
+    const cards = Array.from(document.querySelectorAll('.card[id^="q-"]'));
+    if (!cards.length) return null;
+    const mid = window.innerHeight / 2;
+    let best = null, bestDist = Infinity;
+    for (const card of cards) {
+        const rect = card.getBoundingClientRect();
+        const cardMid = rect.top + rect.height / 2;
+        const dist = Math.abs(cardMid - mid);
+        if (dist < bestDist) { bestDist = dist; best = card; }
+    }
+    return best;
+}
+
+/* Scroll a card back into view after a layout change */
+function restoreScrollToCard(card, delay = 60) {
+    if (!card) return;
+    setTimeout(() => {
+        card.scrollIntoView({ behavior: 'instant', block: 'center' });
+    }, delay);
+}
+
 function toggleBookMode() {
     if (window.innerWidth <= 850) return;
 
     const menu = document.getElementById('dashboardMenu');
     if (menu) menu.style.display = 'none';
+
+    // Capture current card BEFORE the layout shift
+    const currentCard = getCurrentlyReadingCard();
 
     if (isBookMode) {
         // Turning OFF
@@ -8780,24 +8813,16 @@ function toggleBookMode() {
         localStorage.setItem('lh_book_mode', false);
         applyBookMode();
         showReadModeToast('📚 Book Mode Off');
+        restoreScrollToCard(currentCard);
         return;
     }
 
-    // Turning ON — use remembered size, no picker
-    const activeBtn = document.querySelector('.nav-btn.active-index');
-    const activeId = activeBtn ? activeBtn.dataset.id : null;
-
+    // Turning ON
     isBookMode = true;
     localStorage.setItem('lh_book_mode', true);
     applyBookMode();
     showReadModeToast('📚 Book Mode On');
-
-    if (activeId) {
-        setTimeout(() => {
-            const el = document.getElementById('q-' + activeId);
-            if (el) el.scrollIntoView({ behavior: 'instant', block: 'center' });
-        }, 50);
-    }
+    restoreScrollToCard(currentCard);
 }
 
 function applyBookMode() {
@@ -8831,12 +8856,18 @@ function updateBookModeOffset() {
 }
 
 function setBookWidth(w) {
+    // Capture current card BEFORE the layout shift
+    const currentCard = getCurrentlyReadingCard();
+
     bookWidth = w;
     localStorage.setItem('lh_book_width', w);
     document.documentElement.style.setProperty('--book-width', w + 'px');
     document.querySelectorAll('.book-width-pill').forEach(p => {
         p.classList.toggle('active', parseInt(p.dataset.width) === w);
     });
+
+    // Scroll back to the card after the width change reflows the layout
+    restoreScrollToCard(currentCard);
 }
 
 // Patch toggleSidebar to update offset after sidebar animates
