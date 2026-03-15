@@ -1780,18 +1780,23 @@ body.book-mode .search-container {
     z-index: 9000;
     box-shadow: 0 4px 14px rgba(37,99,235,0.35);
     user-select: none;
-    animation: fadeInUp 0.3s ease;
     gap: 6px;
     align-items: center;
-    opacity: 0.25;              /* ← dim level (0 = invisible, 1 = full) */
+    opacity: 0;              /* invisible by default */
     transition: opacity 0.25s ease;
+    pointer-events: none;
 }
 #bookModeIndicator:hover {
-    opacity: 1;                 /* ← full brightness on hover */
+    opacity: 1;
+    pointer-events: auto;
 }
-/* Only show indicator when book-mode is active AND we're on the Q&A page */
+/* Only show (hoverable) indicator when book-mode is active AND we're on the Q&A page */
 body.book-mode.on-qa-page #bookModeIndicator {
     display: flex;
+    pointer-events: auto;
+}
+body.book-mode.on-qa-page #bookModeIndicator:hover {
+    opacity: 1;
 }
 
 #bookWidthPills {
@@ -2299,6 +2304,7 @@ body.book-mode .content-area.has-focus .card:hover {
     opacity: 1 !important;
     transform: scale(1.005) !important;
 }
+
 
     </style>
     <script src="https://js.puter.com/v2/"></script>
@@ -8765,18 +8771,27 @@ let bookWidth  = parseInt(localStorage.getItem('lh_book_width') || '1100');
 function toggleBookMode() {
     if (window.innerWidth <= 850) return;
 
-    // Remember which card is currently in view before layout changes
-    const activeBtn = document.querySelector('.nav-btn.active-index');
-    const activeId = activeBtn ? activeBtn.dataset.id : null;
-
-    isBookMode = !isBookMode;
-    localStorage.setItem('lh_book_mode', isBookMode);
-    applyBookMode();
-    showReadModeToast(isBookMode ? '📚 Book Mode On' : '📚 Book Mode Off');
     const menu = document.getElementById('dashboardMenu');
     if (menu) menu.style.display = 'none';
 
-    // After layout reflows, scroll back to the same card (instant, no animation)
+    if (isBookMode) {
+        // Turning OFF
+        isBookMode = false;
+        localStorage.setItem('lh_book_mode', false);
+        applyBookMode();
+        showReadModeToast('📚 Book Mode Off');
+        return;
+    }
+
+    // Turning ON — use remembered size, no picker
+    const activeBtn = document.querySelector('.nav-btn.active-index');
+    const activeId = activeBtn ? activeBtn.dataset.id : null;
+
+    isBookMode = true;
+    localStorage.setItem('lh_book_mode', true);
+    applyBookMode();
+    showReadModeToast('📚 Book Mode On');
+
     if (activeId) {
         setTimeout(() => {
             const el = document.getElementById('q-' + activeId);
@@ -9036,6 +9051,8 @@ document.getElementById('syncModal').addEventListener('click', function(e) {
         <span class="book-width-pill active" data-width="1100" onclick="setBookWidth(1100)">L</span>
     </div>
 </div>
+
+
 
 </body>
 </html>
