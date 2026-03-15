@@ -4763,6 +4763,18 @@ function openSubmodule(name) {
         document.getElementById('listView').style.display = 'block';
         document.getElementById('formView').style.display = 'none';
         document.body.classList.add('on-qa-page');
+        // Restore scroll to the card that was being edited/cancelled
+        if (editId) {
+            const cardId = editId;
+            setTimeout(() => {
+                const el = document.getElementById('q-' + cardId);
+                if (el) {
+                    smartScrollToCard(el, 'instant');
+                    el.style.borderColor = 'var(--primary)';
+                    setTimeout(() => el.style.borderColor = 'var(--border)', 1000);
+                }
+            }, 50);
+        }
     }
 
     function clearReadingFocus() {
