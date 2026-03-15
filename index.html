@@ -4133,17 +4133,9 @@ function goToNextModuleSearchMatch(){
     const el = document.getElementById(id);
 
     if(el){
-
-        el.scrollIntoView({
-            behavior:'smooth',
-            block:'center'
-        });
-
+        smartScrollToCard(el, 'smooth');
         el.style.borderColor = "#f59e0b";
-
-        setTimeout(()=>{
-            el.style.borderColor = "var(--border)";
-        },800);
+        setTimeout(()=>{ el.style.borderColor = "var(--border)"; },800);
     }
 
     updateModuleMatchCounter();
@@ -4162,17 +4154,9 @@ function goToPreviousModuleSearchMatch(){
     const el = document.getElementById(id);
 
     if(el){
-
-        el.scrollIntoView({
-            behavior:'smooth',
-            block:'center'
-        });
-
+        smartScrollToCard(el, 'smooth');
         el.style.borderColor = "#f59e0b";
-
-        setTimeout(()=>{
-            el.style.borderColor = "var(--border)";
-        },800);
+        setTimeout(()=>{ el.style.borderColor = "var(--border)"; },800);
     }
 
     updateModuleMatchCounter();
@@ -4904,11 +4888,11 @@ function openSubmodule(name) {
         setTimeout(() => {
             const el = document.getElementById("q-" + id);
             if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                smartScrollToCard(el, 'smooth');
                 el.style.borderColor = "var(--primary)";
                 setTimeout(() => el.style.borderColor = "var(--border)", 1000);
             }
-        }, 50);
+        }, 120);
         if (window.innerWidth <= 850) toggleSidebar(); 
     }
 
@@ -5038,17 +5022,9 @@ function goToNextSearchMatch(){
     const el = document.getElementById(id);
 
     if(el){
-
-        el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
-
+        smartScrollToCard(el, 'smooth');
         el.style.borderColor = "#f59e0b";
-
-        setTimeout(()=>{
-            el.style.borderColor = "var(--border)";
-        },800);
+        setTimeout(()=>{ el.style.borderColor = "var(--border)"; },800);
     }
 	updateMatchCounter();
 }
@@ -5066,17 +5042,9 @@ function goToPreviousSearchMatch(){
     const el = document.getElementById(id);
 
     if(el){
-
-        el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
-
+        smartScrollToCard(el, 'smooth');
         el.style.borderColor = "#f59e0b";
-
-        setTimeout(()=>{
-            el.style.borderColor = "var(--border)";
-        },800);
+        setTimeout(()=>{ el.style.borderColor = "var(--border)"; },800);
     }
 	updateMatchCounter();
 }
@@ -6137,17 +6105,9 @@ function goToNextGlobalSearchMatch(){
     const el = document.getElementById(id);
 
     if(el){
-
-        el.scrollIntoView({
-            behavior:'smooth',
-            block:'center'
-        });
-
+        smartScrollToCard(el, 'smooth');
         el.style.borderColor = "#f59e0b";
-
-        setTimeout(()=>{
-            el.style.borderColor = "var(--border)";
-        },800);
+        setTimeout(()=>{ el.style.borderColor = "var(--border)"; },800);
     }
 
     updateGlobalMatchCounter();
@@ -6166,17 +6126,9 @@ function goToPreviousGlobalSearchMatch(){
     const el = document.getElementById(id);
 
     if(el){
-
-        el.scrollIntoView({
-            behavior:'smooth',
-            block:'center'
-        });
-
+        smartScrollToCard(el, 'smooth');
         el.style.borderColor = "#f59e0b";
-
-        setTimeout(()=>{
-            el.style.borderColor = "var(--border)";
-        },800);
+        setTimeout(()=>{ el.style.borderColor = "var(--border)"; },800);
     }
 
     updateGlobalMatchCounter();
@@ -7110,7 +7062,7 @@ function goToQotdSubmodule() {
         const entryId = qotdEntry.id;
         const el = document.getElementById(`q-${entryId}`);
         if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            smartScrollToCard(el, 'smooth');
             el.style.transition = 'box-shadow 0.4s, outline 0.4s';
             el.style.outline = '2px solid rgba(255,255,255,0.5)';
             el.style.boxShadow = '0 0 0 5px rgba(99,102,241,0.4)';
@@ -8790,12 +8742,49 @@ function getCurrentlyReadingCard() {
     return best;
 }
 
+/* Returns the nearest scrollable ancestor of an element */
+function getScrollParent(el) {
+    let node = el.parentElement;
+    while (node) {
+        const style = window.getComputedStyle(node);
+        const overflow = style.overflow + style.overflowY;
+        if (/auto|scroll/.test(overflow) && node.scrollHeight > node.clientHeight) {
+            return node;
+        }
+        node = node.parentElement;
+    }
+    return window;
+}
+
+/* Smart scroll: always shows card from its TOP with a small breathing gap.
+   For small cards that fit in the viewport it centres them instead. */
+function smartScrollToCard(el, behavior = 'smooth') {
+    if (!el) return;
+    const container = getScrollParent(el);
+    const cardHeight = el.offsetHeight;
+    const viewHeight = (container === window) ? window.innerHeight : container.clientHeight;
+
+    if (cardHeight >= viewHeight * 0.6) {
+        // Card is tall — align its top ~72px from the container top
+        if (container === window) {
+            const top = el.getBoundingClientRect().top + window.scrollY - 72;
+            window.scrollTo({ top, behavior });
+        } else {
+            const containerRect = container.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
+            const top = container.scrollTop + (elRect.top - containerRect.top) - 72;
+            container.scrollTo({ top, behavior });
+        }
+    } else {
+        // Card fits comfortably — centre it
+        el.scrollIntoView({ behavior, block: 'center' });
+    }
+}
+
 /* Scroll a card back into view after a layout change */
-function restoreScrollToCard(card, delay = 60) {
+function restoreScrollToCard(card, delay = 80) {
     if (!card) return;
-    setTimeout(() => {
-        card.scrollIntoView({ behavior: 'instant', block: 'center' });
-    }, delay);
+    setTimeout(() => smartScrollToCard(card, 'instant'), delay);
 }
 
 function toggleBookMode() {
