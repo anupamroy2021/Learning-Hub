@@ -1661,6 +1661,14 @@ display:table-cell !important;
     box-shadow:0 20px 60px rgba(0,0,0,0.5); border:none;
 }
 
+/* Copy button success state */
+.copy-card-btn.copy-success {
+    color: #22c55e !important;
+    border-color: #22c55e !important;
+    background: rgba(34,197,94,0.10) !important;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
 /* TTS button speaking state */
 .tts-btn.speaking {
     background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
@@ -4975,6 +4983,11 @@ function openSubmodule(name) {
 								title="Read Aloud"
 								onclick="speakCard(this, '${item.id}')">
 								<i data-lucide="volume-2"></i>
+							</button>
+							<button class="icon-btn copy-card-btn"
+								title="Copy Question & Answer"
+								onclick="copyCard(this, '${item.id}')">
+								<i data-lucide="copy"></i>
 							</button>
 							<button class="icon-btn edit-action"
 								title="Edit Entry"
@@ -8951,6 +8964,36 @@ function chunkBySentence(text, max = 180) {
     }
     if (cur.trim()) chunks.push(cur.trim());
     return chunks.filter(Boolean);
+}
+
+function copyCard(btn, itemId) {
+    const card = document.getElementById('q-' + itemId);
+    if (!card) return;
+    const question = (card.querySelector('h2') || {}).innerText?.trim() || '';
+    const answerEl = card.querySelector('.answer-body');
+    const answer = answerEl ? (answerEl.innerText || answerEl.textContent || '').trim() : '';
+    const text = (question ? 'Q: ' + question + '\n\n' : '') + (answer ? 'A: ' + answer : '');
+    if (!text.trim()) return;
+    navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copy-success');
+        const icon = btn.querySelector('i');
+        if (icon) { icon.setAttribute('data-lucide', 'check'); lucide.createIcons(); }
+        setTimeout(() => {
+            btn.classList.remove('copy-success');
+            if (icon) { icon.setAttribute('data-lucide', 'copy'); lucide.createIcons(); }
+        }, 1800);
+    }).catch(() => {
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.classList.add('copy-success');
+        setTimeout(() => btn.classList.remove('copy-success'), 1800);
+    });
 }
 
 function speakCard(btn, itemId) {
