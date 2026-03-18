@@ -864,10 +864,6 @@ blockquote{
     }
 }
 
-/* Hide book mode button on tablet and smaller, override JS display:block */
-@media (max-width: 850px) {
-    #headerBookModeBtn { display: none !important; }
-}
 
 /* ================= PDF FIX ================= */
 
@@ -1131,7 +1127,6 @@ display:table-cell !important;
         @media (max-width: 650px) {
             .btn span { display: none; }
             .btn { padding: 10px; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
-            #lockBtn b { display: none; }
             .logo span { display: none; }
             .header-actions-mobile {
                 display: flex;
@@ -2178,6 +2173,49 @@ to{transform:translateY(0);}
     color: var(--primary);
     transform: translateX(2px);
 }
+.menu-item.danger-item:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+/* In-menu book width pills */
+#menuBookWidthRow {
+    display: none;
+}
+#menuBookWidthRow.visible {
+    display: flex !important;
+}
+.menu-book-pill {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2px 10px;
+    font-size: 0.78em;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.menu-book-pill:hover:not(.active) {
+    background: rgba(37,99,235,0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.menu-book-pill.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    cursor: default;
+    pointer-events: none;
+}
+/* Prevent edit-action CSS override from breaking menu items inside the dropdown */
+#submoduleMenuDropdown .menu-item {
+    display: flex !important;
+    height: auto !important;
+    min-width: unset !important;
+    width: 100% !important;
+    padding: 9px 16px !important;
+    border-radius: 8px !important;
+}
 
 .menu-section-label {
     padding: 8px 16px 4px;
@@ -2339,59 +2377,107 @@ body.book-mode .content-area.has-focus .card:hover {
 <header>
 
 <!-- LEFT SIDE -->
-<div style="display:flex; align-items:center; gap:8px;">
+<div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;">
 
-    <!-- Ebook PDF Back -->
-    <button id="ebookBackBtn"
+    <!-- Global Back Button -->
+    <button id="headerBackBtn"
     class="btn btn-outline"
-    onclick="handleEbookBack()"
-    style="display:none;">
-    ←
+    onclick="handleHeaderBack()"
+    style="display:none; flex-shrink:0;"
+    title="Go Back">
+    &lt;
     </button>
 
     <!-- Sidebar Toggle -->
     <button class="btn btn-outline"
     id="hamburger"
     onclick="toggleSidebar()"
-    style="display:none; position:relative; z-index:10000;">
+    style="display:none; position:relative; z-index:10000; flex-shrink:0;">
     ☰
     </button>
 
-    <!-- Logo -->
-    <div class="logo" onclick="showDashboard()">
+    <!-- Logo (hidden when breadcrumb is shown) -->
+    <div class="logo" id="headerLogo" onclick="showDashboard()">
         <img src="https://cdn.jsdelivr.net/gh/anupamroy2021/Learning-Hub/logo.png" style="width:32px; height:32px; object-fit:contain;" alt="Logo"> <span>LEARNING HUB</span>
     </div>
-	
+
+    <!-- Breadcrumb (shown on questions page) -->
+    <div id="headerBreadcrumb" style="display:none; flex-direction:column; justify-content:center; min-width:0; overflow:hidden;">
+        <div id="headerBreadcrumbModule" style="font-size:0.6em; font-weight:700; text-transform:uppercase; letter-spacing:1px; opacity:0.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2;"></div>
+        <div id="headerBreadcrumbSub" style="font-size:0.85em; font-weight:700; color:var(--primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3;"></div>
+    </div>
 
 </div>
 
 <!-- RIGHT SIDE -->
 <div class="header-actions">
 
-    <button class="btn btn-outline read-mode-hide"
-    id="headerBookModeBtn"
-    onclick="toggleBookMode()"
-    style="display: none;"
-    title="Toggle Book Mode">
-    📚 <span id="headerBookModeText">Book Mode</span>
-    </button>
-
-    <button class="btn btn-outline edit-action"
-    id="lockBtn"
-    onclick="toggleDraggable()"
-    style="display: none;"
-    title="Toggle Drag Lock">
-    <span id="lockIcon">🔒</span>
-    <b id="lockText">Locked</b>
-    </button>
-
-    <button class="btn edit-action"
-    id="headerNewBtn"
-    onclick="openEditor()"
-    style="display: none;"
-    title="Shortcut: Ctrl+N">
-    <b>+</b> <span>New Entry</span>
-    </button>
+    <!-- Submodule Actions Submenu (questions page only) -->
+    <div id="headerSubmoduleMenu" style="position:relative; display:none;">
+        <button class="btn btn-outline"
+            onclick="toggleSubmoduleMenu(event)"
+            title="Submodule Actions"
+            style="font-size:0.8em; letter-spacing:0.05em; padding:6px 10px;">
+            ⋯
+        </button>
+        <div id="submoduleMenuDropdown"
+            style="
+            display:none;
+            position:absolute;
+            right:0;
+            top:44px;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:14px;
+            min-width:220px;
+            box-shadow:0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+            z-index:10000;
+            overflow:hidden;
+            padding:6px;
+            backdrop-filter:blur(8px);
+            ">
+            <!-- Actions -->
+            <div class="menu-section-label">Actions</div>
+            <button class="menu-item edit-action" onclick="closeSubmoduleMenu(); openEditor()">
+                ➕ New Entry
+            </button>
+            <button class="menu-item read-mode-hide" onclick="closeSubmoduleMenu(); openProgressModal()">
+                📊 Progress
+            </button>
+            <button class="menu-item edit-action" id="menuLockBtn" onclick="closeSubmoduleMenu(); toggleDraggable()">
+                🔒 <span id="menuLockText">Drag Lock: On</span>
+            </button>
+            <button class="menu-item" id="menuBookModeBtn" onclick="closeSubmoduleMenu(); toggleBookMode()">
+                📚 <span id="menuBookModeText">Book Mode</span>
+            </button>
+            <!-- Book width pills — shown only when book mode is active -->
+            <div id="menuBookWidthRow" style="display:none; padding:4px 16px 6px; gap:6px; align-items:center;">
+                <span style="font-size:0.7em; opacity:0.45; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-right:4px;">Width</span>
+                <span class="menu-book-pill" data-width="780" onclick="setBookWidth(780)">S</span>
+                <span class="menu-book-pill" data-width="900" onclick="setBookWidth(900)">M</span>
+                <span class="menu-book-pill active" data-width="1100" onclick="setBookWidth(1100)">L</span>
+            </div>
+            <hr style="border:none; border-top:1px solid var(--border); margin:6px 0;">
+            <!-- Submodule -->
+            <div class="menu-section-label">Submodule</div>
+            <button class="menu-item edit-action" onclick="closeSubmoduleMenu(); renameCurrentSubmodule()">
+                ✏️ Rename
+            </button>
+            <button class="menu-item edit-action danger-item" onclick="closeSubmoduleMenu(); deleteCurrentSubmodule()"
+                style="color:var(--danger);">
+                🗑 Delete Submodule
+            </button>
+            <hr style="border:none; border-top:1px solid var(--border); margin:6px 0;">
+            <!-- Export -->
+            <div class="menu-section-label">Export</div>
+            <button class="menu-item edit-action" onclick="closeSubmoduleMenu(); exportSubmodulePDF()">
+                📄 Export PDF
+            </button>
+            <button class="menu-item edit-action" onclick="closeSubmoduleMenu(); exportSubmoduleTextPDF()">
+                📑 Copyable PDF
+            </button>
+        </div>
+    </div>
 
     <!-- Continue Reading Button (dashboard only) -->
     <button id="continueReadingBtn"
@@ -2684,11 +2770,6 @@ style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
     <!-- ⭐ TITLE ROW -->
 <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
 
-    <button class="btn btn-outline"
-    onclick="showDashboard()">
-    ←
-    </button>
-
     <h1 style="margin:0; color:var(--primary);">
     📚 E-Books
     </h1>
@@ -2743,7 +2824,7 @@ style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
     background:rgba(0,0,0,0.85);
     z-index:9999;
     ">
-<button onclick="goBackToEbooks()"
+<button onclick="handleHeaderBack()"
 style="
 position:absolute;
 top:20px;
@@ -2757,7 +2838,7 @@ border-radius:6px;
 cursor:pointer;
 font-size: 0.875em;
 ">
-← Back to E-Books
+&lt; Back to E-Books
 </button>
         <iframe id="pdfViewer"
         style="
@@ -2777,11 +2858,6 @@ font-size: 0.875em;
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
         <div style="display:flex; align-items:center; gap:12px;">
-           <button id="moduleBackBtn"
-				class="btn btn-outline"
-				onclick="goBackToDashboard()">
-				←
-			</button>
             <div>
                 <div style="font-size: 0.6875em; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Module</div>
                 <h1 id="currentModuleTitle" style="margin:0; font-size:1.4rem;">Module</h1>
@@ -2883,75 +2959,15 @@ font-size: 0.875em;
         ◀
     </button>
 
-</aside>
-    
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
     <main class="content-area">
         <div id="listView">
-            <!-- Updated Header with Back Button -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-
-    <!-- LEFT SIDE -->
-    <div style="display:flex; align-items:center; gap:12px;">
-        <button id="backBtn" class="btn btn-outline"
-			onclick="showSubmoduleView()"
-			title="Back to Submodules">
-			←
-		</button>
-        <div>
-            <div style="font-size: 0.6875em; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Submodule</div>
-            <h2 id="currentSubmoduleTitle"
-                style="color:var(--primary); margin:0; line-height:1;">
-                Submodule
-            </h2>
-        </div>
-    </div>
-
-    <!-- RIGHT SIDE (FIXED ORDER) -->
-    <div style="display:flex; align-items:center; gap:8px;">
-
-        <button class="btn btn-outline read-mode-hide"
-            onclick="openProgressModal()"
-            style="font-size:0.75em;"
-            title="View Progress">
-            📊
-        </button>
-
-        <button class="btn btn-outline edit-action"
-            onclick="renameCurrentSubmodule()"
-            style="font-size:0.75em;">
-            ✏️ <span class="btn-label">Rename</span>
-        </button>
-
-        <button class="edit-action" onclick="deleteCurrentSubmodule()"
-            style="background:none;
-            border:1px solid var(--danger);
-            color:var(--danger);
-            padding:6px 12px;
-            border-radius:8px;
-            font-size: 0.75em;
-            font-weight:600;
-            cursor:pointer;
-            transition: background 0.15s, color 0.15s;"
-            onmouseover="this.style.background='var(--danger)';this.style.color='white'"
-            onmouseout="this.style.background='none';this.style.color='var(--danger)'">
-            🗑 <span class="btn-label">Delete Submodule</span>
-        </button>
-
-        <button class="btn btn-outline edit-action"
-            onclick="exportSubmodulePDF()"
-            style="font-size: 0.6875em;">
-            📄 <span>Export PDF</span>
-        </button>
-		<button class="btn edit-action"
-		onclick="exportSubmoduleTextPDF()"
-		style="font-size: 0.6875em;">
-		📑 <span>Copyable PDF</span>
-		</button>
-
-    </div>
-</div>
+            <!-- Submodule title -->
+            <div style="margin-bottom:20px;">
+                <div style="font-size: 0.6875em; opacity:0.45; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Submodule</div>
+                <h2 id="currentSubmoduleTitle" style="color:var(--primary); margin:0; line-height:1;">Submodule</h2>
+            </div>
             
             <div class="search-container">
                 <div class="search-wrapper" style="position:relative;">
@@ -3509,6 +3525,8 @@ function openEbookPage(){
 document.getElementById('ebookView').style.display='block';
 
     document.getElementById('dashboardControls').style.display='none'; document.getElementById('streakWidget').style.display='none'; document.getElementById('continueReadingBtn').style.display='none';
+    showHeaderBack(true);
+    updateHeaderBreadcrumb(null, null);
 
     renderEbooks();
 }
@@ -3518,6 +3536,8 @@ function openVideoPage(){
     document.getElementById('videoView').style.display='block';
 
     document.getElementById('dashboardControls').style.display='none'; document.getElementById('streakWidget').style.display='none'; document.getElementById('continueReadingBtn').style.display='none';
+    showHeaderBack(true);
+    updateHeaderBreadcrumb(null, null);
 
     renderVideos();
 }
@@ -3776,17 +3796,89 @@ function toggleDashboardMenu(e){
         : "block";
 }
 
+function toggleSubmoduleMenu(e) {
+    if (e) e.stopPropagation();
+    const dd = document.getElementById('submoduleMenuDropdown');
+    dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+}
+
+function closeSubmoduleMenu() {
+    const dd = document.getElementById('submoduleMenuDropdown');
+    if (dd) dd.style.display = 'none';
+}
+
+function handleHeaderBack() {
+    // If PDF viewer is open → close it and stay on ebook page
+    const pdfViewerBox = document.getElementById("pdfViewerBox");
+    if (pdfViewerBox && pdfViewerBox.style.display === "block") {
+        document.getElementById("pdfViewer").src = "";
+        pdfViewerBox.style.display = "none";
+        document.body.style.overflow = "auto";
+        return;
+    }
+    // If video player is open → close it and stay on video page
+    const videoPlayerBox = document.getElementById("videoPlayerBox");
+    if (videoPlayerBox && videoPlayerBox.style.display === "block") {
+        document.getElementById("videoPlayer").src = "";
+        videoPlayerBox.style.display = "none";
+        document.body.style.overflow = "auto";
+        return;
+    }
+    // If editor/form is open → go back to list
+    const formView = document.getElementById('formView');
+    if (formView && formView.style.display !== 'none' && formView.style.display !== '') {
+        showListView();
+        return;
+    }
+    // If on questions page → go back to submodule list
+    if (currentSubmodule) {
+        showSubmoduleView();
+        return;
+    }
+    // If on submodule page → go back to dashboard
+    if (currentModule) {
+        goBackToDashboard();
+        return;
+    }
+    // Ebook/video/other → dashboard
+    showDashboard();
+}
+
+function showHeaderBack(show) {
+    const btn = document.getElementById('headerBackBtn');
+    if (btn) btn.style.display = show ? 'block' : 'none';
+}
+
+function updateHeaderBreadcrumb(module, submodule) {
+    const crumb  = document.getElementById('headerBreadcrumb');
+    const logo   = document.getElementById('headerLogo');
+    const modEl  = document.getElementById('headerBreadcrumbModule');
+    const subEl  = document.getElementById('headerBreadcrumbSub');
+    if (!crumb || !logo) return;
+    if (module && submodule) {
+        modEl.textContent = module;
+        modEl.style.display = '';
+        subEl.textContent = submodule;
+        subEl.style.display = '';
+        crumb.style.display = 'flex';
+        logo.style.display  = 'none';
+    } else if (module) {
+        modEl.textContent = module;
+        modEl.style.display = '';
+        subEl.style.display = 'none';
+        crumb.style.display = 'flex';
+        logo.style.display  = 'none';
+    } else {
+        crumb.style.display = 'none';
+        logo.style.display  = '';
+    }
+}
+
 function openVideo(link){
 
 document.getElementById("videoPlayerBox").style.display="block";
 document.getElementById("videoPlayer").src=link;
 document.body.style.overflow="hidden";
-}
-function goBackToVideos(){
-
-document.getElementById("videoPlayerBox").style.display="none";
-document.getElementById("videoPlayer").src="";
-document.body.style.overflow="auto";
 }
 function clearVideoSearch(){
 document.getElementById("videoSearch").value="";
@@ -3813,25 +3905,6 @@ function addBookPrompt(){
     scheduleAutoSync();
 
     renderEbooks();
-}
-function handleEbookBack(){
-
-    const viewerBox = document.getElementById("pdfViewerBox");
-
-    // ⭐ IF PDF IS OPEN → GO BACK TO EBOOK PAGE
-    if(viewerBox.style.display === "block"){
-
-        const viewer = document.getElementById("pdfViewer");
-
-        viewer.src = "";
-        viewerBox.style.display = "none";
-        document.body.style.overflow = "auto";
-
-        // ⭐ HIDE BACK BUTTON AFTER RETURNING
-        document.getElementById('ebookBackBtn').style.display='none';
-
-        return;
-    }
 }
 function convertDriveLink(link){
 
@@ -4053,7 +4126,7 @@ function openBook(link){
     document.body.style.overflow = "hidden";
 
     // ⭐ SHOW BACK BUTTON ONLY WHEN PDF OPENS
-    document.getElementById('ebookBackBtn').style.display='block';
+    showHeaderBack(true);
 }
 let isFullScreenEditor = false;
 
@@ -4483,19 +4556,10 @@ function looksLikeDiagram(code){
     return;
 }
         isLocked = !isLocked;
-        const icon = document.getElementById('lockIcon');
-        const text = document.getElementById('lockText');
-        const btn = document.getElementById('lockBtn');
-        
-        if (isLocked) {
-            icon.innerText = "🔒";
-            text.innerText = "Locked";
-            btn.classList.add('btn-outline');
-        } else {
-            icon.innerText = "🔓";
-            text.innerText = "Unlocked";
-            btn.classList.remove('btn-outline');
-        }
+        const menuText = document.getElementById('menuLockText');
+        const menuBtn  = document.getElementById('menuLockBtn');
+        if (menuText) menuText.innerText = isLocked ? 'Drag Lock: On' : 'Drag Lock: Off';
+        if (menuBtn)  menuBtn.style.opacity = isLocked ? '1' : '0.6';
         renderSidebarIndex();
     }
 	function hideAllViews(){
@@ -4516,6 +4580,13 @@ function looksLikeDiagram(code){
     // Hide streak from header when leaving dashboard
     const sw = document.getElementById('streakWidget');
     if (sw) sw.style.display = 'none';
+
+    // Hide submodule submenu (only shown on questions page)
+    const sm = document.getElementById('headerSubmoduleMenu');
+    if (sm) sm.style.display = 'none';
+
+    // Clear breadcrumb when leaving all views
+    updateHeaderBreadcrumb(null, null);
 }
 window.addEventListener("DOMContentLoaded", function(){
 
@@ -4570,14 +4641,11 @@ window.addEventListener("DOMContentLoaded", function(){
 
     document.getElementById('dashboardView').style.display = 'block';
     document.getElementById("hamburger").style.display = "none";
-    document.getElementById('headerNewBtn').style.display = 'none';
-    document.getElementById('lockBtn').style.display = 'none';
-    document.getElementById('headerBookModeBtn').style.display = 'none';
+    document.getElementById('headerSubmoduleMenu').style.display = 'none';
+    showHeaderBack(false);
+    updateHeaderBreadcrumb(null, null);
 
     document.getElementById('dashboardControls').style.display = 'flex';
-
-    document.getElementById('ebookBackBtn').style.display = 'none';
-	
 
     renderDashboard();
     initQotd();
@@ -4633,9 +4701,9 @@ window.addEventListener("DOMContentLoaded", function(){
     document.getElementById('moduleWorkspace').style.display = 'none';
 
     document.getElementById('hamburger').style.display = 'none';
-    document.getElementById('headerNewBtn').style.display = 'none';
-    document.getElementById('lockBtn').style.display = 'none';
-    document.getElementById('headerBookModeBtn').style.display = 'none';
+    document.getElementById('headerSubmoduleMenu').style.display = 'none';
+    showHeaderBack(false);
+    updateHeaderBreadcrumb(null, null);
 
     document.getElementById('dashboardControls').style.display = 'flex';
 
@@ -4658,6 +4726,8 @@ window.addEventListener("DOMContentLoaded", function(){
 		document.getElementById('dashboardView').style.display = 'none';
 		document.getElementById('submoduleView').style.display = 'block';
 		document.getElementById('moduleWorkspace').style.display = 'none';
+        showHeaderBack(true);
+        updateHeaderBreadcrumb(name, null);
 
 		renderSubmodules();
 		setTimeout(initSubmoduleSortable,100);
@@ -4674,9 +4744,9 @@ window.addEventListener("DOMContentLoaded", function(){
 		document.getElementById('moduleWorkspace').style.display = 'none';
 
 		document.getElementById('hamburger').style.display = 'none';
-		document.getElementById('headerNewBtn').style.display = 'none';
-		document.getElementById('lockBtn').style.display = 'none';
-    document.getElementById('headerBookModeBtn').style.display = 'none';
+    document.getElementById('headerSubmoduleMenu').style.display = 'none';
+    showHeaderBack(true);
+    updateHeaderBreadcrumb(currentModule, null);
 
 		renderSubmodules();
 		document.getElementById('scrollBtnGroup').style.display = 'none';
@@ -4700,9 +4770,9 @@ function openSubmodule(name) {
     document.getElementById('submoduleView').style.display = 'none';
     document.getElementById('moduleWorkspace').style.display = 'flex';
     document.getElementById('hamburger').style.display = 'block';
-    document.getElementById('headerNewBtn').style.display = 'block';
-    document.getElementById('lockBtn').style.display = 'block';
-    document.getElementById('headerBookModeBtn').style.display = 'block';
+    document.getElementById('headerSubmoduleMenu').style.display = 'block';
+    showHeaderBack(true);
+    updateHeaderBreadcrumb(currentModule, name);
 
     // Always expand sidebar on desktop; on mobile leave it collapsed (user opens via hamburger)
     const sb = document.getElementById('sidebar');
@@ -4770,6 +4840,9 @@ function openSubmodule(name) {
     function showListView() {
         document.getElementById('listView').style.display = 'block';
         document.getElementById('formView').style.display = 'none';
+        document.getElementById('headerSubmoduleMenu').style.display = 'block';
+        showHeaderBack(true);
+        updateHeaderBreadcrumb(currentModule, currentSubmodule);
         document.body.classList.add('on-qa-page');
         // Restore scroll to the card that was being edited/cancelled
         if (editId) {
@@ -5082,6 +5155,9 @@ function goToPreviousSearchMatch(){
         editId = id;
         document.getElementById('listView').style.display = 'none';
         document.getElementById('formView').style.display = 'flex';
+        document.getElementById('headerSubmoduleMenu').style.display = 'none';
+        showHeaderBack(true);
+        updateHeaderBreadcrumb(currentModule, currentSubmodule);
 
         // Populate Sub-topic Suggestions
         const datalist = document.getElementById('subtopicList');
@@ -5320,6 +5396,7 @@ if(sub){
                 data[currentModule] = newSubs;
                 currentSubmodule = newName;
                 document.getElementById('currentSubmoduleTitle').textContent = newName;
+                updateHeaderBreadcrumb(currentModule, newName);
                 save();
                 renderSidebarIndex();
                 showReadModeToast('✅ Submodule renamed!');
@@ -6955,6 +7032,11 @@ function startFreshReading(){
     if(!e.target.closest("#dashboardControls")){
         menu.style.display = "none";
     }
+
+    if(!e.target.closest("#headerSubmoduleMenu")){
+        const dd = document.getElementById("submoduleMenuDropdown");
+        if(dd) dd.style.display = "none";
+    }
 });
 
 
@@ -7977,11 +8059,6 @@ style="display:none; flex:1; overflow-y:auto; padding:1.5rem 2rem;">
 <!-- HEADER -->
 <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
 
-<button class="btn btn-outline"
-onclick="showDashboard()">
-←
-</button>
-
 <h1 style="margin:0; color:var(--primary);">
 🎥 Videos
 </h1>
@@ -8035,7 +8112,7 @@ background:rgba(0,0,0,0.9);
 z-index:9999;
 ">
 
-<button onclick="goBackToVideos()"
+<button onclick="handleHeaderBack()"
 style="
 position:absolute;
 top:20px;
@@ -8049,7 +8126,7 @@ border-radius:6px;
 cursor:pointer;
 font-size: 0.875em;
 ">
-← Back
+&lt; Back
 </button>
 
 <iframe id="videoPlayer"
@@ -8813,8 +8890,6 @@ function restoreScrollToCard(card, delay = 80) {
 }
 
 function toggleBookMode() {
-    if (window.innerWidth <= 850) return;
-
     const menu = document.getElementById('dashboardMenu');
     if (menu) menu.style.display = 'none';
 
@@ -8843,15 +8918,19 @@ function applyBookMode() {
     document.body.classList.toggle('book-mode', isBookMode);
     document.documentElement.style.setProperty('--book-width', bookWidth + 'px');
     updateBookModeOffset();
-    // Header button
-    const headerBtn = document.getElementById('headerBookModeBtn');
-    if (headerBtn) {
-        headerBtn.style.background = isBookMode ? 'var(--primary)' : '';
-        headerBtn.style.color = isBookMode ? 'white' : '';
-        headerBtn.style.borderColor = isBookMode ? 'var(--primary)' : '';
+    // Menu button label
+    const menuText = document.getElementById('menuBookModeText');
+    const menuBtn  = document.getElementById('menuBookModeBtn');
+    if (menuText) menuText.innerText = isBookMode ? 'Book Mode: On' : 'Book Mode';
+    if (menuBtn) {
+        menuBtn.style.fontWeight = isBookMode ? '700' : '';
+        menuBtn.style.color = isBookMode ? 'var(--primary)' : '';
     }
-    // Width pills
-    document.querySelectorAll('.book-width-pill').forEach(p => {
+    // Show/hide in-menu width pills row
+    const widthRow = document.getElementById('menuBookWidthRow');
+    if (widthRow) widthRow.classList.toggle('visible', isBookMode);
+    // Sync all pill sets (floating indicator + in-menu)
+    document.querySelectorAll('.book-width-pill, .menu-book-pill').forEach(p => {
         p.classList.toggle('active', parseInt(p.dataset.width) === bookWidth);
     });
 }
@@ -8876,7 +8955,7 @@ function setBookWidth(w) {
     bookWidth = w;
     localStorage.setItem('lh_book_width', w);
     document.documentElement.style.setProperty('--book-width', w + 'px');
-    document.querySelectorAll('.book-width-pill').forEach(p => {
+    document.querySelectorAll('.book-width-pill, .menu-book-pill').forEach(p => {
         p.classList.toggle('active', parseInt(p.dataset.width) === w);
     });
 
@@ -8899,7 +8978,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Init on load
 (function initBookMode() {
-    if (isBookMode && window.innerWidth > 850) applyBookMode();
+    if (isBookMode) applyBookMode();
     else document.documentElement.style.setProperty('--book-width', bookWidth + 'px');
 })();
 
