@@ -2177,6 +2177,14 @@ to{transform:translateY(0);}
     background: rgba(239, 68, 68, 0.1);
     color: var(--danger);
 }
+/* Hide book mode option entirely on mobile */
+@media (max-width: 768px) {
+    #menuBookModeBtn,
+    #menuBookWidthRow {
+        display: none !important;
+    }
+}
+
 /* In-menu book width pills */
 #menuBookWidthRow {
     display: none;
@@ -8978,6 +8986,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Init on load
 (function initBookMode() {
+    // Book mode is not available on mobile — reset and always use normal mode
+    if (window.innerWidth <= 768) {
+        isBookMode = false;
+        localStorage.setItem('lh_book_mode', false);
+        document.documentElement.style.setProperty('--book-width', bookWidth + 'px');
+        return;
+    }
     if (isBookMode) applyBookMode();
     else document.documentElement.style.setProperty('--book-width', bookWidth + 'px');
 })();
