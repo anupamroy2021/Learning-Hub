@@ -2244,61 +2244,365 @@ to{transform:translateY(0);}
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    gap: 0;
+    overflow: hidden;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 #welcomeSplash.hide {
     opacity: 0;
     pointer-events: none;
-    transform: scale(1.04);
+    transform: scale(1.06);
 }
+
+/* Animated mesh/grid background */
+.splash-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(37,99,235,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.07) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridDrift 20s linear infinite;
+    opacity: 0;
+    animation: gridFadeIn 1s ease 0.1s forwards, gridDrift 20s linear 1.1s infinite;
+}
+@keyframes gridFadeIn {
+    to { opacity: 1; }
+}
+@keyframes gridDrift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+}
+
+/* Radial glow orbs */
+.splash-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+}
+.splash-orb-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(37,99,235,0.35) 0%, transparent 70%);
+    top: -200px; left: -150px;
+    animation: orbFloat1 8s ease-in-out infinite;
+}
+.splash-orb-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%);
+    bottom: -180px; right: -100px;
+    animation: orbFloat2 10s ease-in-out infinite;
+}
+.splash-orb-3 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: orbPulse 4s ease-in-out infinite;
+}
+@keyframes orbFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, 30px) scale(1.1); }
+}
+@keyframes orbFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-30px, -40px) scale(1.05); }
+}
+@keyframes orbPulse {
+    0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.3); }
+}
+
+/* Floating particles */
+.splash-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(99,102,241,0.6);
+    pointer-events: none;
+}
+@keyframes particleRise {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
+}
+
+/* Center content wrapper */
+.splash-center {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+}
+
+/* Logo ring animation */
+.splash-logo-ring {
+    position: relative;
+    width: 180px; height: 180px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    animation: splashFadeUp 0.5s ease 0.1s forwards;
+}
+.splash-logo-ring::before, .splash-logo-ring::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+}
+.splash-logo-ring::before {
+    border-top-color: rgba(37,99,235,0.8);
+    border-right-color: rgba(99,102,241,0.4);
+    animation: ringRotate 2s linear infinite;
+}
+.splash-logo-ring::after {
+    inset: 8px;
+    border-bottom-color: rgba(99,102,241,0.7);
+    border-left-color: rgba(37,99,235,0.3);
+    animation: ringRotate 3s linear infinite reverse;
+}
+@keyframes ringRotate {
+    to { transform: rotate(360deg); }
+}
+.splash-logo-img {
+    width: 120px; height: 120px;
+    object-fit: contain;
+    position: relative; z-index: 1;
+    filter: drop-shadow(0 0 24px rgba(37,99,235,0.5));
+    animation: logoGlow 3s ease-in-out infinite;
+}
+@keyframes logoGlow {
+    0%, 100% { filter: drop-shadow(0 0 16px rgba(37,99,235,0.4)); }
+    50% { filter: drop-shadow(0 0 36px rgba(99,102,241,0.7)); }
+}
+
+/* Main title with letter-by-letter reveal */
 .splash-logo {
-    font-size: 3rem;
+    font-size: 3.2rem;
     font-weight: 900;
     color: white;
     display: flex;
     align-items: center;
     gap: 14px;
     opacity: 0;
-    transform: translateY(24px);
-    animation: splashFadeUp 0.6s ease 0.2s forwards;
+    transform: translateY(20px);
+    animation: splashFadeUp 0.5s ease 0.5s forwards;
+    letter-spacing: -1px;
 }
 .splash-logo span {
-    background: linear-gradient(135deg, #2563eb, #6366f1);
+    background: linear-gradient(135deg, #3b82f6, #6366f1, #a855f7);
+    background-size: 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: gradientShift 4s ease-in-out infinite;
 }
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Tagline */
 .splash-tagline {
-    font-size: 0.875em;
+    font-size: 0.8125em;
     color: rgba(255,255,255,0.4);
     font-weight: 500;
-    letter-spacing: 2px;
+    letter-spacing: 4px;
     text-transform: uppercase;
     opacity: 0;
-    animation: splashFadeUp 0.6s ease 0.45s forwards;
+    animation: splashFadeUp 0.5s ease 0.75s forwards;
 }
+
+/* Progress bar — glowing */
 .splash-bar-wrap {
-    width: 180px;
+    width: 240px;
     height: 3px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.08);
     border-radius: 10px;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
     opacity: 0;
-    animation: splashFadeUp 0.5s ease 0.6s forwards;
+    animation: splashFadeUp 0.5s ease 0.9s forwards;
 }
 .splash-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #2563eb, #6366f1);
+    background: linear-gradient(90deg, #2563eb, #6366f1, #a855f7);
     border-radius: 10px;
-    animation: splashBarFill 1s ease 0.7s forwards;
+    animation: splashBarFill 1.2s cubic-bezier(0.4, 0, 0.2, 1) 1s forwards;
+    position: relative;
 }
+.splash-bar::after {
+    content: '';
+    position: absolute;
+    right: -4px; top: -4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #818cf8;
+    box-shadow: 0 0 16px 6px rgba(99,102,241,0.6);
+    animation: splashBarFill 1.2s cubic-bezier(0.4, 0, 0.2, 1) 1s forwards;
+}
+
+/* Status text */
+.splash-status {
+    font-size: 0.6875em;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: splashFadeUp 0.4s ease 1.1s forwards, splashTextCycle 1.2s ease 1.1s forwards;
+}
+
 @keyframes splashFadeUp {
     to { opacity: 1; transform: translateY(0); }
 }
 @keyframes splashBarFill {
     to { width: 100%; }
+}
+@keyframes splashTextCycle {
+    0% { content: 'Initializing...'; }
+    50% { content: 'Loading modules...'; }
+    100% { content: 'Ready'; }
+}
+
+/* Scanline sweep effect */
+.splash-scanline {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(37,99,235,0.04) 50%,
+        transparent 100%
+    );
+    background-size: 100% 200px;
+    animation: scanSweep 3s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+@keyframes scanSweep {
+    0% { background-position: 0 -200px; }
+    100% { background-position: 0 100vh; }
+}
+
+/* Corner accents */
+.splash-corner {
+    position: absolute;
+    width: 60px; height: 60px;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    animation: splashFadeUp 0.4s ease 0.3s forwards;
+}
+.splash-corner-tl { top: 24px; left: 24px; border-top: 2px solid rgba(99,102,241,0.4); border-left: 2px solid rgba(99,102,241,0.4); border-radius: 4px 0 0 0; }
+.splash-corner-tr { top: 24px; right: 24px; border-top: 2px solid rgba(99,102,241,0.4); border-right: 2px solid rgba(99,102,241,0.4); border-radius: 0 4px 0 0; }
+.splash-corner-bl { bottom: 24px; left: 24px; border-bottom: 2px solid rgba(99,102,241,0.4); border-left: 2px solid rgba(99,102,241,0.4); border-radius: 0 0 0 4px; }
+.splash-corner-br { bottom: 24px; right: 24px; border-bottom: 2px solid rgba(99,102,241,0.4); border-right: 2px solid rgba(99,102,241,0.4); border-radius: 0 0 4px 0; }
+
+/* ── Typewriter cursor ── */
+.splash-cursor {
+    display: inline-block;
+    background: linear-gradient(135deg, #3b82f6, #a855f7);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    font-weight: 900;
+    animation: cursorBlink 0.65s step-end infinite;
+    margin-left: 2px;
+}
+@keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ── Page transitions ── */
+.page-transition-out {
+    animation: pageSlideOut 0.28s cubic-bezier(0.4,0,1,1) forwards !important;
+}
+.page-transition-in {
+    animation: pageSlideIn 0.32s cubic-bezier(0,0,0.2,1) both !important;
+}
+@keyframes pageSlideOut {
+    to { opacity: 0; transform: translateY(-14px) scale(0.98); }
+}
+@keyframes pageSlideIn {
+    from { opacity: 0; transform: translateY(18px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* ── Toast notifications ── */
+#toastContainer {
+    position: fixed; bottom: 28px; right: 24px;
+    display: flex; flex-direction: column-reverse; gap: 10px;
+    z-index: 999999; pointer-events: none;
+}
+.toast {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 18px;
+    min-width: 220px; max-width: 340px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1);
+    pointer-events: all;
+    animation: toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    position: relative; overflow: hidden;
+}
+.toast.toast-out {
+    animation: toastOut 0.28s cubic-bezier(0.4,0,1,1) forwards;
+}
+.toast-icon { font-size: 1.2em; flex-shrink: 0; }
+.toast-msg  { font-size: 0.8125em; font-weight: 600; color: var(--text); flex: 1; }
+.toast-bar  {
+    position: absolute; bottom: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 0 0 0 14px;
+    animation: toastBarShrink 2.8s linear forwards;
+}
+.toast.success .toast-bar { background: linear-gradient(90deg,#22c55e,#16a34a); }
+.toast.error   .toast-bar { background: linear-gradient(90deg,#ef4444,#dc2626); }
+.toast.warning .toast-bar { background: linear-gradient(90deg,#f59e0b,#d97706); }
+@keyframes toastIn  { from{opacity:0;transform:translateX(48px) scale(0.9)} to{opacity:1;transform:none} }
+@keyframes toastOut { to{opacity:0;transform:translateX(60px) scale(0.9)} }
+@keyframes toastBarShrink { from{width:100%} to{width:0%} }
+
+/* ── Interview timer ring ── */
+.iv-timer-wrap {
+    position: relative; width: 96px; height: 96px;
+    display: flex; align-items: center; justify-content: center;
+}
+.iv-timer-svg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    transform: rotate(-90deg);
+}
+.iv-timer-track { fill: none; stroke: var(--border); stroke-width: 5; }
+.iv-timer-ring  {
+    fill: none; stroke-width: 5; stroke-linecap: round;
+    stroke: var(--primary);
+    transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+}
+.iv-timer-ring.warning { stroke: #f59e0b; }
+.iv-timer-ring.danger  { stroke: var(--danger); }
+.iv-timer-digits {
+    position: relative; z-index: 1;
+    font-size: 1.35em; font-weight: 800;
+    font-variant-numeric: tabular-nums; letter-spacing: 1px;
+    color: var(--text);
+}
+.iv-timer-digits.warning { color: #f59e0b; }
+.iv-timer-digits.danger  { color: var(--danger); animation: timerPulse 0.5s infinite; }
+
+/* ── Flashcard 3D tilt ── */
+.flashcard-scene {
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.08s ease-out;
+}
+
+/* ── Confetti canvas ── */
+#confettiCanvas {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 999998;
+    width: 100%; height: 100%;
 }
 
 /* Smooth transition for all cards */
@@ -2343,6 +2647,210 @@ to{transform:translateY(0);}
     opacity: 1;
     transform: scale(1.01);
 }
+
+/* ===== GLOBAL MICRO-ANIMATIONS ===== */
+
+/* Module cards staggered entrance */
+@keyframes moduleCardEntrance {
+    from { opacity: 0; transform: translateY(28px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.grid .module-card {
+    animation: moduleCardEntrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.grid .module-card:nth-child(1)  { animation-delay: 0.05s; }
+.grid .module-card:nth-child(2)  { animation-delay: 0.10s; }
+.grid .module-card:nth-child(3)  { animation-delay: 0.15s; }
+.grid .module-card:nth-child(4)  { animation-delay: 0.20s; }
+.grid .module-card:nth-child(5)  { animation-delay: 0.25s; }
+.grid .module-card:nth-child(6)  { animation-delay: 0.30s; }
+.grid .module-card:nth-child(n+7){ animation-delay: 0.35s; }
+
+/* Module card banner shimmer on hover */
+.module-card-banner {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.module-card:hover .module-card-banner {
+    transform: scale(1.03);
+}
+.module-card-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    transition: left 0.5s ease;
+    z-index: 2;
+}
+.module-card:hover .module-card-banner::before {
+    left: 150%;
+}
+
+/* Button ripple on click */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+.btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: inherit;
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.btn:active::after {
+    transform: scale(2);
+    opacity: 0;
+    transition: 0s;
+}
+
+/* Sidebar nav button entrance */
+@keyframes navSlideIn {
+    from { opacity: 0; transform: translateX(-14px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.index-group {
+    animation: navSlideIn 0.3s ease both;
+}
+.index-group:nth-child(1) { animation-delay: 0.05s; }
+.index-group:nth-child(2) { animation-delay: 0.10s; }
+.index-group:nth-child(3) { animation-delay: 0.15s; }
+.index-group:nth-child(4) { animation-delay: 0.20s; }
+.index-group:nth-child(5) { animation-delay: 0.25s; }
+.index-group:nth-child(n+6) { animation-delay: 0.28s; }
+
+/* Nav button hover: subtle slide */
+.nav-btn {
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease, padding-left 0.15s ease;
+}
+.nav-btn:hover {
+    padding-left: 18px !important;
+}
+
+/* QOTD banner entrance */
+#qotdBanner {
+    animation: qotdSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+@keyframes qotdSlideIn {
+    from { opacity: 0; transform: translateY(-16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header entrance */
+header {
+    animation: headerSlideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes headerSlideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Dashboard h1 entrance */
+#dashboardView h1 {
+    animation: splashFadeUp 0.5s ease 0.1s both;
+}
+
+/* Practice buttons pop in */
+.practice-btn {
+    transition: background 0.2s, border-color 0.2s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s;
+}
+.practice-btn:hover {
+    transform: translateY(-3px) scale(1.04) !important;
+}
+
+/* Section separator animation */
+.section-separator {
+    animation: separatorReveal 0.4s ease both;
+}
+@keyframes separatorReveal {
+    from { opacity: 0; transform: scaleX(0.7); transform-origin: left; }
+    to   { opacity: 1; transform: scaleX(1); }
+}
+
+/* Icon button hover bounce */
+.icon-btn {
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+.icon-btn:hover {
+    transform: scale(1.13) !important;
+}
+
+/* Mastery badge pulse on change */
+.mastery-btn:hover {
+    transform: scale(1.08);
+}
+
+/* Scroll buttons float in */
+.scroll-btn {
+    transition: background 0.15s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s !important;
+}
+.scroll-btn:hover {
+    transform: scale(1.18) !important;
+}
+
+/* Sidebar toggle transition */
+.sidebar {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+/* Dropdown menus */
+#dashboardMenu, #submoduleMenuDropdown {
+    transform-origin: top right;
+    animation: menuReveal 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes menuReveal {
+    from { opacity: 0; transform: scale(0.92) translateY(-8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Menu items stagger */
+.menu-item {
+    animation: menuItemIn 0.2s ease both;
+}
+#dashboardMenu .menu-item:nth-child(1)  { animation-delay: 0.03s; }
+#dashboardMenu .menu-item:nth-child(2)  { animation-delay: 0.06s; }
+#dashboardMenu .menu-item:nth-child(3)  { animation-delay: 0.09s; }
+#dashboardMenu .menu-item:nth-child(4)  { animation-delay: 0.12s; }
+#dashboardMenu .menu-item:nth-child(n+5){ animation-delay: 0.15s; }
+@keyframes menuItemIn {
+    from { opacity: 0; transform: translateX(8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Progress bar fills with spring */
+.module-progress-bar {
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Streak fire animation enhanced */
+.streak-fire {
+    animation: fireWiggle 1.8s ease-in-out infinite, fireGlow 2.4s ease-in-out infinite;
+}
+@keyframes fireGlow {
+    0%, 100% { filter: drop-shadow(0 2px 4px rgba(245,158,11,0.4)); }
+    50% { filter: drop-shadow(0 2px 12px rgba(245,158,11,0.8)) brightness(1.2); }
+}
+
+/* Flash on bookmark/mastery action */
+@keyframes flashSuccess {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+    50% { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+.mastery-btn.mastered {
+    animation: flashSuccess 0.5s ease;
+}
+
+/* Submodule view entrance */
+#submoduleView {
+    animation: splashFadeUp 0.35s ease both;
+}
+#submoduleView h1 {
+    animation: splashFadeUp 0.4s ease 0.05s both;
+}
 /* Book mode variants */
 body.book-mode .content-area.has-focus .card {
     opacity: 0.55 !important;
@@ -2364,6 +2872,8 @@ body.book-mode .content-area.has-focus .card:hover {
     <script src="https://js.puter.com/v2/"></script>
 </head>
 <body class="dark">
+<canvas id="confettiCanvas" style="display:none;"></canvas>
+<div id="toastContainer"></div>
 <script>
 // Restore theme before paint to avoid flash
 (function(){
@@ -2374,13 +2884,47 @@ body.book-mode .content-area.has-focus .card:hover {
 
 <!-- ===== WELCOME SPLASH ===== -->
 <div id="welcomeSplash">
-    <img src="https://cdn.jsdelivr.net/gh/anupamroy2021/Learning-Hub/logo.png" style="width:160px; height:160px; object-fit:contain; opacity:0; transform:translateY(24px); animation: splashFadeUp 0.6s ease 0.2s forwards;" alt="Learning Hub Logo">
-	<div class="splash-logo"><span>LEARNING HUB</span></div>
-    <div class="splash-tagline">Your personal knowledge base</div>
-    <div class="splash-bar-wrap">
-        <div class="splash-bar"></div>
+    <div class="splash-bg-grid"></div>
+    <div class="splash-orb splash-orb-1"></div>
+    <div class="splash-orb splash-orb-2"></div>
+    <div class="splash-orb splash-orb-3"></div>
+    <div class="splash-scanline"></div>
+    <div class="splash-corner splash-corner-tl"></div>
+    <div class="splash-corner splash-corner-tr"></div>
+    <div class="splash-corner splash-corner-bl"></div>
+    <div class="splash-corner splash-corner-br"></div>
+    <div id="splashParticles"></div>
+    <div class="splash-center">
+        <div class="splash-logo-ring">
+            <img class="splash-logo-img" src="https://cdn.jsdelivr.net/gh/anupamroy2021/Learning-Hub/logo.png" alt="Learning Hub Logo">
+        </div>
+        <div class="splash-logo"><span id="splashTypewriter"></span><span class="splash-cursor">|</span></div>
+        <div class="splash-tagline">Your personal knowledge base</div>
+        <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+        <div class="splash-status" id="splashStatus">Initializing...</div>
     </div>
 </div>
+<script>
+(function() {
+    var container = document.getElementById('splashParticles');
+    if (!container) return;
+    var colors = ['rgba(99,102,241,0.7)','rgba(37,99,235,0.7)','rgba(168,85,247,0.6)','rgba(59,130,246,0.5)'];
+    for (var i = 0; i < 28; i++) {
+        var p = document.createElement('div');
+        p.className = 'splash-particle';
+        p.style.cssText = 'position:absolute;border-radius:50%;pointer-events:none;left:' + (Math.random()*100) + '%;bottom:-10px;width:' + (2+Math.random()*5) + 'px;height:' + (2+Math.random()*5) + 'px;background:' + colors[Math.floor(Math.random()*colors.length)] + ';animation:particleRise ' + (4+Math.random()*8) + 's ease-in ' + (Math.random()*3) + 's infinite;';
+        container.appendChild(p);
+    }
+    var statusEl = document.getElementById('splashStatus');
+    var msgs = ['Initializing...','Loading modules...','Almost ready...','Ready ✓'];
+    var idx = 0;
+    var iv = setInterval(function() {
+        idx++;
+        if (statusEl) statusEl.textContent = msgs[Math.min(idx, msgs.length-1)];
+        if (idx >= msgs.length - 1) clearInterval(iv);
+    }, 450);
+})();
+</script>
 
 <header>
 
@@ -7867,8 +8411,8 @@ function renderProgressModal() {
 	const splash = document.getElementById('welcomeSplash');
 	setTimeout(() => {
 		splash.classList.add('hide');
-		setTimeout(() => splash.style.display = 'none', 650);
-	}, 1800);
+		setTimeout(() => splash.style.display = 'none', 850);
+	}, 2400);
 
 	showDashboard();
 	// Restore sort button active state from saved preference
@@ -8305,9 +8849,18 @@ style="display:none"
     </div>
     <div id="interviewSession" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <div>
-                <div style="font-size: 0.6875em; opacity:0.5; text-transform:uppercase; letter-spacing:1px;">Time Remaining</div>
-                <div class="interview-timer" id="ivTimer">10:00</div>
+            <div style="display:flex;align-items:center;gap:16px;">
+                <div class="iv-timer-wrap" id="ivTimerWrap">
+                    <svg class="iv-timer-svg" viewBox="0 0 96 96">
+                        <circle class="iv-timer-track" cx="48" cy="48" r="43"/>
+                        <circle class="iv-timer-ring" id="ivTimerRing" cx="48" cy="48" r="43"/>
+                    </svg>
+                    <div class="iv-timer-digits" id="ivTimer">10:00</div>
+                </div>
+                <div>
+                    <div style="font-size:0.6875em;opacity:0.5;text-transform:uppercase;letter-spacing:1px;">Time Remaining</div>
+                    <div style="font-size:0.8125em;opacity:0.6;margin-top:2px;" id="ivTimerLabel">–</div>
+                </div>
             </div>
             <div style="text-align:right;">
                 <button class="btn btn-outline" style="font-size: 0.75em;" onclick="revealAllAnswers()">👁 Reveal All</button>
@@ -9186,6 +9739,316 @@ function ttsStop(resetBar = true) {
 document.getElementById('syncModal').addEventListener('click', function(e) {
     if (e.target === this) closeSyncModal();
 });
+
+// ============================================================
+// 1. TYPEWRITER EFFECT ON SPLASH
+// ============================================================
+(function() {
+    var el = document.getElementById('splashTypewriter');
+    var cursor = document.querySelector('.splash-cursor');
+    if (!el) return;
+    var text = 'LEARNING HUB';
+    var i = 0;
+    var delay = 620; // start after logo ring fades in
+    setTimeout(function type() {
+        if (i <= text.length) {
+            el.textContent = text.slice(0, i);
+            i++;
+            setTimeout(type, i <= text.length ? 80 : 400);
+        } else {
+            // Hide cursor after typing done
+            if (cursor) setTimeout(function(){ cursor.style.display='none'; }, 600);
+        }
+    }, delay);
+})();
+
+// ============================================================
+// 2. TOAST NOTIFICATIONS
+// ============================================================
+function showToast(msg, type, icon) {
+    type = type || 'info';
+    icon = icon || (type==='success'?'✅': type==='error'?'❌': type==='warning'?'⚠️':'ℹ️');
+    var container = document.getElementById('toastContainer');
+    if (!container) return;
+    var t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML = '<span class="toast-icon">' + icon + '</span><span class="toast-msg">' + msg + '</span><div class="toast-bar"></div>';
+    container.appendChild(t);
+    setTimeout(function() {
+        t.classList.add('toast-out');
+        setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
+    }, 2800);
+}
+
+// Intercept save / delete / export actions with toasts
+var _origSave = typeof save === 'function' ? save : null;
+// Patch save — wrap after DOMContentLoaded since save is already defined above
+(function patchFunctions() {
+    // Patch cycleMastery for confetti + toast
+    var _origCycleMastery = window.cycleMastery;
+    window.cycleMastery = function(entryId) {
+        var prev = masteryData[entryId];
+        _origCycleMastery(entryId);
+        var cur = masteryData[entryId];
+        if (cur === 'mastered' && prev !== 'mastered') {
+            showToast('Marked as Mastered! 🎓', 'success', '🏆');
+            launchConfetti();
+        } else if (cur === 'learning') {
+            showToast('Added to Learning list', 'info', '📘');
+        } else if (!cur) {
+            showToast('Reset to New', 'info', '🔄');
+        }
+    };
+
+    // Patch deleteEntry if it exists
+    var _origDeleteEntry = window.deleteEntry;
+    if (_origDeleteEntry) {
+        window.deleteEntry = function() {
+            _origDeleteEntry.apply(this, arguments);
+            showToast('Entry deleted', 'warning', '🗑');
+        };
+    }
+
+    // Patch exportData
+    var _origExportData = window.exportData;
+    if (_origExportData) {
+        window.exportData = function() {
+            _origExportData.apply(this, arguments);
+            showToast('Data exported successfully', 'success', '📤');
+        };
+    }
+
+    // Patch save to show subtle toast (debounced)
+    var _origSaveFn = window.save;
+    var _saveToastTimer = null;
+    if (_origSaveFn) {
+        window.save = function() {
+            _origSaveFn.apply(this, arguments);
+            clearTimeout(_saveToastTimer);
+            _saveToastTimer = setTimeout(function() {
+                showToast('Saved', 'success', '💾');
+            }, 400);
+        };
+    }
+})();
+
+// ============================================================
+// 3. CONFETTI ON MASTERED
+// ============================================================
+function launchConfetti() {
+    var canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    canvas.style.display = 'block';
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    var ctx = canvas.getContext('2d');
+    var pieces = [];
+    var colors = ['#2563eb','#6366f1','#a855f7','#22c55e','#f59e0b','#ef4444','#06b6d4','#ec4899'];
+    for (var i = 0; i < 140; i++) {
+        pieces.push({
+            x: Math.random() * canvas.width,
+            y: -10 - Math.random() * 120,
+            r: 3 + Math.random() * 6,
+            d: 1.5 + Math.random() * 3,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            tilt: Math.random() * 10 - 5,
+            tiltSpeed: 0.1 + Math.random() * 0.2,
+            angle: 0,
+            shape: Math.random() > 0.5 ? 'rect' : 'circle'
+        });
+    }
+    var frame = 0;
+    var maxFrames = 120;
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(function(p) {
+            p.angle += p.tiltSpeed;
+            p.y += p.d + Math.sin(p.angle) * 0.5;
+            p.x += Math.sin(p.angle * 0.7) * 1.2;
+            p.tilt = Math.sin(p.angle) * 12;
+            ctx.save();
+            ctx.beginPath();
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = Math.max(0, 1 - frame / maxFrames);
+            if (p.shape === 'rect') {
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.tilt * Math.PI / 180);
+                ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+            } else {
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        });
+        frame++;
+        if (frame < maxFrames) {
+            requestAnimationFrame(draw);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.display = 'none';
+        }
+    }
+    requestAnimationFrame(draw);
+}
+
+// ============================================================
+// 4. SMOOTH PAGE TRANSITIONS
+// ============================================================
+function transitionViews(hideEl, showEl, showFn) {
+    if (!hideEl || hideEl.style.display === 'none') {
+        if (showFn) showFn();
+        if (showEl) { showEl.style.display = ''; showEl.classList.add('page-transition-in'); setTimeout(function(){ showEl.classList.remove('page-transition-in'); }, 400); }
+        return;
+    }
+    hideEl.classList.add('page-transition-out');
+    setTimeout(function() {
+        hideEl.classList.remove('page-transition-out');
+        hideEl.style.display = 'none';
+        if (showFn) showFn();
+        if (showEl) {
+            showEl.classList.remove('page-transition-in');
+            void showEl.offsetWidth; // reflow
+            showEl.classList.add('page-transition-in');
+            setTimeout(function(){ showEl.classList.remove('page-transition-in'); }, 400);
+        }
+    }, 250);
+}
+
+// Wrap core navigation with transitions
+var _origOpenModule = window.openModule;
+window.openModule = function(name) {
+    var dashboard = document.getElementById('dashboardView');
+    var subView = document.getElementById('submoduleView');
+    dashboard.classList.add('page-transition-out');
+    setTimeout(function() {
+        dashboard.classList.remove('page-transition-out');
+        _origOpenModule(name);
+        subView.classList.add('page-transition-in');
+        setTimeout(function(){ subView.classList.remove('page-transition-in'); }, 400);
+    }, 240);
+};
+
+var _origGoBack = window.goBackToDashboard;
+window.goBackToDashboard = function() {
+    var cur = document.getElementById('submoduleView').style.display !== 'none'
+        ? document.getElementById('submoduleView')
+        : document.getElementById('moduleWorkspace');
+    cur.classList.add('page-transition-out');
+    setTimeout(function() {
+        cur.classList.remove('page-transition-out');
+        _origGoBack();
+        var dv = document.getElementById('dashboardView');
+        dv.classList.add('page-transition-in');
+        setTimeout(function(){ dv.classList.remove('page-transition-in'); }, 400);
+    }, 240);
+};
+
+var _origOpenSubmodule = window.openSubmodule;
+window.openSubmodule = function(name) {
+    var sv = document.getElementById('submoduleView');
+    sv.classList.add('page-transition-out');
+    setTimeout(function() {
+        sv.classList.remove('page-transition-out');
+        _origOpenSubmodule(name);
+        var ws = document.getElementById('moduleWorkspace');
+        ws.classList.add('page-transition-in');
+        setTimeout(function(){ ws.classList.remove('page-transition-in'); }, 400);
+    }, 240);
+};
+
+// ============================================================
+// 7. INTERVIEW TIMER RING
+// ============================================================
+var _ivTotalTime = 600;
+
+var _origStartInterview = window.startInterview;
+window.startInterview = function() {
+    _ivTotalTime = parseInt(document.getElementById('ivTimeSelect').value) || 600;
+    _origStartInterview.apply(this, arguments);
+    updateIvRing();
+};
+
+var _origUpdateIvTimer = window.updateIvTimer;
+window.updateIvTimer = function() {
+    _origUpdateIvTimer.apply(this, arguments);
+    updateIvRing();
+};
+
+function updateIvRing() {
+    var ring = document.getElementById('ivTimerRing');
+    var digits = document.getElementById('ivTimer');
+    var label = document.getElementById('ivTimerLabel');
+    if (!ring) return;
+
+    var r = 43;
+    var circumference = 2 * Math.PI * r;
+    ring.style.strokeDasharray = circumference;
+
+    var timeLeft = typeof ivTimeLeft !== 'undefined' ? ivTimeLeft : _ivTotalTime;
+    var fraction = _ivTotalTime > 0 ? timeLeft / _ivTotalTime : 1;
+    var offset = circumference * (1 - fraction);
+    ring.style.strokeDashoffset = offset;
+
+    // Color states
+    ring.classList.remove('warning', 'danger');
+    if (digits) digits.classList.remove('warning', 'danger');
+    if (timeLeft <= 60) {
+        ring.classList.add('danger');
+        if (digits) digits.classList.add('danger');
+        if (label) label.textContent = '⚠️ Under a minute!';
+    } else if (timeLeft <= 120) {
+        ring.classList.add('warning');
+        if (digits) digits.classList.add('warning');
+        if (label) label.textContent = '⏳ Almost done';
+    } else {
+        if (label) {
+            var mins = Math.ceil(timeLeft / 60);
+            label.textContent = mins + ' min' + (mins !== 1 ? 's' : '') + ' left';
+        }
+    }
+}
+
+// ============================================================
+// 8. FLASHCARD 3D TILT
+// ============================================================
+(function() {
+    function attachTilt() {
+        var scene = document.getElementById('flashcardScene');
+        if (!scene || scene._tiltAttached) return;
+        scene._tiltAttached = true;
+
+        scene.addEventListener('mousemove', function(e) {
+            var inner = document.getElementById('flashcardInner');
+            if (inner && inner.classList.contains('is-flipped')) return;
+            var rect = scene.getBoundingClientRect();
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top + rect.height / 2;
+            var dx = (e.clientX - cx) / (rect.width / 2);
+            var dy = (e.clientY - cy) / (rect.height / 2);
+            var tiltX = dy * -8;
+            var tiltY = dx * 8;
+            scene.style.transform = 'perspective(1400px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale(1.01)';
+        });
+
+        scene.addEventListener('mouseleave', function() {
+            scene.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+            scene.style.transform = 'perspective(1400px) rotateX(0deg) rotateY(0deg) scale(1)';
+            setTimeout(function(){ scene.style.transition = ''; }, 500);
+        });
+    }
+
+    // Attach whenever flashcard modal opens
+    var _origOpenFlashcard = window.openFlashcardMode;
+    if (_origOpenFlashcard) {
+        window.openFlashcardMode = function() {
+            _origOpenFlashcard.apply(this, arguments);
+            setTimeout(attachTilt, 100);
+        };
+    }
+    // Also try on DOMContentLoaded in case it's already open
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(attachTilt, 500); });
+    setTimeout(attachTilt, 800);
+})();
 </script>
 
 <!-- ================= PROGRESS MODAL ================= -->
