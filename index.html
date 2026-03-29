@@ -833,7 +833,9 @@ blockquote{
         gap: 6px !important;
     }
 
-    /* Every button that appears in the header on mobile gets same size */
+    /* Every button that appears in the header on mobile gets same size.
+       NOTE: display is intentionally NOT set here — JS controls show/hide via inline style.
+       Only set sizing/layout so they look consistent when JS makes them visible. */
     #headerBackBtn,
     #hamburger,
     #headerHomeBtn,
@@ -848,19 +850,25 @@ blockquote{
         min-width: 36px !important;
         padding: 0 !important;
         border-radius: 50% !important;
-        display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
         font-size: 1rem !important;
         flex-shrink: 0 !important;
     }
 
-    /* Home button label already hidden by .btn-label, but its inner svg needs centering */
-    #headerHomeBtn { gap: 0 !important; }
-    #headerHomeBtn .btn-label { display: none !important; }
+    /* When JS shows these buttons, render them as flex */
+    #headerBackBtn[style*="display: inline-flex"],
+    #headerBackBtn[style*="display:inline-flex"],
+    #hamburger[style*="display: inline-flex"],
+    #hamburger[style*="display:inline-flex"],
+    #headerHomeBtn[style*="display: inline-flex"],
+    #headerHomeBtn[style*="display:inline-flex"] {
+        display: inline-flex !important;
+    }
 
-    /* Continue reading button: shrink to icon only */
-    #continueReadingBtn {
+    /* Continue reading button: shrink to icon only — only when JS shows it */
+    #continueReadingBtn[style*="display: inline-flex"],
+    #continueReadingBtn[style*="display:inline-flex"] {
         width: 36px !important;
         height: 36px !important;
         min-width: 36px !important;
@@ -872,7 +880,6 @@ blockquote{
         font-size: 1rem !important;
         flex-shrink: 0 !important;
     }
-    #continueReadingBtn #continueReadingLabel { display: none !important; }
 
     /* Streak widget: compact */
     #streakWidget {
@@ -4802,7 +4809,7 @@ function handleHeaderBack() {
 
 function showHeaderBack(show) {
     const btn = document.getElementById('headerBackBtn');
-    if (btn) btn.style.display = show ? 'block' : 'none';
+    if (btn) btn.style.display = show ? 'inline-flex' : 'none';
 }
 
 function updateHeaderBreadcrumb(module, submodule) {
@@ -5728,7 +5735,7 @@ function openSubmodule(name) {
     document.getElementById('dashboardView').style.display = 'none';
     document.getElementById('submoduleView').style.display = 'none';
     document.getElementById('moduleWorkspace').style.display = 'flex';
-    document.getElementById('hamburger').style.display = 'block';
+    document.getElementById('hamburger').style.display = 'inline-flex';
     document.getElementById('headerSubmoduleMenu').style.display = 'block';
     var _hhb = document.getElementById('headerHomeBtn'); if(_hhb) _hhb.style.display = 'inline-flex';
     showHeaderBack(true);
