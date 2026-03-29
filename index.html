@@ -25,23 +25,52 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #f8fafc; --text: #1e293b; --card: #ffffff; --sidebar: #f1f5f9;
-            --primary: #2563eb; --border: #cbd5e1; --accent: #6366f1; --danger: #ef4444;
+            /* Google Material You — Light */
+            --bg: #f8f9fa;
+            --text: #202124;
+            --card: #ffffff;
+            --sidebar: #e8f0fe;
+            --primary: #1a73e8;       /* Google Blue */
+            --primary-hover: #1557b0;
+            --accent: #34a853;         /* Google Green */
+            --danger: #ea4335;         /* Google Red */
+            --warning: #fbbc04;        /* Google Yellow */
+            --border: #dadce0;
             --md-bg: #ffffff;
-			--highlight: #facc15;
-            --question-color: #0d9488;
+            --highlight: #fbbc04;
+            --question-color: #1a73e8;
+            --surface: #f1f3f4;
+            --on-primary: #ffffff;
+            --shadow-sm: 0 1px 2px rgba(60,64,67,0.10), 0 1px 3px 1px rgba(60,64,67,0.08);
+            --shadow-md: 0 1px 3px rgba(60,64,67,0.15), 0 4px 8px 3px rgba(60,64,67,0.10);
+            --shadow-lg: 0 2px 6px rgba(60,64,67,0.15), 0 8px 24px 4px rgba(60,64,67,0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 24px;
         }
         .dark {
-            --bg: #0d1117; 
-            --text: #e6edf3; --card: #161b22; --sidebar: #010409;
-            --primary: #2f81f7; --border: #30363d;
-            --md-bg: #0d1117;
-			--highlight: #f59e0b;
-            --question-color: #2dd4bf;
+            /* True Black — OLED/AMOLED optimized */
+            --bg: #000000;
+            --text: #e8eaed;
+            --card: #0d0d0d;
+            --sidebar: #000000;
+            --primary: #8ab4f8;       /* Google Blue dark */
+            --primary-hover: #aecbfa;
+            --accent: #81c995;         /* Google Green dark */
+            --danger: #f28b82;         /* Google Red dark */
+            --warning: #fdd663;        /* Google Yellow dark */
+            --border: #1f1f1f;
+            --md-bg: #0d0d0d;
+            --highlight: #fdd663;
+            --question-color: #8ab4f8;
+            --surface: #0d0d0d;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.6), 0 1px 3px 1px rgba(0,0,0,0.4);
+            --shadow-md: 0 1px 3px rgba(0,0,0,0.6), 0 4px 8px 3px rgba(0,0,0,0.4);
+            --shadow-lg: 0 2px 6px rgba(0,0,0,0.6), 0 8px 24px 4px rgba(0,0,0,0.5);
         }
 		.highlighted {
             background-color: var(--highlight);
@@ -56,14 +85,17 @@
     margin-top:20px;
 }
 pre, code, pre code, pre[class*="language-"], code[class*="language-"] {
-    font-family: 'Fira Code', 'Source Code Pro', monospace !important;
-    font-size: 0.9rem !important;
+    font-family: 'Roboto Mono', 'Source Code Pro', monospace !important;
+    font-size: 0.875rem !important;
     line-height: 1.6 !important;
 }
 blockquote{
-    border-left:4px solid #6366f1;
+    border-left:4px solid var(--primary);
     padding-left:10px;
     color:#555;
+    background: rgba(26,115,232,0.05);
+    border-radius: 0 8px 8px 0;
+    padding: 8px 10px 8px 16px;
 }
 /* ===== CUSTOM PROMPT / CONFIRM MODAL ===== */
 #customDialogOverlay {
@@ -322,7 +354,7 @@ blockquote{
     pointer-events: none;
 }
 .dark .flashcard-back {
-    background: linear-gradient(145deg, #161b22, #1b2236);
+    background: linear-gradient(145deg, #0d0d0d, #111111);
 }
 
 /* Question text */
@@ -795,6 +827,75 @@ blockquote{
 @media (max-width: 600px) {
     .btn-label { display: none; }
 
+    /* ── Header: consistent icon button sizing across ALL views ── */
+    header {
+        padding: 8px 10px !important;
+        gap: 6px !important;
+    }
+
+    /* Every button that appears in the header on mobile gets same size */
+    #headerBackBtn,
+    #hamburger,
+    #headerHomeBtn,
+    .header-actions .btn,
+    .header-actions .btn-outline,
+    #headerSubmoduleMenu > .btn,
+    #headerSubmoduleMenu > .btn-outline,
+    #dashboardControls > .btn,
+    #dashboardControls > .btn-outline {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Home button label already hidden by .btn-label, but its inner svg needs centering */
+    #headerHomeBtn { gap: 0 !important; }
+    #headerHomeBtn .btn-label { display: none !important; }
+
+    /* Continue reading button: shrink to icon only */
+    #continueReadingBtn {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1rem !important;
+        flex-shrink: 0 !important;
+    }
+    #continueReadingBtn #continueReadingLabel { display: none !important; }
+
+    /* Streak widget: compact */
+    #streakWidget {
+        padding: 4px 8px !important;
+        border-radius: 20px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Left side of header: tight gap */
+    header > div:first-child {
+        gap: 6px !important;
+    }
+
+    /* Right side header-actions: tight gap */
+    .header-actions {
+        gap: 5px !important;
+    }
+
+    /* Logo: only show icon, hide text on very small screens */
+    @media (max-width: 400px) {
+        #headerLogo > span { display: none !important; }
+    }
+
     /* Normalize ALL action buttons to same square size */
     .edit-action,
     .btn.edit-action,
@@ -1103,7 +1204,7 @@ display:table-cell !important;
 			font-size: 0.75em;
 			user-select: none;
 		}
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Google Sans', 'Roboto', sans-serif; }
 
         /* ── Fluid base font: scales from 14px (360px screen) → 18px (2560px screen) ── */
         html { font-size: clamp(14px, 0.55vw + 12px, 20px); }
@@ -1112,10 +1213,17 @@ display:table-cell !important;
 
         header { 
             display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; 
-            background: var(--card); border-bottom: 1px solid var(--border); z-index: 10001;
+            background: #ffffff; border-bottom: 1px solid var(--border); z-index: 10001;
             height: 60px; gap: 8px;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.15), 0 1px 2px rgba(60,64,67,0.10);
         }
-        .logo { font-weight: 800; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem; flex-shrink: 0; }
+        .logo { font-weight: 700; color: #202124; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; flex-shrink: 0; letter-spacing: -0.3px; }
+        .logo .logo-g { color: #4285f4; }
+        .logo .logo-o1 { color: #ea4335; }
+        .logo .logo-o2 { color: #fbbc04; }
+        .logo .logo-g2 { color: #4285f4; }
+        .logo .logo-l { color: #34a853; }
+        .logo .logo-e { color: #ea4335; }
         .header-actions { display: flex; gap: 6px; align-items: center; }
         
         .menu-toggle { 
@@ -1127,7 +1235,7 @@ display:table-cell !important;
         @media (max-width: 650px) {
             .btn span { display: none; }
             .btn { padding: 10px; min-width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
-            .logo span { display: none; }
+            /* logo text hidden below 400px via the mobile block */
             .header-actions-mobile {
                 display: flex;
                 flex-direction: column;
@@ -1302,7 +1410,7 @@ display:table-cell !important;
         .markdown-body table tr { background-color: var(--card) !important; border-top: 1px solid var(--border); }
         .markdown-body table tr:nth-child(2n) { background-color: var(--bg) !important; }
         .markdown-body table th, .markdown-body table td { border: 1px solid var(--border); padding: 6px 13px; }
-        code[class*="language-"], pre[class*="language-"] { font-family: 'Fira Code', monospace !important; font-size: 0.9rem !important; }
+        code[class*="language-"], pre[class*="language-"] { font-family: 'Roboto Mono', monospace !important; font-size: 0.9rem !important; }
 
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); z-index: 150; }
@@ -2868,6 +2976,266 @@ body.book-mode .content-area.has-focus .card:hover {
 }
 
 
+/* ============================================================
+   GOOGLE MATERIAL DESIGN 3 THEME OVERRIDES
+   ============================================================ */
+
+/* --- Buttons: Material filled + tonal + outlined styles --- */
+.btn {
+    border-radius: 20px !important;
+    font-family: 'Google Sans', 'Roboto', sans-serif !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.01em !important;
+    padding: 8px 20px !important;
+    box-shadow: none !important;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s !important;
+}
+.btn:hover {
+    box-shadow: 0 1px 3px rgba(60,64,67,0.3), 0 4px 8px rgba(60,64,67,0.15) !important;
+    filter: none !important;
+    transform: none !important;
+}
+.btn:active { transform: scale(0.97) !important; }
+.btn-outline {
+    border-radius: 20px !important;
+    border: 1px solid var(--border) !important;
+}
+.btn-outline:hover {
+    background: rgba(26,115,232,0.08) !important;
+    border-color: var(--primary) !important;
+}
+
+/* --- Cards: Material elevated surface --- */
+.card {
+    border-radius: 16px !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.10), 0 1px 3px 1px rgba(60,64,67,0.08) !important;
+}
+.card:hover {
+    box-shadow: 0 1px 3px rgba(60,64,67,0.15), 0 4px 8px 3px rgba(60,64,67,0.10) !important;
+}
+
+/* --- Module cards: Material card look --- */
+.module-card {
+    border-radius: 16px !important;
+    box-shadow: 0 1px 2px rgba(60,64,67,0.10), 0 1px 3px rgba(60,64,67,0.08) !important;
+}
+.module-card:hover {
+    box-shadow: 0 2px 6px rgba(60,64,67,0.15), 0 8px 24px rgba(60,64,67,0.12) !important;
+    transform: translateY(-3px) !important;
+    border-color: var(--primary) !important;
+}
+
+/* --- Header: Google-style top app bar --- */
+header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    box-shadow: 0 1px 3px rgba(60,64,67,0.15), 0 1px 2px rgba(60,64,67,0.10) !important;
+}
+.dark header {
+    background: #000000 !important;
+    border-bottom: 1px solid #1f1f1f !important;
+    box-shadow: none !important;
+}
+
+/* --- Search box: Material outlined text field --- */
+#search, #globalSearch, textarea, input[type="text"], input[type="search"] {
+    border-radius: 24px !important;
+    border: 1px solid var(--border) !important;
+    font-family: 'Roboto', sans-serif !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+#search:focus, #globalSearch:focus, textarea:focus, input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.2) !important;
+    outline: none !important;
+}
+
+/* --- Sidebar: Google sidebar style --- */
+.sidebar {
+    background: var(--sidebar) !important;
+    border-right: 1px solid var(--border) !important;
+}
+.dark .sidebar {
+    background: #000000 !important;
+    border-right: 1px solid #1a1a1a !important;
+}
+
+/* --- Nav buttons: Google navigation item --- */
+.nav-btn {
+    border-radius: 24px !important;
+    font-family: 'Google Sans', 'Roboto', sans-serif !important;
+    font-weight: 500 !important;
+}
+.nav-btn.active-index {
+    background: #e8f0fe !important;
+    color: #1a73e8 !important;
+    border-left: none !important;
+    font-weight: 700 !important;
+}
+.dark .nav-btn.active-index {
+    background: rgba(138,180,248,0.10) !important;
+    color: #8ab4f8 !important;
+}
+.nav-btn:hover {
+    background: rgba(26,115,232,0.08) !important;
+    padding-left: 12px !important;
+}
+
+/* --- QOTD Banner: Google blue gradient --- */
+#qotdBanner {
+    background: linear-gradient(135deg, #1a73e8, #4285f4) !important;
+    border-radius: 16px !important;
+}
+
+/* --- Modal boxes: Material dialog --- */
+.flashcard-box, .interview-box, .weak-topics-box, .progress-box, .custom-dialog, .video-modal-content {
+    border-radius: 28px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.10) !important;
+}
+
+/* --- Scrollbar: Material style --- */
+::-webkit-scrollbar-thumb {
+    background: #dadce0 !important;
+    border-radius: 10px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #1a73e8 !important;
+}
+
+/* --- Badge colors: Google tonal style --- */
+.badge-mastered  { background: #e6f4ea !important; color: #137333 !important; border-color: #ceead6 !important; }
+.badge-learning  { background: #e8f0fe !important; color: #1a73e8 !important; border-color: #c5d8fd !important; }
+.badge-new       { background: #f1f3f4 !important; color: #5f6368 !important; border-color: #e0e0e0 !important; }
+.dark .badge-mastered  { background: rgba(129,201,149,0.15) !important; color: #81c995 !important; border-color: rgba(129,201,149,0.3) !important; }
+.dark .badge-learning  { background: rgba(138,180,248,0.15) !important; color: #8ab4f8 !important; border-color: rgba(138,180,248,0.3) !important; }
+
+/* --- PDF export color fix for Google Blue --- */
+.pdf-export table th, .pdf-print table th, .pdf-wrapper table th {
+    background: #1a73e8 !important;
+}
+.pdf-wrapper h2, .pdf-text h2, .pdf-print h2 { color: #1a73e8 !important; }
+
+/* --- Progress bar fill: Google gradient --- */
+.progress-bar-fill, .flashcard-progress-bar {
+    background: linear-gradient(90deg, #1a73e8, #34a853) !important;
+}
+
+/* --- Toast bar: Google color bars --- */
+.toast.success .toast-bar { background: linear-gradient(90deg, #34a853, #137333) !important; }
+.toast.error   .toast-bar { background: linear-gradient(90deg, #ea4335, #c5221f) !important; }
+.toast.warning .toast-bar { background: linear-gradient(90deg, #fbbc04, #f29900) !important; }
+
+/* --- Module card hover glow: Google blue tint --- */
+.module-card:hover {
+    box-shadow: 0 4px 12px rgba(26,115,232,0.2), 0 8px 28px rgba(26,115,232,0.10) !important;
+}
+
+/* --- Section separator: Google blue --- */
+.section-separator {
+    color: var(--primary) !important;
+    border-bottom-color: var(--border) !important;
+}
+
+/* --- Body h1 dashboard: Roboto font --- */
+#dashboardView h1, #submoduleView h1 {
+    font-family: 'Google Sans', 'Roboto', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.3px !important;
+}
+
+/* --- Icon buttons: Material icon button --- */
+.icon-btn {
+    border-radius: 50% !important;
+    transition: background 0.15s, transform 0.15s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+.icon-btn:hover {
+    background: rgba(26,115,232,0.12) !important;
+    color: var(--primary) !important;
+    border-color: transparent !important;
+    transform: scale(1.1) !important;
+}
+
+/* --- Menu items: Material list item --- */
+.menu-item:hover {
+    background: rgba(26,115,232,0.08) !important;
+    color: #1a73e8 !important;
+    transform: none !important;
+}
+
+/* --- Scroll buttons: Material FAB style --- */
+.scroll-btn {
+    border-radius: 16px !important;
+}
+.scroll-btn.active {
+    background: var(--primary) !important;
+    border-color: transparent !important;
+    box-shadow: 0 2px 8px rgba(26,115,232,0.35) !important;
+}
+
+/* --- Ebook cards --- */
+.ebook-card {
+    border-radius: 16px !important;
+}
+.ebook-card:hover {
+    box-shadow: 0 4px 16px rgba(26,115,232,0.15) !important;
+}
+
+/* --- Sidebar collapse button: Material shape --- */
+#sidebarCollapseBtn {
+    border-radius: 0 12px 12px 0 !important;
+}
+
+/* --- Dark mode inline code: softer Google tone --- */
+.dark .markdown-body :not(pre) > code {
+    background: rgba(138,180,248,0.10) !important;
+    color: #8ab4f8 !important;
+    border-radius: 4px !important;
+}
+
+/* --- Dark mode: submodule continue button --- */
+.dark .submodule-continue-btn {
+    background: rgba(138,180,248,0.10) !important;
+    border-color: #8ab4f8 !important;
+    color: #8ab4f8 !important;
+}
+.dark .submodule-continue-btn svg { stroke: #8ab4f8 !important; }
+.markdown-body :not(pre) > code {
+    background: #e8f0fe !important;
+    color: #1a73e8 !important;
+    border-radius: 4px !important;
+}
+
+/* Splash screen: Google color orbs */
+.splash-orb-1 {
+    background: radial-gradient(circle, rgba(66,133,244,0.35) 0%, transparent 70%) !important;
+}
+.splash-orb-2 {
+    background: radial-gradient(circle, rgba(52,168,83,0.3) 0%, transparent 70%) !important;
+}
+.splash-orb-3 {
+    background: radial-gradient(circle, rgba(251,188,4,0.2) 0%, transparent 70%) !important;
+}
+.splash-logo span {
+    background: linear-gradient(135deg, #4285f4, #34a853, #fbbc04, #ea4335) !important;
+    background-size: 300% !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+.splash-bar {
+    background: linear-gradient(90deg, #4285f4, #34a853, #fbbc04, #ea4335) !important;
+}
+.splash-bar::after {
+    background: #fbbc04 !important;
+    box-shadow: 0 0 16px 6px rgba(251,188,4,0.5) !important;
+}
+.splash-bg-grid {
+    background-image:
+        linear-gradient(rgba(66,133,244,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(66,133,244,0.07) 1px, transparent 1px) !important;
+}
+
     </style>
     <script src="https://js.puter.com/v2/"></script>
 </head>
@@ -2949,8 +3317,16 @@ body.book-mode .content-area.has-focus .card:hover {
     </button>
 
     <!-- Logo (hidden when breadcrumb is shown) -->
-    <div class="logo" id="headerLogo" onclick="showDashboard()">
-        <img src="https://cdn.jsdelivr.net/gh/anupamroy2021/Learning-Hub/logo.png" style="width:32px; height:32px; object-fit:contain;" alt="Logo"> <span>LEARNING HUB</span>
+    <div class="logo" id="headerLogo" onclick="showDashboard()" style="display:flex;align-items:center;gap:10px;">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="12" height="12" rx="3" fill="#4285F4"/>
+            <rect x="16" y="0" width="12" height="12" rx="3" fill="#EA4335"/>
+            <rect x="0" y="16" width="12" height="12" rx="3" fill="#34A853"/>
+            <rect x="16" y="16" width="12" height="12" rx="3" fill="#FBBC04"/>
+        </svg>
+        <span style="font-weight:700;letter-spacing:-0.5px;font-size:1rem;color:#202124;font-family:'Google Sans','Roboto',sans-serif;">
+            <span style="color:#4285F4">L</span><span style="color:#EA4335">e</span><span style="color:#FBBC04">a</span><span style="color:#4285F4">r</span><span style="color:#34A853">n</span><span style="color:#EA4335">i</span><span style="color:#4285F4">n</span><span style="color:#34A853">g</span>&nbsp;<span style="color:#4285F4">H</span><span style="color:#EA4335">u</span><span style="color:#FBBC04">b</span>
+        </span>
     </div>
 
     <!-- Breadcrumb (shown on questions page) -->
@@ -2963,6 +3339,25 @@ body.book-mode .content-area.has-focus .card:hover {
 
 <!-- RIGHT SIDE -->
 <div class="header-actions">
+
+    <!-- Home Button (Q&A page only) -->
+    <button id="headerHomeBtn"
+        onclick="showDashboard()"
+        title="Go to Home"
+        style="display:none; align-items:center; justify-content:center; gap:6px;
+               padding:7px 14px; border-radius:20px; border:1px solid var(--border);
+               background:var(--card); color:var(--text); cursor:pointer; font-size:0.82em;
+               font-weight:600; font-family:'Google Sans','Roboto',sans-serif;
+               transition:background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
+               flex-shrink:0;"
+        onmouseover="this.style.background='#e8f0fe';this.style.borderColor='#1a73e8';this.style.color='#1a73e8';"
+        onmouseout="this.style.background='var(--card)';this.style.borderColor='var(--border)';this.style.color='var(--text)';">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span class="btn-label">Home</span>
+    </button>
 
     <!-- Submodule Actions Submenu (questions page only) -->
     <div id="headerSubmoduleMenu" style="position:relative; display:none;">
@@ -4007,10 +4402,19 @@ function saveReadingState(entryId = null){
         time : Date.now()
     };
 
+    // Write global last-read (for "Continue Reading" dashboard button)
     localStorage.setItem(
         "learninghub_last_state",
         JSON.stringify(state)
     );
+
+    // Write per-submodule last-read map (for submodule card Continue buttons)
+    const key = currentModule + '||' + currentSubmodule;
+    let subStates = {};
+    try { subStates = JSON.parse(localStorage.getItem('learninghub_submodule_states') || '{}'); } catch(e) {}
+    subStates[key] = state;
+    localStorage.setItem('learninghub_submodule_states', JSON.stringify(subStates));
+
     scheduleAutoSync();
 }
 function toggleModuleDragLock(){
@@ -5194,6 +5598,7 @@ window.addEventListener("DOMContentLoaded", function(){
     document.getElementById('dashboardView').style.display = 'block';
     document.getElementById("hamburger").style.display = "none";
     document.getElementById('headerSubmoduleMenu').style.display = 'none';
+    var _hhb3 = document.getElementById('headerHomeBtn'); if(_hhb3) _hhb3.style.display = 'none';
     showHeaderBack(false);
     updateHeaderBreadcrumb(null, null);
 
@@ -5254,6 +5659,7 @@ window.addEventListener("DOMContentLoaded", function(){
 
     document.getElementById('hamburger').style.display = 'none';
     document.getElementById('headerSubmoduleMenu').style.display = 'none';
+    var _hhbgb = document.getElementById('headerHomeBtn'); if(_hhbgb) _hhbgb.style.display = 'none';
     showHeaderBack(false);
     updateHeaderBreadcrumb(null, null);
 
@@ -5297,6 +5703,7 @@ window.addEventListener("DOMContentLoaded", function(){
 
 		document.getElementById('hamburger').style.display = 'none';
     document.getElementById('headerSubmoduleMenu').style.display = 'none';
+    var _hhbsv = document.getElementById('headerHomeBtn'); if(_hhbsv) _hhbsv.style.display = 'none';
     showHeaderBack(true);
     updateHeaderBreadcrumb(currentModule, null);
 
@@ -5323,6 +5730,7 @@ function openSubmodule(name) {
     document.getElementById('moduleWorkspace').style.display = 'flex';
     document.getElementById('hamburger').style.display = 'block';
     document.getElementById('headerSubmoduleMenu').style.display = 'block';
+    var _hhb = document.getElementById('headerHomeBtn'); if(_hhb) _hhb.style.display = 'inline-flex';
     showHeaderBack(true);
     updateHeaderBreadcrumb(currentModule, name);
 
@@ -5393,6 +5801,7 @@ function openSubmodule(name) {
         document.getElementById('listView').style.display = 'block';
         document.getElementById('formView').style.display = 'none';
         document.getElementById('headerSubmoduleMenu').style.display = 'block';
+        var _hhb2 = document.getElementById('headerHomeBtn'); if(_hhb2) _hhb2.style.display = 'inline-flex';
         showHeaderBack(true);
         updateHeaderBreadcrumb(currentModule, currentSubmodule);
         document.body.classList.add('on-qa-page');
@@ -5708,6 +6117,7 @@ function goToPreviousSearchMatch(){
         document.getElementById('listView').style.display = 'none';
         document.getElementById('formView').style.display = 'flex';
         document.getElementById('headerSubmoduleMenu').style.display = 'none';
+        var _hhboe = document.getElementById('headerHomeBtn'); if(_hhboe) _hhboe.style.display = 'none';
         showHeaderBack(true);
         updateHeaderBreadcrumb(currentModule, currentSubmodule);
 
@@ -5853,6 +6263,7 @@ if(sub){
             onConfirm: () => {
                 data[currentModule][currentSubmodule] = data[currentModule][currentSubmodule].filter(i => i.id != id);
                 save(); renderSidebarIndex(); renderQuestions();
+                showToast('Entry deleted', 'warning', '🗑');
             }
         });
     }
@@ -6511,6 +6922,10 @@ function initModuleSortable(){
         return;
     }
 
+    // Load per-submodule saved states once for all cards
+    let _subStates = {};
+    try { _subStates = JSON.parse(localStorage.getItem('learninghub_submodule_states') || '{}'); } catch(e) {}
+
     subKeys.forEach((s, idx) => {
 
         const card = document.createElement('div');
@@ -6526,6 +6941,23 @@ function initModuleSortable(){
         const readCount = masteredCount + learningCount;
         const mastPct = itemCount ? Math.round((readCount / itemCount) * 100) : 0;
 
+        // Per-submodule saved position
+        const stateKey = currentModule + '||' + s;
+        const savedSub = _subStates[stateKey] || null;
+        const hasLastRead = !!(savedSub && savedSub.entryId);
+
+        const lastReadTime = hasLastRead && savedSub.time ? (() => {
+            const secs = Math.floor((Date.now() - savedSub.time) / 1000);
+            if (secs < 60) return 'just now';
+            const m = Math.floor(secs / 60); if (m < 60) return m + 'm ago';
+            const h = Math.floor(m / 60); if (h < 24) return h + 'h ago';
+            return Math.floor(h / 24) + 'd ago';
+        })() : '';
+
+        const lastReadLabel = hasLastRead && savedSub.question
+            ? savedSub.question.replace(/</g, '&lt;').replace(/>/g, '&gt;').slice(0, 45) + (savedSub.question.length > 45 ? '…' : '')
+            : '';
+
         card.innerHTML = `
         <div class="module-card-banner" style="background: ${gradient};">
             <div class="module-card-icon">${icon}</div>
@@ -6539,6 +6971,17 @@ function initModuleSortable(){
             ${itemCount > 0 ? `<div style="margin-top:8px; height:4px; background:var(--border); border-radius:4px; overflow:hidden;">
                 <div class="submodule-progress-bar" data-submodule-bar="${s}" style="height:100%; width:${mastPct}%; background:linear-gradient(90deg,#22c55e,#16a34a); border-radius:4px; transition:width 0.5s;"></div>
             </div>` : ''}
+            ${hasLastRead ? `
+            <button class="submodule-continue-btn" onclick="event.stopPropagation(); resumeSubmoduleReading('${s.replace(/'/g, "\\'")}');"
+                title="${lastReadLabel ? 'Continue from: ' + lastReadLabel : 'Continue reading'}"
+                style="margin-top:10px; width:100%; display:flex; align-items:center; gap:7px;
+                       padding:7px 12px; border-radius:20px; border:1.5px solid #1a73e8;
+                       background:#e8f0fe; color:#1a73e8; cursor:pointer; font-size:0.75em;
+                       font-weight:600; font-family:'Google Sans','Roboto',sans-serif;
+                       transition:background 0.18s, box-shadow 0.18s; text-align:left; white-space:nowrap; overflow:hidden;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span style="overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;">Continue${lastReadTime ? ' · <span style="opacity:0.65;font-weight:400;">' + lastReadTime + '</span>' : ''}</span>
+            </button>` : ''}
         </div>`;
 
         card.onclick = () => openSubmodule(s);
@@ -7477,6 +7920,28 @@ function resumeLastReading(){
         },400);
 
     },400);
+}
+
+function resumeSubmoduleReading(submoduleName) {
+    let subStates = {};
+    try { subStates = JSON.parse(localStorage.getItem('learninghub_submodule_states') || '{}'); } catch(e) {}
+    const stateKey = currentModule + '||' + submoduleName;
+    const savedSub = subStates[stateKey] || null;
+
+    if (!savedSub || !savedSub.entryId) {
+        // No saved position — just open normally
+        openSubmodule(submoduleName);
+        return;
+    }
+    openSubmodule(submoduleName);
+    setTimeout(() => {
+        showListView();
+        setTimeout(() => {
+            if (savedSub.entryId) scrollToQuestion(savedSub.entryId);
+            const area = document.querySelector('.content-area');
+            if (area && savedSub.scrollTop) area.scrollTop = savedSub.scrollTop;
+        }, 400);
+    }, 400);
 }
 function showResumePopup(){
     const state = JSON.parse(localStorage.getItem("learninghub_last_state"));
@@ -9048,6 +9513,7 @@ async function pushToCloud(silent = false) {
         ebook_data    : ebooks,
         video_data    : videos,
         last_state    : JSON.parse(localStorage.getItem('learninghub_last_state') || 'null'),
+        submodule_states : JSON.parse(localStorage.getItem('learninghub_submodule_states') || '{}'),
         mastery_data  : JSON.parse(localStorage.getItem('lh_mastery') || '{}'),
         streak_data   : JSON.parse(localStorage.getItem('lh_streak') || '{"dates":[],"best":0}'),
         view_counts   : JSON.parse(localStorage.getItem('lh_view_counts') || '{}'),
@@ -9184,6 +9650,9 @@ async function pullFromCloud(silent = false) {
         }
         if (parsed.last_state) {
             localStorage.setItem('learninghub_last_state', JSON.stringify(parsed.last_state));
+        }
+        if (parsed.submodule_states) {
+            localStorage.setItem('learninghub_submodule_states', JSON.stringify(parsed.submodule_states));
         }
         if (parsed.mastery_data) {
             masteryData = parsed.mastery_data;
@@ -9625,6 +10094,7 @@ function copyCard(btn, itemId) {
         btn.classList.add('copy-success');
         const icon = btn.querySelector('i');
         if (icon) { icon.setAttribute('data-lucide', 'check'); lucide.createIcons(); }
+        showToast('Copied to clipboard', 'success', '📋');
         setTimeout(() => {
             btn.classList.remove('copy-success');
             if (icon) { icon.setAttribute('data-lucide', 'copy'); lucide.createIcons(); }
@@ -9639,6 +10109,7 @@ function copyCard(btn, itemId) {
         document.execCommand('copy');
         document.body.removeChild(ta);
         btn.classList.add('copy-success');
+        showToast('Copied to clipboard', 'success', '📋');
         setTimeout(() => btn.classList.remove('copy-success'), 1800);
     });
 }
@@ -9800,14 +10271,7 @@ var _origSave = typeof save === 'function' ? save : null;
         }
     };
 
-    // Patch deleteEntry if it exists
-    var _origDeleteEntry = window.deleteEntry;
-    if (_origDeleteEntry) {
-        window.deleteEntry = function() {
-            _origDeleteEntry.apply(this, arguments);
-            showToast('Entry deleted', 'warning', '🗑');
-        };
-    }
+    // deleteEntry toast is handled inside the onConfirm callback directly in deleteEntry()
 
     // Patch exportData
     var _origExportData = window.exportData;
