@@ -879,6 +879,13 @@ blockquote{
         justify-content: center !important;
         font-size: 1rem !important;
         flex-shrink: 0 !important;
+        gap: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+    }
+    /* Hide the "Continue" label text — keep only the ▶ icon */
+    #continueReadingBtn #continueReadingLabel {
+        display: none !important;
     }
 
     /* Streak widget: compact */
@@ -3207,6 +3214,27 @@ header {
     color: #8ab4f8 !important;
 }
 .dark .submodule-continue-btn svg { stroke: #8ab4f8 !important; }
+
+/* --- Mobile: continue button icon only, no text --- */
+@media (max-width: 600px) {
+    .submodule-continue-btn {
+        width: 36px !important;
+        min-width: 36px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        justify-content: center !important;
+        gap: 0 !important;
+        align-self: flex-end !important;
+        margin-top: 8px !important;
+    }
+    .submodule-continue-btn span {
+        display: none !important;
+    }
+    .submodule-continue-btn svg {
+        width: 15px !important;
+        height: 15px !important;
+    }
+}
 .markdown-body :not(pre) > code {
     background: #e8f0fe !important;
     color: #1a73e8 !important;
@@ -3325,12 +3353,7 @@ header {
 
     <!-- Logo (hidden when breadcrumb is shown) -->
     <div class="logo" id="headerLogo" onclick="showDashboard()" style="display:flex;align-items:center;gap:10px;">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0" y="0" width="12" height="12" rx="3" fill="#4285F4"/>
-            <rect x="16" y="0" width="12" height="12" rx="3" fill="#EA4335"/>
-            <rect x="0" y="16" width="12" height="12" rx="3" fill="#34A853"/>
-            <rect x="16" y="16" width="12" height="12" rx="3" fill="#FBBC04"/>
-        </svg>
+        <img src="https://cdn.jsdelivr.net/gh/anupamroy2021/Learning-Hub/logo.png" alt="Learning Hub Logo" width="28" height="28" style="object-fit:contain;border-radius:6px;">
         <span style="font-weight:700;letter-spacing:-0.5px;font-size:1rem;color:#202124;font-family:'Google Sans','Roboto',sans-serif;">
             <span style="color:#4285F4">L</span><span style="color:#EA4335">e</span><span style="color:#FBBC04">a</span><span style="color:#4285F4">r</span><span style="color:#34A853">n</span><span style="color:#EA4335">i</span><span style="color:#4285F4">n</span><span style="color:#34A853">g</span>&nbsp;<span style="color:#4285F4">H</span><span style="color:#EA4335">u</span><span style="color:#FBBC04">b</span>
         </span>
